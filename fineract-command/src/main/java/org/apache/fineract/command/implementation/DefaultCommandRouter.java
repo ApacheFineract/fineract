@@ -43,8 +43,8 @@ public class DefaultCommandRouter implements CommandRouter {
         if (command == null) {
             throw new CommandHandlerNotFoundException(command);
         }
-
-        return commandHandlers.stream().filter(handler -> handler.matches(command)).findFirst()
+        CommandHandler<REQ, RES> commandHandler = commandHandlers.stream().filter(handler -> handler.matches(command)).findFirst()
                 .orElseThrow(() -> new CommandHandlerNotFoundException(command));
+        return commandHandler;
     }
 }
