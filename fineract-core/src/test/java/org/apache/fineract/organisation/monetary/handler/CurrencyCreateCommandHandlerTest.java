@@ -1,15 +1,12 @@
 package org.apache.fineract.organisation.monetary.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.organisation.monetary.domain.CreateCurrency;
 import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -60,5 +56,4 @@ class CurrencyCreateCommandHandlerTest {
 			assertThat(underTest.handle(command)).isEqualTo(element);
 		}
 	}
-
 }
