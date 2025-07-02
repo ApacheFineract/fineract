@@ -90,12 +90,12 @@ public class CurrenciesApiResource {
     @Operation(summary = "Inserts a new currency to the Fineract Platform", description = "Inserts a new currency to the Fineract Platform.")
     public Response createCurrencies(CurrencyData request) {
         final var command = new CurrencyCreateCommand();
-        final Set<Integer> ALLOWED_DECIMAL_PLACES_VALUES = Set.of(0, 1, 2, 3);
+        final Set<Integer> ALLOWED_DECIMAL_PLACES_VALUES = Set.of(0, 1, 2, 3, 4, 5);
         
-        // Case where the currency code is not == 3
-        if(request.getCode().length() != 3) {
+        // Case where the currency code is not an alphabet == 3
+        if(request.getCode().matches("^[A-Z]{3}$")) {
         	 return Response.status(Response.Status.CONFLICT)
-               .entity("Currency Code should be 3 characters long.").build();
+               .entity("Currency Code should be non-null, 3 characters long, non-numeric and uppercase.").build();
         }
         
         // Case where the currency code does not match the currency Name Code
