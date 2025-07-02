@@ -88,6 +88,7 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
     	CreateCurrency currency = CreateCurrency.fromCurrencyData(request);
 			CreateCurrency savedResults = createCurrencyRepository.save(currency);
 			CurrencyData finalResults = CreateCurrency.toCurrencyData(savedResults);
+			
 			return finalResults;
 		}
 }

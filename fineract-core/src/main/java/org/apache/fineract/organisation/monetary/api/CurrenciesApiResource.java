@@ -27,8 +27,11 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -85,8 +88,40 @@ public class CurrenciesApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Inserts a new currency to the Fineract Platform", description = "Inserts a new currency to the Fineract Platform.")
-    public CurrencyData createCurrencies(CurrencyData request) {
+    public Response createCurrencies(CurrencyData request) {
         final var command = new CurrencyCreateCommand();
+        final Set<Integer> ALLOWED_DECIMAL_PLACES_VALUES = Set.of(0, 1, 2, 3);
+        
+        // Case where the currency code is not == 3
+        if(request.getCode().length() != 3) {
+        	 return Response.status(Response.Status.CONFLICT)
+               .entity("Currency Code should be 3 characters long.").build();
+        }
+        
+        // Case where the currency code does not match the currency Name Code
+        // e.g. AAA != currency.BBB
+        String[] nameCodeParts = request.getNameCode().trim().split("\\.");
+        if (nameCodeParts.length < 2 || !request.getCode().trim().equals(nameCodeParts[1].trim())) {
+            return Response.status(Response.Status.CONFLICT)
+                .entity("Currency Code does not match NameCode currency suffix.").build();
+        }
+        
+        // Check if the decimal places are within 0,1,2,3
+        if (!ALLOWED_DECIMAL_PLACES_VALUES.contains(request.getDecimalPlaces())){
+          return Response.status(Response.Status.CONFLICT)
+              .entity("Decimal Places allowed are from 0 to 3").build();
+        }
+        
+        // Check if this is a duplicate request. Query Database
+        // if present return response.
+        CurrencyConfigurationData retrievedCurrencies = readPlatformService.retrieveCurrencyConfiguration();
+        Set<String> currencyCodes = retrievedCurrencies.getCurrencyOptions().stream()
+        		.map(element -> element.getCode().trim()).collect(Collectors.toSet());
+       
+        if(currencyCodes.contains(request.getCode())) {
+        	return Response.status(Response.Status.CONFLICT)
+        			.entity("Duplicate Request. Request cannot be accepted as the currency is already present in the system.").build();
+        }
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
@@ -94,6 +129,6 @@ public class CurrenciesApiResource {
 
         final Supplier<CurrencyData> response = commandPipeline.send(command);
 
-        return response.get();
+        return Response.status(Response.Status.CREATED).entity(response.get()).build();
     }
 }

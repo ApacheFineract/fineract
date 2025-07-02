@@ -25,6 +25,6 @@ import org.apache.fineract.organisation.monetary.data.CurrencyUpdateResponse;
 public interface CurrencyWritePlatformService {
 
     CurrencyUpdateResponse updateAllowedCurrencies(CurrencyUpdateRequest request);
-    
+
     CurrencyData createCurrency (CurrencyData request);
 }
