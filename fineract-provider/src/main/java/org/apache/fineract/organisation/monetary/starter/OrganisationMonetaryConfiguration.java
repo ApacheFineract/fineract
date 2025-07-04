@@ -47,10 +47,11 @@ public class OrganisationMonetaryConfiguration {
     @Bean
     @ConditionalOnMissingBean(CurrencyWritePlatformService.class)
     CurrencyWritePlatformService currencyWritePlatformService(ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository,
-            OrganisationCurrencyRepository organisationCurrencyRepository, CreateCurrencyRepository createCurrencyRepository,LoanProductReadPlatformService loanProductService,
-            SavingsProductReadPlatformService savingsProductService, ChargeReadPlatformService chargeService) {
-        return new CurrencyWritePlatformServiceJpaRepositoryImpl(applicationCurrencyRepository, organisationCurrencyRepository, createCurrencyRepository,
-                loanProductService, savingsProductService, chargeService);
+            OrganisationCurrencyRepository organisationCurrencyRepository, CreateCurrencyRepository createCurrencyRepository,
+            LoanProductReadPlatformService loanProductService, SavingsProductReadPlatformService savingsProductService,
+            ChargeReadPlatformService chargeService) {
+        return new CurrencyWritePlatformServiceJpaRepositoryImpl(applicationCurrencyRepository, organisationCurrencyRepository,
+                createCurrencyRepository, loanProductService, savingsProductService, chargeService);
     }
 
     @Bean

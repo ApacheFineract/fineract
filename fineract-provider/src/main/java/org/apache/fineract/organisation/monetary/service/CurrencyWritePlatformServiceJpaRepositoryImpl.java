@@ -83,32 +83,32 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
     }
 
     @Transactional
-		@Override
-		public CurrencyData createCurrency(CurrencyData request) {
-    	validate(request);
-    	
-    	CreateCurrency currency = CreateCurrency.fromCurrencyData(request);
-			CreateCurrency savedResults = createCurrencyRepository.save(currency);
-			CurrencyData finalResults = CreateCurrency.toCurrencyData(savedResults);
-			
-			return finalResults;
-		}
-    
+    @Override
+    public CurrencyData createCurrency(CurrencyData request) {
+        validate(request);
+
+        CreateCurrency currency = CreateCurrency.fromCurrencyData(request);
+        CreateCurrency savedResults = createCurrencyRepository.save(currency);
+        CurrencyData finalResults = CreateCurrency.toCurrencyData(savedResults);
+
+        return finalResults;
+    }
+
     private void validate(CurrencyData data) {
-      if (data == null) {
-          throw new IllegalArgumentException("Currency data must not be null.");
-      }
+        if (data == null) {
+            throw new IllegalArgumentException("Currency data must not be null.");
+        }
 
-      if (data.getCode() == null || !data.getCode().matches("^[A-Z]{3}$")) {
-          throw new IllegalArgumentException("Currency code must be exactly 3 uppercase letters.");
-      }
+        if (data.getCode() == null || !data.getCode().matches("^[A-Z]{3}$")) {
+            throw new IllegalArgumentException("Currency code must be exactly 3 uppercase letters.");
+        }
 
-      if (data.getName() == null || data.getName().trim().isEmpty()) {
-          throw new IllegalArgumentException("Currency name must not be empty.");
-      }
+        if (data.getName() == null || data.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Currency name must not be empty.");
+        }
 
-      if (data.getDecimalPlaces() < 0 || data.getDecimalPlaces() > 5) {
-          throw new IllegalArgumentException("Decimal places must be between 0 and 3.");
-      }
-  }
+        if (data.getDecimalPlaces() < 0 || data.getDecimalPlaces() > 5) {
+            throw new IllegalArgumentException("Decimal places must be between 0 and 3.");
+        }
+    }
 }
