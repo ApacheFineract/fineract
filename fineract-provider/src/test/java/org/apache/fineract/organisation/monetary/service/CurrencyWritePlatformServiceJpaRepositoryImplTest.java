@@ -1,7 +1,28 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.fineract.organisation.monetary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.List;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -14,63 +35,55 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class CurrencyWritePlatformServiceJpaRepositoryImplTest {
 
-	private List<CurrencyData> currenciesGood;
-	private List<CurrencyData> currenciesCorrupted;
+    private List<CurrencyData> currenciesGood;
+    private List<CurrencyData> currenciesCorrupted;
 
-	@InjectMocks
-	private CurrencyWritePlatformServiceJpaRepositoryImpl underTest;
+    @InjectMocks
+    private CurrencyWritePlatformServiceJpaRepositoryImpl underTest;
 
-	@Mock
-	private CreateCurrencyRepository createCurrencyRepository;
+    @Mock
+    private CreateCurrencyRepository createCurrencyRepository;
 
-	@BeforeEach
-	void setUp() throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
-		InputStream inputStream = getClass().getClassLoader()
-				.getResourceAsStream("test-resources/currenciesGoodData.json");
+    @BeforeEach
+    void setUp() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test-resources/currenciesGoodData.json");
 
-		currenciesGood = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {
-		});
+        currenciesGood = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {});
 
-		inputStream = getClass().getClassLoader()
-				.getResourceAsStream("test-resources/currenciesCorruptedData.json");
+        inputStream = getClass().getClassLoader().getResourceAsStream("test-resources/currenciesCorruptedData.json");
 
-		currenciesCorrupted = objectMapper.readValue(inputStream,
-				new TypeReference<List<CurrencyData>>() {
-				});
-	}
+        currenciesCorrupted = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {});
+    }
 
-	@Test
-	void testHappyPathForGoodData() {
-		System.out.println("Currency Happy Path");
-		for (CurrencyData element : currenciesGood) {
-			CreateCurrency currency = CreateCurrency.fromCurrencyData(element);
-			Mockito.when(createCurrencyRepository.save(Mockito.refEq(currency))).thenReturn(currency);
-			System.out.println("Currently Testing: " + element.getCode() + " Currency.");
-			System.out.println();
-			assertThat(underTest.createCurrency(element)).isEqualTo(element);
-		}
-	}
+    @Test
+    void testHappyPathForGoodData() {
+        System.out.println("Currency Happy Path");
+        for (CurrencyData element : currenciesGood) {
+            CreateCurrency currency = CreateCurrency.fromCurrencyData(element);
+            Mockito.when(createCurrencyRepository.save(Mockito.refEq(currency))).thenReturn(currency);
+            System.out.println("Currently Testing: " + element.getCode() + " Currency.");
+            System.out.println();
+            assertThat(underTest.createCurrency(element)).isEqualTo(element);
+        }
+    }
 
-	@Test
-	void testCorruptedDataShouldThrowException() {
-		System.out.println("Currency Corrupted Data");
+    @Test
+    void testCorruptedDataShouldThrowException() {
+        System.out.println("Currency Corrupted Data");
 
-		for (CurrencyData element : currenciesCorrupted) {
-			System.out.println("Currently Testing: " + element.getCode() + " Currency.");
+        for (CurrencyData element : currenciesCorrupted) {
+            System.out.println("Currently Testing: " + element.getCode() + " Currency.");
 
-			Throwable thrown = assertThrows(Throwable.class, () -> {
-				underTest.createCurrency(element);
-			});
-			System.out
-					.println("Caught: " + thrown.getClass().getSimpleName() + " - " + thrown.getMessage());
-			System.out.println();
-		}
-	}
+            Throwable thrown = assertThrows(Throwable.class, () -> {
+                underTest.createCurrency(element);
+            });
+            System.out.println("Caught: " + thrown.getClass().getSimpleName() + " - " + thrown.getMessage());
+            System.out.println();
+        }
+    }
 }
