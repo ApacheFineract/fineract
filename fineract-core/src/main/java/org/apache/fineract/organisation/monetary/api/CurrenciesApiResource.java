@@ -93,8 +93,8 @@ public class CurrenciesApiResource {
         final Set<Integer> ALLOWED_DECIMAL_PLACES_VALUES = Set.of(0, 1, 2, 3, 4, 5);
         
         // Case where the currency code is not an alphabet == 3
-        if(request.getCode().matches("^[A-Z]{3}$")) {
-        	 return Response.status(Response.Status.CONFLICT)
+        if(!request.getCode().matches("^[A-Z]{3}$")) {
+        	 return Response.status(Response.Status.BAD_REQUEST)
                .entity("Currency Code should be non-null, 3 characters long, non-numeric and uppercase.").build();
         }
         
@@ -102,13 +102,13 @@ public class CurrenciesApiResource {
         // e.g. AAA != currency.BBB
         String[] nameCodeParts = request.getNameCode().trim().split("\\.");
         if (nameCodeParts.length < 2 || !request.getCode().trim().equals(nameCodeParts[1].trim())) {
-            return Response.status(Response.Status.CONFLICT)
+            return Response.status(Response.Status.BAD_REQUEST)
                 .entity("Currency Code does not match NameCode currency suffix.").build();
         }
         
         // Check if the decimal places are within 0,1,2,3
         if (!ALLOWED_DECIMAL_PLACES_VALUES.contains(request.getDecimalPlaces())){
-          return Response.status(Response.Status.CONFLICT)
+          return Response.status(Response.Status.BAD_REQUEST)
               .entity("Decimal Places allowed are from 0 to 3").build();
         }
         
@@ -119,7 +119,7 @@ public class CurrenciesApiResource {
         		.map(element -> element.getCode().trim()).collect(Collectors.toSet());
        
         if(currencyCodes.contains(request.getCode())) {
-        	return Response.status(Response.Status.CONFLICT)
+        	return Response.status(Response.Status.BAD_REQUEST)
         			.entity("Duplicate Request. Request cannot be accepted as the currency is already present in the system.").build();
         }
 
