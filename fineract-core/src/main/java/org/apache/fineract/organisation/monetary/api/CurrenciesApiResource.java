@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.organisation.monetary.api;
 
+import com.google.common.base.Splitter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -28,6 +29,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -83,7 +85,7 @@ public class CurrenciesApiResource {
 
         return response.get();
     }
-    
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -91,36 +93,35 @@ public class CurrenciesApiResource {
     public Response createCurrencies(CurrencyData request) {
         final var command = new CurrencyCreateCommand();
         final Set<Integer> ALLOWED_DECIMAL_PLACES_VALUES = Set.of(0, 1, 2, 3, 4, 5);
-        
+
         // Case where the currency code is not an alphabet == 3
-        if(!request.getCode().matches("^[A-Z]{3}$")) {
-        	 return Response.status(Response.Status.BAD_REQUEST)
-               .entity("Currency Code should be non-null, 3 characters long, non-numeric and uppercase.").build();
+        if (!request.getCode().matches("^[A-Z]{3}$")) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Currency Code should be non-null, 3 characters long, non-numeric and uppercase.").build();
         }
-        
+
         // Case where the currency code does not match the currency Name Code
         // e.g. AAA != currency.BBB
-        String[] nameCodeParts = request.getNameCode().trim().split("\\.");
-        if (nameCodeParts.length < 2 || !request.getCode().trim().equals(nameCodeParts[1].trim())) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                .entity("Currency Code does not match NameCode currency suffix.").build();
+        // String[] nameCodeParts = request.getNameCode().trim().split("\\.");
+        List<String> nameCodeParts = Splitter.on('.').splitToList(request.getNameCode().trim());
+        if (nameCodeParts.size() < 2 || !request.getCode().trim().equals(nameCodeParts.get(1).trim())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Currency Code does not match NameCode currency suffix.").build();
         }
-        
+
         // Check if the decimal places are within 0,1,2,3
-        if (!ALLOWED_DECIMAL_PLACES_VALUES.contains(request.getDecimalPlaces())){
-          return Response.status(Response.Status.BAD_REQUEST)
-              .entity("Decimal Places allowed are from 0 to 3").build();
+        if (!ALLOWED_DECIMAL_PLACES_VALUES.contains(request.getDecimalPlaces())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Decimal Places allowed are from 0 to 3").build();
         }
-        
+
         // Check if this is a duplicate request. Query Database
         // if present return response.
         CurrencyConfigurationData retrievedCurrencies = readPlatformService.retrieveCurrencyConfiguration();
-        Set<String> currencyCodes = retrievedCurrencies.getCurrencyOptions().stream()
-        		.map(element -> element.getCode().trim()).collect(Collectors.toSet());
-       
-        if(currencyCodes.contains(request.getCode())) {
-        	return Response.status(Response.Status.BAD_REQUEST)
-        			.entity("Duplicate Request. Request cannot be accepted as the currency is already present in the system.").build();
+        Set<String> currencyCodes = retrievedCurrencies.getCurrencyOptions().stream().map(element -> element.getCode().trim())
+                .collect(Collectors.toSet());
+
+        if (currencyCodes.contains(request.getCode())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Duplicate Request. Request cannot be accepted as the currency is already present in the system.").build();
         }
 
         command.setId(UUID.randomUUID());

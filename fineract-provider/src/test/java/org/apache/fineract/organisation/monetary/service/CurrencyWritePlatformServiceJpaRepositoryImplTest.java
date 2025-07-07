@@ -39,51 +39,44 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CurrencyWritePlatformServiceJpaRepositoryImplTest {
 
-    private List<CurrencyData> currenciesGood;
-    private List<CurrencyData> currenciesCorrupted;
+  private List<CurrencyData> currenciesGood;
+  private List<CurrencyData> currenciesCorrupted;
 
-    @InjectMocks
-    private CurrencyWritePlatformServiceJpaRepositoryImpl underTest;
+  @InjectMocks
+  private CurrencyWritePlatformServiceJpaRepositoryImpl underTest;
 
-    @Mock
-    private CreateCurrencyRepository createCurrencyRepository;
+  @Mock
+  private CreateCurrencyRepository createCurrencyRepository;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test-resources/currenciesGoodData.json");
+  @BeforeEach
+  void setUp() throws Exception {
+    ObjectMapper objectMapper = new ObjectMapper();
+    InputStream inputStream = getClass().getClassLoader()
+        .getResourceAsStream("test-resources/currenciesGoodData.json");
+    currenciesGood = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {
+    });
+    inputStream = getClass().getClassLoader()
+        .getResourceAsStream("test-resources/currenciesCorruptedData.json");
+    currenciesCorrupted = objectMapper.readValue(inputStream,
+        new TypeReference<List<CurrencyData>>() {
+        });
+  }
 
-        currenciesGood = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {});
-
-        inputStream = getClass().getClassLoader().getResourceAsStream("test-resources/currenciesCorruptedData.json");
-
-        currenciesCorrupted = objectMapper.readValue(inputStream, new TypeReference<List<CurrencyData>>() {});
+  @Test
+  void testHappyPathForGoodData() {
+    for (CurrencyData element : currenciesGood) {
+      CreateCurrency currency = CreateCurrency.fromCurrencyData(element);
+      Mockito.when(createCurrencyRepository.save(Mockito.refEq(currency))).thenReturn(currency);
+      assertThat(underTest.createCurrency(element)).isEqualTo(element);
     }
+  }
 
-    @Test
-    void testHappyPathForGoodData() {
-        System.out.println("Currency Happy Path");
-        for (CurrencyData element : currenciesGood) {
-            CreateCurrency currency = CreateCurrency.fromCurrencyData(element);
-            Mockito.when(createCurrencyRepository.save(Mockito.refEq(currency))).thenReturn(currency);
-            System.out.println("Currently Testing: " + element.getCode() + " Currency.");
-            System.out.println();
-            assertThat(underTest.createCurrency(element)).isEqualTo(element);
-        }
+  @Test
+  void testCorruptedDataShouldThrowException() {
+    for (CurrencyData element : currenciesCorrupted) {
+      Throwable thrown = assertThrows(Throwable.class, () -> {
+        underTest.createCurrency(element);
+      });
     }
-
-    @Test
-    void testCorruptedDataShouldThrowException() {
-        System.out.println("Currency Corrupted Data");
-
-        for (CurrencyData element : currenciesCorrupted) {
-            System.out.println("Currently Testing: " + element.getCode() + " Currency.");
-
-            Throwable thrown = assertThrows(Throwable.class, () -> {
-                underTest.createCurrency(element);
-            });
-            System.out.println("Caught: " + thrown.getClass().getSimpleName() + " - " + thrown.getMessage());
-            System.out.println();
-        }
-    }
+  }
 }

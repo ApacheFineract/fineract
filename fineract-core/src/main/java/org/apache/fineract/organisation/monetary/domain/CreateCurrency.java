@@ -37,46 +37,37 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 @Entity
 @Table(name = "m_currency")
 public class CreateCurrency extends AbstractPersistableCustom<Long> {
-	private static final long serialVersionUID = 1L;
 
-	@Column(name = "code", nullable = false, length = 3)
-  public String code;
+    private static final long serialVersionUID = 1L;
 
-  @Column(name = "name", nullable = false, length = 50)
-  public String name;
+    @Column(name = "code", nullable = false, length = 3)
+    public String code;
 
-  @Column(name = "decimal_places", nullable = false)
-  public Integer decimalPlaces;
+    @Column(name = "name", nullable = false, length = 50)
+    public String name;
 
-  @Column(name = "currency_multiplesof")
-  public Integer inMultiplesOf;
+    @Column(name = "decimal_places", nullable = false)
+    public Integer decimalPlaces;
 
-  @Column(name = "display_symbol", nullable = true, length = 10)
-  public String displaySymbol;
+    @Column(name = "currency_multiplesof")
+    public Integer inMultiplesOf;
 
-  @Column(name = "internationalized_name_code", nullable = false, length = 50)
-  public String nameCode;
+    @Column(name = "display_symbol", nullable = true, length = 10)
+    public String displaySymbol;
 
-  public static CreateCurrency fromCurrencyData(CurrencyData currencyData) {
-  	return CreateCurrency.builder()
-  			.code(currencyData.getCode())
-  			.name(currencyData.getName())
-  			.decimalPlaces(currencyData.getDecimalPlaces())
-  			.inMultiplesOf(currencyData.getInMultiplesOf())
-  			.displaySymbol(currencyData.getDisplaySymbol())
-  			.nameCode(currencyData.getNameCode())
-  			.build();
-  }
+    @Column(name = "internationalized_name_code", nullable = false, length = 50)
+    public String nameCode;
 
-  public static CurrencyData toCurrencyData(CreateCurrency createCurrencyData) {
-  	return CurrencyData.builder()
-  			.code(createCurrencyData.getCode())
-  			.name(createCurrencyData.getName())
-  			.decimalPlaces(createCurrencyData.getDecimalPlaces())
-  			.inMultiplesOf(createCurrencyData.getInMultiplesOf())
-  			.displaySymbol(createCurrencyData.getDisplaySymbol())
-  			.nameCode(createCurrencyData.getNameCode())
-  			.build();
-  }
+    public static CreateCurrency fromCurrencyData(CurrencyData currencyData) {
+        return CreateCurrency.builder().code(currencyData.getCode()).name(currencyData.getName())
+                .decimalPlaces(currencyData.getDecimalPlaces()).inMultiplesOf(currencyData.getInMultiplesOf())
+                .displaySymbol(currencyData.getDisplaySymbol()).nameCode(currencyData.getNameCode()).build();
+    }
+
+    public static CurrencyData toCurrencyData(CreateCurrency createCurrencyData) {
+        return CurrencyData.builder().code(createCurrencyData.getCode()).name(createCurrencyData.getName())
+                .decimalPlaces(createCurrencyData.getDecimalPlaces()).inMultiplesOf(createCurrencyData.getInMultiplesOf())
+                .displaySymbol(createCurrencyData.getDisplaySymbol()).nameCode(createCurrencyData.getNameCode()).build();
+    }
 
 }

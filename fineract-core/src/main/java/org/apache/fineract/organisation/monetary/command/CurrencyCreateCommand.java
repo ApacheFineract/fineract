@@ -26,5 +26,6 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CurrencyCreateCommand extends Command<CurrencyData> {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 }

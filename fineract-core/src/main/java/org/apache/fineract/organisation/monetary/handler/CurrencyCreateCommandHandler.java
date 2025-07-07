@@ -30,14 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CurrencyCreateCommandHandler implements CommandHandler<CurrencyData, CurrencyData>{
+public class CurrencyCreateCommandHandler implements CommandHandler<CurrencyData, CurrencyData> {
 
-	private final CurrencyWritePlatformService writePlatformService;
+    private final CurrencyWritePlatformService writePlatformService;
 
-	@Transactional
-	@Override
-	public CurrencyData handle(Command<CurrencyData> command) {
-		return writePlatformService.createCurrency(command.getPayload());
-	}
+    @Transactional
+    @Override
+    public CurrencyData handle(Command<CurrencyData> command) {
+        return writePlatformService.createCurrency(command.getPayload());
+    }
 
 }

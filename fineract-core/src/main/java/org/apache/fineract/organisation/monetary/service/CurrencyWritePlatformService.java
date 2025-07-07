@@ -26,5 +26,5 @@ public interface CurrencyWritePlatformService {
 
     CurrencyUpdateResponse updateAllowedCurrencies(CurrencyUpdateRequest request);
 
-    CurrencyData createCurrency (CurrencyData request);
+    CurrencyData createCurrency(CurrencyData request);
 }
