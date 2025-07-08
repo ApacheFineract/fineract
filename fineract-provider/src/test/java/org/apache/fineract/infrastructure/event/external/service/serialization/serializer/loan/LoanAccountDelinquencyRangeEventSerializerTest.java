@@ -18,9 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.loan;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,35 +25,19 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
-import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.infrastructure.event.business.domain.loan.LoanDelinquencyRangeChangeBusinessEvent;
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.support.AvroDateTimeMapper;
-import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.ExternalEventCustomDataSerializer;
-import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.delinquency.data.LoanInstallmentDelinquencyTagData;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyRangeRepository;
 import org.apache.fineract.portfolio.delinquency.domain.LoanDelinquencyActionRepository;
@@ -71,20 +52,12 @@ import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatform
 import org.apache.fineract.portfolio.delinquency.service.LoanDelinquencyDomainService;
 import org.apache.fineract.portfolio.loanaccount.data.CollectionData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanInstallmentCharge;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
-import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
-import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidator;
-import org.apache.fineract.portfolio.loanaccount.service.LoanBalanceService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanChargeReadPlatformService;
-import org.apache.fineract.portfolio.loanaccount.service.LoanChargeService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
-import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionProcessingService;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -109,18 +82,16 @@ public class LoanAccountDelinquencyRangeEventSerializerTest {
     private LoanChargeReadPlatformService loanChargeReadPlatformService;
 
     @Mock
-    private DelinquencyReadPlatformService delinquencyReadPlatformService;
-
-    @Mock
     private AvroDateTimeMapper mapper;
 
-    private final LoanChargeService loanChargeService = new LoanChargeService(mock(LoanChargeValidator.class),
-            mock(LoanTransactionProcessingService.class), mock(LoanLifecycleStateMachine.class), mock(LoanBalanceService.class),
-            mock(LoanTransactionRepository.class));
+    // private final LoanChargeService loanChargeService = new LoanChargeService(mock(LoanChargeValidator.class),
+    // mock(LoanTransactionProcessingService.class), mock(LoanLifecycleStateMachine.class),
+    // mock(LoanBalanceService.class),
+    // mock(LoanTransactionRepository.class));
 
     private MockedStatic<MoneyHelper> moneyHelper = Mockito.mockStatic(MoneyHelper.class);
 
-    private static final String CUSTOM_DATA_PREFIX = "test_data_loan_delinquency_range_business_event";
+    // private static final String CUSTOM_DATA_PREFIX = "test_data_loan_delinquency_range_business_event";
 
     @BeforeEach
     public void setUp() {
@@ -413,91 +384,94 @@ public class LoanAccountDelinquencyRangeEventSerializerTest {
         verify(collectionData, times(1)).setLastRepaymentAmount(BigDecimal.TEN);
     }
 
-    private LoanInstallmentDelinquencyTagData buildInstallmentDelinquencyTag(long installmentId, long rangeId) {
-        LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange delinquencyRange = mock(
-                LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange.class);
-        when(delinquencyRange.getId()).thenReturn(rangeId);
-        when(delinquencyRange.getClassification()).thenReturn("range_" + rangeId);
-        when(delinquencyRange.getMaximumAgeDays()).thenReturn(1);
-        when(delinquencyRange.getMinimumAgeDays()).thenReturn(2);
-        LoanInstallmentDelinquencyTagData installmentDelinquencyTagData = mock(LoanInstallmentDelinquencyTagData.class);
-        when(installmentDelinquencyTagData.getId()).thenReturn(installmentId);
-        when(installmentDelinquencyTagData.getDelinquencyRange()).thenReturn(delinquencyRange);
-        return installmentDelinquencyTagData;
-    }
+    // private LoanInstallmentDelinquencyTagData buildInstallmentDelinquencyTag(long installmentId, long rangeId) {
+    // LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange delinquencyRange = mock(
+    // LoanInstallmentDelinquencyTagData.InstallmentDelinquencyRange.class);
+    // when(delinquencyRange.getId()).thenReturn(rangeId);
+    // when(delinquencyRange.getClassification()).thenReturn("range_" + rangeId);
+    // when(delinquencyRange.getMaximumAgeDays()).thenReturn(1);
+    // when(delinquencyRange.getMinimumAgeDays()).thenReturn(2);
+    // LoanInstallmentDelinquencyTagData installmentDelinquencyTagData = mock(LoanInstallmentDelinquencyTagData.class);
+    // when(installmentDelinquencyTagData.getId()).thenReturn(installmentId);
+    // when(installmentDelinquencyTagData.getDelinquencyRange()).thenReturn(delinquencyRange);
+    // return installmentDelinquencyTagData;
+    // }
 
-    private LoanRepaymentScheduleInstallment buildInstallment(Loan loan, MonetaryCurrency currency, BigDecimal principalAmount,
-            BigDecimal freeAmount, BigDecimal interestAmount, BigDecimal penaltyAmount, BigDecimal totalAmount, BigDecimal... charges) {
+    // private LoanRepaymentScheduleInstallment buildInstallment(Loan loan, MonetaryCurrency currency, BigDecimal
+    // principalAmount,
+    // BigDecimal freeAmount, BigDecimal interestAmount, BigDecimal penaltyAmount, BigDecimal totalAmount, BigDecimal...
+    // charges) {
+    //
+    // LoanRepaymentScheduleInstallment installment = mock(LoanRepaymentScheduleInstallment.class);
+    // when(installment.getPrincipalOutstanding(any())).thenAnswer(a -> Money.of(currency, principalAmount));
+    // when(installment.getInterestOutstanding(any())).thenAnswer(a -> Money.of(currency, interestAmount));
+    // when(installment.getPenaltyChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, penaltyAmount));
+    // when(installment.getFeeChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, freeAmount));
+    // when(installment.getTotalOutstanding(any())).thenAnswer(a -> Money.of(currency, totalAmount));
+    // Charge charge = mock(Charge.class);
+    // when(charge.getName()).thenReturn("charge");
+    // when(charge.toData()).thenAnswer(a -> {
+    // ChargeData chargeData = mock(ChargeData.class);
+    // when(chargeData.getCurrency()).thenAnswer(b -> new CurrencyData(currency.getCode()));
+    // return chargeData;
+    // });
+    //
+    // Set<LoanInstallmentCharge> installmentCharges = Arrays.stream(charges)
+    // .map(amount -> buildLoanInstallmentCharge(amount, charge, loan)).collect(Collectors.toSet());
+    // when(installment.getInstallmentCharges()).thenReturn(installmentCharges);
+    // return installment;
+    // }
 
-        LoanRepaymentScheduleInstallment installment = mock(LoanRepaymentScheduleInstallment.class);
-        when(installment.getPrincipalOutstanding(any())).thenAnswer(a -> Money.of(currency, principalAmount));
-        when(installment.getInterestOutstanding(any())).thenAnswer(a -> Money.of(currency, interestAmount));
-        when(installment.getPenaltyChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, penaltyAmount));
-        when(installment.getFeeChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, freeAmount));
-        when(installment.getTotalOutstanding(any())).thenAnswer(a -> Money.of(currency, totalAmount));
-        Charge charge = mock(Charge.class);
-        when(charge.getName()).thenReturn("charge");
-        when(charge.toData()).thenAnswer(a -> {
-            ChargeData chargeData = mock(ChargeData.class);
-            when(chargeData.getCurrency()).thenAnswer(b -> new CurrencyData(currency.getCode()));
-            return chargeData;
-        });
+    // private LoanInstallmentCharge buildLoanInstallmentCharge(BigDecimal amount, Charge charge, Loan loan) {
+    // LoanInstallmentCharge installmentCharge = new LoanInstallmentCharge();
+    // ReflectionTestUtils.setField(installmentCharge, "amount", amount);
+    // ReflectionTestUtils.setField(installmentCharge, "loancharge", buildLoanCharge(loan, amount, charge));
+    // return installmentCharge;
+    // }
 
-        Set<LoanInstallmentCharge> installmentCharges = Arrays.stream(charges)
-                .map(amount -> buildLoanInstallmentCharge(amount, charge, loan)).collect(Collectors.toSet());
-        when(installment.getInstallmentCharges()).thenReturn(installmentCharges);
-        return installment;
-    }
+    // private LoanCharge buildLoanCharge(Loan loan, BigDecimal amount, Charge charge) {
+    // LoanCharge loanCharge = loanChargeService.create(loan, charge, amount, amount, ChargeTimeType.SPECIFIED_DUE_DATE,
+    // ChargeCalculationType.FLAT, LocalDate.of(2022, 6, 27), ChargePaymentMode.REGULAR, 1, new BigDecimal(100),
+    // ExternalId.generate());
+    // ReflectionTestUtils.setField(loanCharge, "id", 1L);
+    // return loanCharge;
+    // }
 
-    private LoanInstallmentCharge buildLoanInstallmentCharge(BigDecimal amount, Charge charge, Loan loan) {
-        LoanInstallmentCharge installmentCharge = new LoanInstallmentCharge();
-        ReflectionTestUtils.setField(installmentCharge, "amount", amount);
-        ReflectionTestUtils.setField(installmentCharge, "loancharge", buildLoanCharge(loan, amount, charge));
-        return installmentCharge;
-    }
-
-    private LoanCharge buildLoanCharge(Loan loan, BigDecimal amount, Charge charge) {
-        LoanCharge loanCharge = loanChargeService.create(loan, charge, amount, amount, ChargeTimeType.SPECIFIED_DUE_DATE,
-                ChargeCalculationType.FLAT, LocalDate.of(2022, 6, 27), ChargePaymentMode.REGULAR, 1, new BigDecimal(100),
-                ExternalId.generate());
-        ReflectionTestUtils.setField(loanCharge, "id", 1L);
-        return loanCharge;
-    }
-
-    private List<ExternalEventCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent>> createCustomDataForEvents() {
-        return List.of(new ExternalEventCustomDataSerializer<>() {
-
-            @Override
-            public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
-                return ByteBuffer.wrap(CUSTOM_DATA_PREFIX.getBytes(UTF_8));
-            }
-
-            @Override
-            public String key() {
-                return "test_key_1";
-            }
-        }, new ExternalEventCustomDataSerializer<>() {
-
-            @Override
-            public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
-                return ByteBuffer.wrap((CUSTOM_DATA_PREFIX + "_1").getBytes(UTF_8));
-            }
-
-            @Override
-            public String key() {
-                return "test_key_1";
-            }
-        }, new ExternalEventCustomDataSerializer<>() {
-
-            @Override
-            public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
-                return ByteBuffer.wrap((CUSTOM_DATA_PREFIX + "_2").getBytes(UTF_8));
-            }
-
-            @Override
-            public String key() {
-                return "test_key_2";
-            }
-        });
-    }
+    // private List<ExternalEventCustomDataSerializer<LoanDelinquencyRangeChangeBusinessEvent>>
+    // createCustomDataForEvents() {
+    // return List.of(new ExternalEventCustomDataSerializer<>() {
+    //
+    // @Override
+    // public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
+    // return ByteBuffer.wrap(CUSTOM_DATA_PREFIX.getBytes(UTF_8));
+    // }
+    //
+    // @Override
+    // public String key() {
+    // return "test_key_1";
+    // }
+    // }, new ExternalEventCustomDataSerializer<>() {
+    //
+    // @Override
+    // public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
+    // return ByteBuffer.wrap((CUSTOM_DATA_PREFIX + "_1").getBytes(UTF_8));
+    // }
+    //
+    // @Override
+    // public String key() {
+    // return "test_key_1";
+    // }
+    // }, new ExternalEventCustomDataSerializer<>() {
+    //
+    // @Override
+    // public ByteBuffer serialize(final LoanDelinquencyRangeChangeBusinessEvent event) {
+    // return ByteBuffer.wrap((CUSTOM_DATA_PREFIX + "_2").getBytes(UTF_8));
+    // }
+    //
+    // @Override
+    // public String key() {
+    // return "test_key_2";
+    // }
+    // });
+    // }
 }
