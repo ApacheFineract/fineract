@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.investor.exception;
 
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.portfolio.loanaccount.serialization.LoanTransactionValidator;
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
 
-public interface ProgressiveLoanTransactionValidator extends LoanTransactionValidator {
+public class ExternalAssetOwnerNotFoundException extends AbstractPlatformResourceNotFoundException {
 
-    void validateCapitalizedIncome(JsonCommand command, Long loanId);
+    public ExternalAssetOwnerNotFoundException(ExternalId externalId) {
+        super("error.msg.external.asset.owner.external.id",
+                String.format("External asset owner with external id: %s does not found", externalId.getValue()), externalId.getValue());
+    }
 
-    void validateCapitalizedIncomeAdjustment(JsonCommand command, Long loanId, Long capitalizedIncomeTransactionId);
-
-    void validateContractTerminationUndo(JsonCommand command, Long loanId);
-
-    void validateBuyDownFee(JsonCommand command, Long loanId);
-
-    void validateBuyDownFeeAdjustment(JsonCommand command, Long loanId, Long buyDownFeeTransactionId);
+    public ExternalAssetOwnerNotFoundException(Long id) {
+        super("error.msg.external.asset.owner.id", String.format("External asset owner with id: %s does not found", id), id);
+    }
 }
