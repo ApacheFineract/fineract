@@ -28,4 +28,6 @@ public interface CurrencyReadPlatformService {
     List<CurrencyData> retrieveAllPlatformCurrencies();
 
     CurrencyData retrieveCurrency(String code);
+
+    Boolean checkExistingCurrencyCode(String currencyCode);
 }

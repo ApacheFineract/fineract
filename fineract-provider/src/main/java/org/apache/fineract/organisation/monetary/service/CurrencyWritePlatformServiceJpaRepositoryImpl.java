@@ -23,10 +23,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateResponse;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
+import org.apache.fineract.organisation.monetary.domain.CreateCurrency;
+import org.apache.fineract.organisation.monetary.domain.CreateCurrencyRepository;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepository;
 import org.apache.fineract.organisation.monetary.exception.CurrencyInUseException;
@@ -40,6 +43,7 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
 
     private final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository;
     private final OrganisationCurrencyRepository organisationCurrencyRepository;
+    private final CreateCurrencyRepository createCurrencyRepository;
     private final LoanProductReadPlatformService loanProductService;
     private final SavingsProductReadPlatformService savingsProductService;
     private final ChargeReadPlatformService chargeService;
@@ -77,4 +81,53 @@ public class CurrencyWritePlatformServiceJpaRepositoryImpl implements CurrencyWr
 
         return CurrencyUpdateResponse.builder().currencies(allowedCurrencyCodes).build();
     }
+
+    @Override
+    public CurrencyData createCurrency(CurrencyData request) {
+        // validate(request);
+
+        CreateCurrency currency = CreateCurrency.fromCurrencyData(request);
+        CreateCurrency savedResults = createCurrencyRepository.save(currency);
+        CurrencyData finalResults = CreateCurrency.toCurrencyData(savedResults);
+
+        return finalResults;
+    }
+
+    // private void validate(CurrencyData data) {
+    // if (data == null) {
+    // throw new IllegalArgumentException("Currency data must not be null.");
+    // }
+    //
+    // if (data.getCode() == null || !data.getCode().matches("^[A-Z]{3}$")) {
+    // final String errorMessage = "Currency Code should be non-null, 3 characters long, non-numeric and uppercase.";
+    // final String errorArgs = data.getCode();
+    // throw new InvalidCurrencyException("currency", "code", errorMessage, errorArgs);
+    // }
+    //
+    // if (data.getName() == null || data.getName().trim().isEmpty()) {
+    // throw new IllegalArgumentException("Currency name must not be empty.");
+    // }
+    //
+    // if (data.getDecimalPlaces() < 0 || data.getDecimalPlaces() > 5) {
+    // final String errorMessage = "Decimal Places allowed are inclusive of values in the range 0 - 5.";
+    // final String errorArgs = String.valueOf(data.getDecimalPlaces());
+    // throw new InvalidCurrencyException("decimal", "places", errorMessage, errorArgs);
+    // }
+    //
+    // if (data.getInMultiplesOf() != null
+    // && !(data.getInMultiplesOf() >= 0 && data.getInMultiplesOf() <= 1)) {
+    // final String errorMessage = "In Multiples of (sub-units) allowed are inclusive of values in the range 0 - 1.";
+    // final String errorArgs = String.valueOf(data.getInMultiplesOf());
+    // throw new InvalidCurrencyException("sub", "unit", errorMessage, errorArgs);
+    // }
+    //
+    // Boolean isExistingCurrency = readPlatformService.checkExistingCurrencyCode(data.getCode());
+    //
+    // if (isExistingCurrency) {
+    // final String errorMessage = "Duplicate Request. Request cannot be accepted as the currency is already present in
+    // the system.";
+    // final String errorArgs = String.valueOf(data.getCode());
+    // throw new InvalidCurrencyException("existing", "currency.code", errorMessage, errorArgs);
+    // }
+    // }
 }
