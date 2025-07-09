@@ -24,6 +24,7 @@ import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainR
  * {@link AbstractPlatformDomainRuleException} thrown when currency mismatch occurs
  */
 public class InvalidCurrencyException extends AbstractPlatformDomainRuleException {
+    private static final long serialVersionUID = 1L;
 
     public InvalidCurrencyException(final String entity, final String postFix, final String defaultUserMessage,
             final Object... defaultUserMessageArgs) {
