@@ -537,6 +537,8 @@ public class LoanTransactionsApiResource {
             case capitalizedIncomeAdjustment -> LoanTransactionType.CAPITALIZED_INCOME_ADJUSTMENT;
             case contractTermination -> LoanTransactionType.CONTRACT_TERMINATION;
             case capitalizedIncomeAmortizationAdjustment -> LoanTransactionType.CAPITALIZED_INCOME_AMORTIZATION_ADJUSTMENT;
+            case buyDownFeeAmortization -> LoanTransactionType.BUY_DOWN_FEE_AMORTIZATION;
+            case buyDownFeeAmortizationAdjustment -> LoanTransactionType.BUY_DOWN_FEE_AMORTIZATION_ADJUSTMENT;
             default ->
                 throw new InvalidLoanTransactionTypeException("transaction", transactionTypeParam.name(), "Unknown transaction type");
         };
@@ -687,7 +689,11 @@ public class LoanTransactionsApiResource {
             transactionData = this.loanReadPlatformService.retrieveLoanTransactionTemplate(resolvedLoanId,
                     LoanTransactionType.CAPITALIZED_INCOME_ADJUSTMENT, transactionId);
         } else if (CommandParameterUtil.is(commandParam, LoanApiConstants.BUY_DOWN_FEE_COMMAND)) {
-            transactionData = this.loanReadPlatformService.retrieveLoanTransactionTemplate(resolvedLoanId);
+            transactionData = this.loanReadPlatformService.retrieveLoanTransactionTemplate(resolvedLoanId, LoanTransactionType.BUY_DOWN_FEE,
+                    transactionId);
+        } else if (CommandParameterUtil.is(commandParam, LoanApiConstants.BUY_DOWN_FEE_ADJUSTMENT_COMMAND)) {
+            transactionData = this.loanReadPlatformService.retrieveLoanTransactionTemplate(resolvedLoanId,
+                    LoanTransactionType.BUY_DOWN_FEE_ADJUSTMENT, transactionId);
         } else {
             throw new UnrecognizedQueryParamException("command", commandParam);
         }

@@ -30,6 +30,7 @@ public abstract class TestContextKey {
     public static final String LOAN_CREATE_SECOND_LOAN_RESPONSE = "loanCreateSecondLoanResponse";
     public static final String LOAN_MODIFY_RESPONSE = "loanModifyResponse";
     public static final String ADD_DUE_DATE_CHARGE_RESPONSE = "addDueDateChargeResponse";
+    public static final String ADD_INSTALLMENT_FEE_CHARGE_RESPONSE = "addInstallmentFeeChargeResponse";
     public static final String ADD_PROCESSING_FEE_RESPONSE = "addProcessingFeeResponse";
     public static final String ADD_NSF_FEE_RESPONSE = "addNsfFeeResponse";
     public static final String WAIVE_CHARGE_RESPONSE = "waiveChargeResponse";
@@ -178,7 +179,10 @@ public abstract class TestContextKey {
     public static final String CHARGE_FOR_LOAN_DISBURSEMENET_FEE_CREATE_RESPONSE = "ChargeForLoanDisbursementCreateResponse";
     public static final String CHARGE_FOR_LOAN_TRANCHE_DISBURSEMENT_PERCENT_CREATE_RESPONSE = "ChargeForLoanTrancheDisbursementPercentCreateResponse";
     public static final String CHARGE_FOR_LOAN_TRANCHE_DISBURSEMENT_CHARGE_PERCENT_CREATE_RESPONSE = "ChargeForLoanTrancheDisbursementChargePercentCreateResponse";
-    public static final String CHARGE_FOR_LOAN_INSTALLMENT_FEE_CREATE_RESPONSE = "ChargeForLoanInstallmentCreateResponse";
+    public static final String CHARGE_FOR_LOAN_INSTALLMENT_FEE_PERCENTAGE_AMOUNT_PLUS_INTEREST_CREATE_RESPONSE = "ChargeForLoanInstallmentFeePercentageAmountPlusInterestCreateResponse";
+    public static final String CHARGE_FOR_LOAN_INSTALLMENT_FEE_PERCENTAGE_AMOUNT_CREATE_RESPONSE = "ChargeForLoanInstallmentFeePercentageAmountCreateResponse";
+    public static final String CHARGE_FOR_LOAN_INSTALLMENT_FEE_PERCENTAGE_INTEREST_CREATE_RESPONSE = "ChargeForLoanInstallmentFeePercentageInterestCreateResponse";
+    public static final String CHARGE_FOR_LOAN_INSTALLMENT_FEE_FLAT_CREATE_RESPONSE = "ChargeForLoanInstallmentFeeFlatCreateResponse";
     public static final String CHARGE_FOR_CLIENT_FIXED_FEE_CREATE_RESPONSE = "ChargeForClientFixedFeeCreateResponse";
     public static final String CHARGE_FOR_LOAN_DISBURSEMENT_CHARGE_CREATE_RESPONSE = "ChargeForLoanDisbursementChargeCreateResponse";
     public static final String LOAN_RESPONSE = "loanResponse";
@@ -225,13 +229,20 @@ public abstract class TestContextKey {
     public static final String LOAN_DELINQUENCY_ACTION_RESPONSE = "loanDelinquencyActionResponse";
     public static final String LOAN_TRANSACTION_RESPONSE = "loanTransactionResponse";
     public static final String LOAN_CAPITALIZED_INCOME_RESPONSE = "loanCapitalizedIncomeResponse";
-    public static final String LOAN_BUY_DOWN_FEE_RESPONSE = "loanCapitalizedBuyDownFeeResponse";
     public static final String LOAN_DISBURSEMENT_DETAIL_RESPONSE = "loanDisbursementDetailResponse";
     public static final String LOAN_CAPITALIZED_INCOME_AMORTIZATION_ID = "loanCapitalizedIncomeAmortizationId";
     public static final String LOAN_CAPITALIZED_INCOME_ADJUSTMENT_RESPONSE = "loanCapitalizedIncomeAdjustmentResponse";
     public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INTEREST_RECALCULATION_CONTRACT_TERMINATION = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInterestRecalculationContractTermination";
     public static final String LOAN_CONTRACT_TERMINATION_RESPONSE = "loanContractTerminationResponse";
     public static final String LOAN_UNDO_CONTRACT_TERMINATION_RESPONSE = "loanUndoContractTerminationResponse";
+    public static final String LOAN_BUY_DOWN_FEE_RESPONSE = "loanBuyDownFeeResponse";
+    public static final String LOAN_BUY_DOWN_FEE_ADJUSTMENT_RESPONSE = "loanBuyDownFeeAdjustmentResponse";
     public static final String MANUAL_JOURNAL_ENTRIES_REQUEST = "manualJournalEntriesRequest";
     public static final String MANUAL_JOURNAL_ENTRIES_RESPONSE = "manualJournalEntriesResponse";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INTEREST_RECALC_DAILY_INSTALLMENT_FEE_FLAT_CHARGES = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInterestRecalculationInstallmentFeeFlatCharges";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INSTALLMENT_FEE_PERCENT_AMOUNT_CHARGES = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInstallmentFeePercentageAmountCharges";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INSTALLMENT_FEE_PERCENT_INTEREST_CHARGES = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInstallmentFeePercentageInterestCharges";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INSTALLMENT_FEE_PERCENT_AMOUNT_INTEREST_CHARGES = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInstallmentFeeAmountPlusPercentageInterestCharges";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INSTALLMENT_FEE_ALL_CHARGES = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInstallmentFeeAllCharges";
+    public static final String DEFAULT_LOAN_PRODUCT_CREATE_RESPONSE_LP2_ADV_PYMNT_INTEREST_DAILY_INSTALLMENT_FEE_FLAT_INTEREST_CHARGES_TRANCHE = "loanProductCreateResponseLP2AdvancedPaymentInterestDailyInstallmentFeeFlatPlusPercentageInterestChargesMultidisbursal";
 }
