@@ -27,10 +27,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 
 @Data
-@NoArgsConstructor
-@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldNameConstants
+@Builder
 public class CollectionSheetRequest implements Serializable {
 
     @Serial
@@ -41,6 +41,7 @@ public class CollectionSheetRequest implements Serializable {
     private String locale;
     private String actualDisbursementDate;
     private String transactionDate;
-    private DisbursementTransactionsRequest bulkDisbursementTransactions;
+    private String commandParameter;
+    // private DisbursementTransactionsRequest bulkDisbursementTransactions;
 
 }
