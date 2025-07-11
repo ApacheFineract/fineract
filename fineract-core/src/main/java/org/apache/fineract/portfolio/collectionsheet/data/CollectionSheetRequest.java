@@ -42,6 +42,6 @@ public class CollectionSheetRequest implements Serializable {
     private String actualDisbursementDate;
     private String transactionDate;
     private String commandParameter;
-    // private DisbursementTransactionsRequest bulkDisbursementTransactions;
+    private DisbursementTransactionsRequest bulkDisbursementTransactions;
 
 }

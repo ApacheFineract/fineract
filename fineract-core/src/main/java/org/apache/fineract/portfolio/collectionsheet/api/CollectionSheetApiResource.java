@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
+import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.collectionsheet.command.GenerateCollectionSheetCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetCommandParameter;
@@ -48,7 +49,7 @@ public class CollectionSheetApiResource {
     // private final CollectionSheetReadPlatformService collectionSheetReadPlatformService;
     // private final ToApiJsonSerializer<Object> toApiJsonSerializer;
     // private final FromJsonHelper fromJsonHelper;
-    // private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     // private final PlatformSecurityContext context;
 
     @POST

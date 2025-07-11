@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetCommandParameter;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,14 @@ public class GenerateCollectionSheetCommandHandler implements CommandHandler<Col
     @Transactional
     @Override
     public Object handle(Command<CollectionSheetRequest> command) {
+      CollectionSheetRequest payload = command.getPayload();
+      
+      if(payload.getCommandParameter().equalsIgnoreCase(CollectionSheetCommandParameter.GENERATE_COLLECTION_SHEET.getValue())) {
         return command.getPayload();
+      } else if(payload.getCommandParameter().equalsIgnoreCase(CollectionSheetCommandParameter.SAVE_COLLECTION_SHEET.getValue())) {
+        return command.getPayload();
+      }
+      return null;
     }
 
 }
