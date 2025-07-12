@@ -50,6 +50,13 @@ import com.google.gson.JsonElement;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -84,6 +91,61 @@ public class CollectionSheetApiResource {
 //    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CollectionSheetRequest.class)))
 //    @ApiResponses({
 //            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollectionSheetApiResourceSwagger.PostCollectionSheetResponse.class))) })
+//    @Operation(
+//        summary = "Generate Individual Collection Sheet | Save Collection Sheet",
+//        description = "Generate Individual Collection Sheet:\n\n"
+//                    + "This API retrieves repayment details of all individual loans under an office as on a specified meeting date.\n\n"
+//                    + "Save Collection Sheet:\n\n"
+//                    + "This API allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.",
+//        parameters = {
+//            @Parameter(
+//                name = "fineract-platform-tenantid",
+//                in = ParameterIn.HEADER,
+//                required = true,
+//                description = "Tenant identifier",
+//                example = "default"
+//            )
+//        },
+//        requestBody = @RequestBody(
+//            description = "Request payload for collection sheet generation",
+//            required = true,
+//            content = @Content(
+//                schema = @Schema(implementation = CollectionSheetRequest.class),
+//                examples = {
+//                    @ExampleObject(
+//                        name = "Sample Request",
+//                        value = "{ \"officeId\": 1, \"meetingDate\": \"2025-07-01\", \"staffId\": 5 }"
+//                    )
+//                }
+//            )
+//        ),
+//        responses = {
+//            @ApiResponse(
+//                responseCode = "200",
+//                description = "Successfully generated or saved collection sheet",
+//                content = {
+//                    @Content(
+//                        mediaType = "application/json",
+//                        schema = @Schema(implementation = IndividualCollectionSheetData.class),
+//                        examples = @ExampleObject(
+//                            name = "Generate Collection Sheet",
+//                            value = "{ \"clientId\": 1, \"totalDue\": 1500.0 }"
+//                        )
+//                    ),
+//                    @Content(
+//                        mediaType = "application/json",
+//                        schema = @Schema(implementation = CommandProcessingResult.class),
+//                        examples = @ExampleObject(
+//                            name = "Save Collection Sheet",
+//                            value = "{ \"resourceId\": 42, \"status\": \"success\" }"
+//                        )
+//                    )
+//                }
+//            ),
+//            @ApiResponse(responseCode = "400", description = "Invalid input"),
+//            @ApiResponse(responseCode = "500", description = "Server error")
+//        }
+//    )
     public Object generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
 
@@ -127,7 +189,7 @@ public class CollectionSheetApiResource {
             final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
             return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
         }
-        return Response.ok().build(); */
-
+        return Response.ok().build();
+*/
     }
 }
