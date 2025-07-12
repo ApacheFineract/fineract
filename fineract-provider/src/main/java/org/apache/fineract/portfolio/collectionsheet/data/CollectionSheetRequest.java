@@ -41,6 +41,7 @@ public class CollectionSheetRequest implements Serializable {
     private String locale;
     private String actualDisbursementDate;
     private String transactionDate;
+    private String commandParameter;
     private DisbursementTransactionsRequest bulkDisbursementTransactions;
 
 }
