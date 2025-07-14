@@ -18,10 +18,13 @@
  */
 package org.apache.fineract.portfolio.loanaccount.guarantor.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -43,6 +46,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.GuarantorCommand;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.Guarantor;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundStatusType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundingDetails;
@@ -56,14 +60,15 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements GuarantorWritePlatformService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuarantorWritePlatformServiceJpaRepositoryIImpl.class);
@@ -78,23 +83,24 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final GuarantorDomainService guarantorDomainService;
 
-    @Autowired
-    public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
-            final GuarantorRepository guarantorRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
-            final StaffRepositoryWrapper staffRepositoryWrapper, final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-            final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final SavingsAccountAssembler savingsAccountAssembler,
-            final AccountAssociationsRepository accountAssociationsRepository, final GuarantorDomainService guarantorDomainService) {
-        this.loanRepositoryWrapper = loanRepositoryWrapper;
-        this.clientRepositoryWrapper = clientRepositoryWrapper;
-        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-        this.guarantorRepository = guarantorRepository;
-        this.staffRepositoryWrapper = staffRepositoryWrapper;
-        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
-        this.savingsAccountAssembler = savingsAccountAssembler;
-        this.accountAssociationsRepository = accountAssociationsRepository;
-        this.guarantorDomainService = guarantorDomainService;
-    }
+//    @Autowired
+//    public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
+//            final GuarantorRepository guarantorRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
+//            final StaffRepositoryWrapper staffRepositoryWrapper, final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
+//            final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final SavingsAccountAssembler savingsAccountAssembler,
+//            final AccountAssociationsRepository accountAssociationsRepository, final GuarantorDomainService guarantorDomainService) {
+//        this.loanRepositoryWrapper = loanRepositoryWrapper;
+//        this.clientRepositoryWrapper = clientRepositoryWrapper;
+//        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+//        this.guarantorRepository = guarantorRepository;
+//        this.staffRepositoryWrapper = staffRepositoryWrapper;
+//        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+//        this.savingsAccountAssembler = savingsAccountAssembler;
+//        this.accountAssociationsRepository = accountAssociationsRepository;
+//        this.guarantorDomainService = guarantorDomainService;
+//    }
 
+    @Deprecated
     @Override
     @Transactional
     public CommandProcessingResult createGuarantor(final Long loanId, final JsonCommand command) {
@@ -177,6 +183,102 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             }
             this.guarantorRepository.saveAndFlush(guarantor);
             return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(guarantor.getOfficeId())
+                    .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return CommandProcessingResult.empty();
+        }
+    }
+
+    @Override
+    @Transactional
+    public CommandProcessingResult createGuarantor(final Command<CreateGuarantorsRequest> command) {
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(command.getPayload().getLoanId(), true);
+        final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+        return createGuarantor(loan, command, existGuarantorList);
+    }
+
+    private CommandProcessingResult createGuarantor(final Loan loan, final Command<CreateGuarantorsRequest> command,
+            final Collection<Guarantor> existGuarantorList) {
+
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        final String json = gson.toJson(command.getPayload().getRequest());
+
+        try {
+
+            final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(json);
+            guarantorCommand.validateForCreate();
+            validateLoanStatus(loan);
+            final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
+            final boolean backdatedTxnsAllowedTill = false;
+            AccountAssociations accountAssociations = null;
+            if (guarantorCommand.getSavingsId() != null) {
+                final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(guarantorCommand.getSavingsId(),
+                        backdatedTxnsAllowedTill);
+                validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
+                accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
+                        AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
+
+                GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,
+                        GuarantorFundStatusType.ACTIVE.getValue(), guarantorCommand.getAmount());
+                guarantorFundingDetails.add(fundingDetails);
+                if (loan.isDisbursed()
+                        || (loan.isApproved() && (loan.getGuaranteeAmount() != null || loan.loanProduct().isHoldGuaranteeFunds()))) {
+                    this.guarantorDomainService.assignGuarantor(fundingDetails, DateUtils.getBusinessLocalDate());
+                    loan.updateGuaranteeAmount(fundingDetails.getAmount());
+                }
+            }
+
+            final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
+            CodeValue clientRelationshipType = null;
+
+            if (clientRelationshipId != null) {
+                clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                        GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
+            }
+
+            final Long entityId = guarantorCommand.getEntityId();
+            final Integer guarantorTypeId = guarantorCommand.getGuarantorTypeId();
+            Guarantor guarantor = null;
+            for (final Guarantor avilableGuarantor : existGuarantorList) {
+                if (entityId != null && avilableGuarantor.getEntityId() != null && avilableGuarantor.getEntityId().equals(entityId)
+                        && avilableGuarantor.getGurantorType().equals(guarantorTypeId) && avilableGuarantor.isActive()) {
+                    if (guarantorCommand.getSavingsId() == null || avilableGuarantor.hasGuarantor(guarantorCommand.getSavingsId())) {
+                        /** Get the right guarantor based on guarantorType **/
+                        String defaultUserMessage = null;
+                        if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
+                            defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).displayName();
+                        } else {
+                            defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        }
+
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
+                                loan.getId());
+                    }
+                    guarantor = avilableGuarantor;
+                    break;
+                }
+            }
+
+            if (guarantor == null) {
+//                guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
+                guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
+            } else {
+                guarantor.addFundingDetails(guarantorFundingDetails);
+            }
+            validateGuarantorBusinessRules(guarantor);
+            for (GuarantorFundingDetails fundingDetails : guarantorFundingDetails) {
+                fundingDetails.updateGuarantor(guarantor);
+            }
+
+            if (accountAssociations != null) {
+                this.accountAssociationsRepository.saveAndFlush(accountAssociations);
+            }
+            this.guarantorRepository.saveAndFlush(guarantor);
+            return new CommandProcessingResultBuilder().withCommandId((long)command.getId().hashCode()).withOfficeId(guarantor.getOfficeId())
                     .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();

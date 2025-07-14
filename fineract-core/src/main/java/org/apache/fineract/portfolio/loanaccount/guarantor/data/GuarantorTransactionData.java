@@ -21,7 +21,7 @@ package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.Getter;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.collateralmanagement.data.LoanTransactionData;
 import org.apache.fineract.portfolio.savings.data.DepositAccountOnHoldTransactionData;
 
 @Getter
