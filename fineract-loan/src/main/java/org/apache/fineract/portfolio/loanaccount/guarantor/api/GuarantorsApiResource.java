@@ -64,8 +64,10 @@ import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.CreateGuarantorsCommand;
+import org.apache.fineract.portfolio.loanaccount.guarantor.command.DeleteGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.UpdateGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
@@ -203,11 +205,29 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult deleteGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
             @QueryParam("guarantorFundingId") final Long guarantorFundingId) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId, guarantorFundingId).build();
+//        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId, guarantorFundingId).build();
+//
+//        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
+
+        final DeleteGuarantorsRequest request = DeleteGuarantorsRequest.builder()
+            .loanId(loanId)
+            .guarantorId(guarantorId)
+            .guarantorFundingId(guarantorFundingId)
+            .build();
+
+        command.setId(UUID.randomUUID());
+        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        command.setPayload(request);
+
+        final Supplier<CommandProcessingResult> response = commandPipeline.send(command);
+
+        return response.get();
+
     }
 
+    
     @GET
     @Path("accounts/template")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -232,6 +252,7 @@ public class GuarantorsApiResource {
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GUARANTORS.toString(), officeId, null, dateFormat);
     }
 
+    
     @POST
     @Path("uploadtemplate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

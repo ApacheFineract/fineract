@@ -35,7 +35,6 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
@@ -48,7 +47,6 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.GuarantorCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
-import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.Guarantor;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundStatusType;
@@ -85,24 +83,6 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     private final SavingsAccountAssembler savingsAccountAssembler;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final GuarantorDomainService guarantorDomainService;
-    private final DefaultToApiJsonSerializer<GuarantorData> apiJsonSerializerService;
-
-//    @Autowired
-//    public GuarantorWritePlatformServiceJpaRepositoryIImpl(final LoanRepositoryWrapper loanRepositoryWrapper,
-//            final GuarantorRepository guarantorRepository, final ClientRepositoryWrapper clientRepositoryWrapper,
-//            final StaffRepositoryWrapper staffRepositoryWrapper, final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-//            final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final SavingsAccountAssembler savingsAccountAssembler,
-//            final AccountAssociationsRepository accountAssociationsRepository, final GuarantorDomainService guarantorDomainService) {
-//        this.loanRepositoryWrapper = loanRepositoryWrapper;
-//        this.clientRepositoryWrapper = clientRepositoryWrapper;
-//        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
-//        this.guarantorRepository = guarantorRepository;
-//        this.staffRepositoryWrapper = staffRepositoryWrapper;
-//        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
-//        this.savingsAccountAssembler = savingsAccountAssembler;
-//        this.accountAssociationsRepository = accountAssociationsRepository;
-//        this.guarantorDomainService = guarantorDomainService;
-//    }
 
     @Deprecated
     @Override
@@ -362,14 +342,14 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             return CommandProcessingResult.empty();
         }
     }
-    
+
     @Override
     @Transactional
     public CommandProcessingResult updateGuarantor(final Command<UpdateGuarantorsRequest> command) {
-      
+
       final Gson gson = new GsonBuilder().setPrettyPrinting().create();
       final String json = gson.toJson(command.getPayload().getRequest());
-      
+
       try {
             final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(json);
             guarantorCommand.validateForUpdate();
