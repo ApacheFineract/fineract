@@ -22,6 +22,7 @@ import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 
 public interface GuarantorWritePlatformService {
 
@@ -30,6 +31,8 @@ public interface GuarantorWritePlatformService {
     CommandProcessingResult createGuarantor(Command<CreateGuarantorsRequest> command);
 
     CommandProcessingResult updateGuarantor(Long loanId, Long guarantorId, JsonCommand command);
+    
+    CommandProcessingResult updateGuarantor(Command<UpdateGuarantorsRequest> command);
 
     CommandProcessingResult removeGuarantor(Long loanId, Long guarantorId, Long guarantorFundingId);
 

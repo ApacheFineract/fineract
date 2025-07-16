@@ -64,9 +64,11 @@ import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.CreateGuarantorsCommand;
+import org.apache.fineract.portfolio.loanaccount.guarantor.command.UpdateGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorReadPlatformService;
@@ -172,10 +174,27 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult updateGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
             final GuarantorsRequest guarantorsRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
-                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+//        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
+//                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+//
+//        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+      final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
+
+      final UpdateGuarantorsRequest request = UpdateGuarantorsRequest.builder()
+          .loanId(loanId)
+          .guarantorId(guarantorId)
+          .request(guarantorsRequest)
+          .build();
+
+      command.setId(UUID.randomUUID());
+      command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+      command.setPayload(request);
+
+      final Supplier<CommandProcessingResult> response = commandPipeline.send(command);
+
+      return response.get();
+
     }
 
     @DELETE

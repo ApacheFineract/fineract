@@ -16,5 +16,7 @@ public class UpdateGuarantorsRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long loanId;
+    private Long guarantorId;
     private GuarantorsRequest request;
 }
