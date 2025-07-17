@@ -157,12 +157,12 @@ public class GuarantorsApiResource {
 //         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
-//        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder()
-//            .loanId(loanId)
-//            .request(guarantorsRequest)
-//            .build();
+        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder()
+            .loanId(loanId)
+            .request(guarantorsRequest)
+            .build();
         
-        final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
+//        final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
