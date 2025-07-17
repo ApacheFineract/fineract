@@ -70,6 +70,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantors
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequestMapper;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
@@ -98,12 +99,13 @@ public class GuarantorsApiResource {
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final CommandPipeline commandPipeline;
+    private final GuarantorsRequestMapper guarantorsRequestMapper;
 
     @GET
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
+     public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
 
         final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
@@ -155,10 +157,12 @@ public class GuarantorsApiResource {
 //         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
-        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder()
-            .loanId(loanId)
-            .request(guarantorsRequest)
-            .build();
+//        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder()
+//            .loanId(loanId)
+//            .request(guarantorsRequest)
+//            .build();
+        
+        final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
