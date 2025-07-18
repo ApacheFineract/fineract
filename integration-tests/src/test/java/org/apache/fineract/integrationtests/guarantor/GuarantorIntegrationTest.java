@@ -16,6 +16,8 @@ import java.util.UUID;
 import org.apache.fineract.client.models.GetClientsClientIdResponse;
 import org.apache.fineract.client.models.PostClientsRequest;
 import org.apache.fineract.client.models.PostClientsResponse;
+import org.apache.fineract.client.models.PostSavingsAccountsRequest;
+import org.apache.fineract.client.models.PostSavingsAccountsResponse;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
 import org.apache.fineract.integrationtests.common.FineractClientHelper;
@@ -37,19 +39,25 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @ExtendWith(LoanTestLifecycleExtension.class)
 @Slf4j
 public class GuarantorIntegrationTest {
+  private static final Float SELF1_BALANCE = Float.valueOf((float) 5000);
+  private static final Float EXTERNAL1_BALANCE = Float.valueOf((float) 5000);
+  private static final Float EXTERNAL2_BALANCE = Float.valueOf((float) 5000);
+  private static final Float SELF1_GURANTEE = Float.valueOf((float) 2000);
+  private static final Float EXTERNAL1_GURANTEE = Float.valueOf((float) 2000);
+  private static final Float EXTERNAL2_GURANTEE = Float.valueOf((float) 1000);
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
   public void testGuarantor() throws IOException {
 
-//  Enable full HTTP logging
+    //  Enable full HTTP logging
     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
     logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(logging)
         .build();
-    
+
     final String ERROR_RESPONSE = "Error: Request didn't receive a valid response!";
 
     // Create client request
@@ -64,37 +72,76 @@ public class GuarantorIntegrationTest {
       request.setLegalFormId(1L);
 
     final Integer clientID = createClient(request);
+    log.info("Client Id: {}", clientID);
     if(clientID.equals(Integer.MIN_VALUE)) {
       fail(ERROR_RESPONSE);
     }
 
     final GetClientsClientIdResponse verifyClientCreated = verifyClientCreated(clientID.longValue(), false);
     log.info(verifyClientCreated.toString());
-    
+
     final Integer clientID_external = createClient(request);
+    log.info("External Client Id: {}", clientID_external);
     if(clientID_external.equals(Integer.MIN_VALUE)) {
       fail(ERROR_RESPONSE);
     }
-    
+
+    final GetClientsClientIdResponse verifyExternalClientCreated = verifyClientCreated(clientID.longValue(), false);
+    log.info(verifyExternalClientCreated.toString());
+
     final Integer clientID_external2 = createClient(request);
+    log.info("External Client 2 Id: {}", clientID_external2);
     if(clientID_external2.equals(Integer.MIN_VALUE)) {
       fail(ERROR_RESPONSE);
     }
 
+    PostSavingsAccountsRequest savingsRequest = new PostSavingsAccountsRequest();
+      savingsRequest.setClientId(clientID.longValue());
+      savingsRequest.setDateFormat("dd MMMM yyyy");
+      savingsRequest.setLocale("en");
+      savingsRequest.setProductId(1L);
+      savingsRequest.setSubmittedOnDate("01 July 2025");
+      savingsRequest.setExternalId(UUID.randomUUID().toString());
+   
+   PostSavingsAccountsRequest savingsRequestExternal = new PostSavingsAccountsRequest();
+      savingsRequest.setClientId(clientID_external.longValue());
+      savingsRequest.setDateFormat("dd MMMM yyyy");
+      savingsRequest.setLocale("en");
+      savingsRequest.setProductId(2L);
+      savingsRequest.setSubmittedOnDate("01 July 2025");
+      savingsRequest.setExternalId(UUID.randomUUID().toString());
+      
+      PostSavingsAccountsRequest savingsRequestExternal2 = new PostSavingsAccountsRequest();
+      savingsRequest.setClientId(clientID_external.longValue());
+      savingsRequest.setDateFormat("dd MMMM yyyy");
+      savingsRequest.setLocale("en");
+      savingsRequest.setProductId(3L);
+      savingsRequest.setSubmittedOnDate("01 July 2025");
+      savingsRequest.setExternalId(UUID.randomUUID().toString());
+      
+    final Integer selfSavingsId = openSavingsAccount(savingsRequest, String.valueOf(SELF1_BALANCE)); //SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID, String.valueOf(SELF1_BALANCE));
+    log.info("Saving Account Id: {}", selfSavingsId);
+    
+    final Integer externalSavigsId_1 = openSavingsAccount(savingsRequestExternal, String.valueOf(EXTERNAL1_BALANCE));
+    log.info("Saving Account External 1 Id: {}", externalSavigsId_1);
+    
+    final Integer externalSavigsId_2 = openSavingsAccount(savingsRequestExternal2, String.valueOf(EXTERNAL2_BALANCE));
+    log.info("Saving Account External 2 Id: {}", externalSavigsId_2);
+
 ////      final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
 ////      ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
-//      final Integer clientID_external = ClientHelper.createClient(this.requestSpec, this.responseSpec);
-//      final Integer clientID_external2 = ClientHelper.createClient(this.requestSpec, this.responseSpec);
-
-//      ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID_external);
-//
-//      final Integer selfSavigsId = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID,
-//              String.valueOf(SELF1_BALANCE));
-//      final Integer externalSavigsId_1 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
-//              String.valueOf(EXTERNAL1_BALANCE));
-//      final Integer externalSavigsId_2 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external2,
-//              String.valueOf(EXTERNAL2_BALANCE));
-//
+////      final Integer clientID_external = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+////      final Integer clientID_external2 = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+////
+////      ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID_external);
+////
+////      final Integer selfSavigsId = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID,
+////              String.valueOf(SELF1_BALANCE));
+////      final Integer externalSavigsId_1 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
+////              String.valueOf(EXTERNAL1_BALANCE));
+////      final Integer externalSavigsId_2 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external2,
+////              String.valueOf(EXTERNAL2_BALANCE));
+////
 //      final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
 //      DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
 //      Calendar todaysDate = Calendar.getInstance();
@@ -232,25 +279,42 @@ public class GuarantorIntegrationTest {
 
   }
 
+  private Integer openSavingsAccount(PostSavingsAccountsRequest savingsRequest,
+      String selfBalanceVal) throws IOException {
+    final Call<PostSavingsAccountsResponse> callSavingsAccount = FineractClientHelper
+        .getFineractClient()
+        .savingsAccounts
+        .submitApplication2(savingsRequest);
+    final Response<PostSavingsAccountsResponse> response = callSavingsAccount.execute();
+
+    if (response.isSuccessful() && response.body() != null) {
+      return response.body().getSavingsId().intValue();
+    }
+
+    final String error = response.errorBody() != null ? response.errorBody().string() : "No error body";
+    fail("Savings Account creation failed. HTTP Code: " + response.code() + ", Error: " + error);
+
+    return Integer.MIN_VALUE;
+  }
+
   private GetClientsClientIdResponse verifyClientCreated(Long clientID, Boolean staffInSelectedOfficeOnly) throws IOException {
-    // Create NEW call to fetch client details
-    Call<GetClientsClientIdResponse> verifyCall = FineractClientHelper
+    final Call<GetClientsClientIdResponse> verifyCall = FineractClientHelper
         .getFineractClient()
         .clients
         .retrieveOne11(clientID.longValue(), false);
 
-    Response<GetClientsClientIdResponse> verifyResponse = verifyCall.execute();
+    final Response<GetClientsClientIdResponse> verifyResponse = verifyCall.execute();
     if (verifyResponse.isSuccessful() && verifyResponse.body() != null) {
         log.info("Client verification successful: {}", verifyResponse.body());
     } else {
         fail("Client verification failed. HTTP Code: " + verifyResponse.code());
-    }    
+    }
     return verifyResponse.body();
   }
 
   private Integer createClient(PostClientsRequest request) throws IOException {
-    Call<PostClientsResponse> callClient = FineractClientHelper.getFineractClient().clients.create6(request);
-    Response<PostClientsResponse> response = callClient.execute();
+    final Call<PostClientsResponse> callClient = FineractClientHelper.getFineractClient().clients.create6(request);
+    final Response<PostClientsResponse> response = callClient.execute();
 
     if (response.isSuccessful() && response.body() != null) {
       return response.body().getClientId().intValue();
