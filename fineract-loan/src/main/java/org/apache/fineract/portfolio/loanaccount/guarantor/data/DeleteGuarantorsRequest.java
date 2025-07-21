@@ -13,10 +13,11 @@ import lombok.experimental.FieldNameConstants;
 @AllArgsConstructor
 @FieldNameConstants
 public class DeleteGuarantorsRequest implements Serializable {
-  private static final long serialVersionUID = 1L;
 
-  private Long loanId;
-  private Long guarantorId;
-  private Long guarantorFundingId;
+    private static final long serialVersionUID = 1L;
+
+    private Long loanId;
+    private Long guarantorId;
+    private Long guarantorFundingId;
 
 }

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
@@ -66,7 +67,6 @@ import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -248,7 +248,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             }
 
             if (guarantor == null) {
-//                guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
+                // guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
                 guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
             } else {
                 guarantor.addFundingDetails(guarantorFundingDetails);
@@ -262,8 +262,8 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                 this.accountAssociationsRepository.saveAndFlush(accountAssociations);
             }
             this.guarantorRepository.saveAndFlush(guarantor);
-            return new CommandProcessingResultBuilder().withCommandId((long)command.getId().hashCode()).withOfficeId(guarantor.getOfficeId())
-                    .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
+            return new CommandProcessingResultBuilder().withCommandId((long) command.getId().hashCode())
+                    .withOfficeId(guarantor.getOfficeId()).withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGuarantorDataIntegrityIssues(throwable, dve);
@@ -347,10 +347,10 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     @Transactional
     public CommandProcessingResult updateGuarantor(final Command<UpdateGuarantorsRequest> command) {
 
-      final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-      final String json = gson.toJson(command.getPayload().getRequest());
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        final String json = gson.toJson(command.getPayload().getRequest());
 
-      try {
+        try {
             final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(json);
             guarantorCommand.validateForUpdate();
 
@@ -384,7 +384,8 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                         String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
                         defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
                         final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
-                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, command.getPayload().getLoanId());
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
+                                command.getPayload().getLoanId());
                     }
                 }
             }
@@ -398,8 +399,9 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                 this.guarantorRepository.saveAndFlush(guarantorForUpdate);
             }
 
-            return new CommandProcessingResultBuilder().withCommandId((long)command.getId().hashCode()).withOfficeId(guarantorForUpdate.getOfficeId())
-                    .withEntityId(guarantorForUpdate.getId()).withOfficeId(guarantorForUpdate.getLoanId()).with(changesOnly).build();
+            return new CommandProcessingResultBuilder().withCommandId((long) command.getId().hashCode())
+                    .withOfficeId(guarantorForUpdate.getOfficeId()).withEntityId(guarantorForUpdate.getId())
+                    .withOfficeId(guarantorForUpdate.getLoanId()).with(changesOnly).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGuarantorDataIntegrityIssues(throwable, dve);

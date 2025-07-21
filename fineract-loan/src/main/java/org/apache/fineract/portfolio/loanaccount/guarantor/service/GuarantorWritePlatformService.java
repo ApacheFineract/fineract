@@ -27,11 +27,11 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantors
 public interface GuarantorWritePlatformService {
 
     CommandProcessingResult createGuarantor(Long loanId, JsonCommand command);
-    
+
     CommandProcessingResult createGuarantor(Command<CreateGuarantorsRequest> command);
 
     CommandProcessingResult updateGuarantor(Long loanId, Long guarantorId, JsonCommand command);
-    
+
     CommandProcessingResult updateGuarantor(Command<UpdateGuarantorsRequest> command);
 
     CommandProcessingResult removeGuarantor(Long loanId, Long guarantorId, Long guarantorFundingId);

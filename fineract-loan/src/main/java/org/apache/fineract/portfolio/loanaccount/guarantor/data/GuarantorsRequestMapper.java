@@ -6,10 +6,10 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface GuarantorsRequestMapper {
 
-  GuarantorsRequestMapper INSTANCE = Mappers.getMapper(GuarantorsRequestMapper.class);
+    GuarantorsRequestMapper INSTANCE = Mappers.getMapper(GuarantorsRequestMapper.class);
 
-  CreateGuarantorsRequest toCreateRequest(GuarantorsRequest source);
+    CreateGuarantorsRequest toCreateRequest(GuarantorsRequest source);
 
-  GuarantorsRequest fromCreateRequest(CreateGuarantorsRequest source);
+    GuarantorsRequest fromCreateRequest(CreateGuarantorsRequest source);
 
 }

@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreateGuarantorsCommandHandler implements CommandHandler<CreateGuarantorsRequest, CommandProcessingResult> {
 
-  private final GuarantorWritePlatformService writePlatformService;
+    private final GuarantorWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult handle(Command<CreateGuarantorsRequest> command) {
-      return this.writePlatformService.createGuarantor(command);
+        return this.writePlatformService.createGuarantor(command);
     }
 }

@@ -8,6 +8,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantors
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UpdateGuarantorsCommand extends Command<UpdateGuarantorsRequest> {
+
     private static final long serialVersionUID = 1L;
 
 }

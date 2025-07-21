@@ -42,8 +42,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
@@ -105,7 +103,7 @@ public class GuarantorsApiResource {
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-     public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
+    public GuarantorData newGuarantorTemplate(@PathParam("loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
 
         final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
@@ -151,18 +149,15 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest guarantorsRequest) {
 
-//         final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
-//         .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-//
-//         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
+        // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        //
+        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
-        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder()
-            .loanId(loanId)
-            .request(guarantorsRequest)
-            .build();
-        
-//        final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
+        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder().loanId(loanId).request(guarantorsRequest).build();
+
+        // final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
@@ -180,46 +175,15 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult updateGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
             final GuarantorsRequest guarantorsRequest) {
-//        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
-//                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-//
-//        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
+        // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        //
+        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-      final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
+        final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
 
-      final UpdateGuarantorsRequest request = UpdateGuarantorsRequest.builder()
-          .loanId(loanId)
-          .guarantorId(guarantorId)
-          .request(guarantorsRequest)
-          .build();
-
-      command.setId(UUID.randomUUID());
-      command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-      command.setPayload(request);
-
-      final Supplier<CommandProcessingResult> response = commandPipeline.send(command);
-
-      return response.get();
-
-    }
-
-    @DELETE
-    @Path("{guarantorId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public CommandProcessingResult deleteGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
-            @QueryParam("guarantorFundingId") final Long guarantorFundingId) {
-//        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId, guarantorFundingId).build();
-//
-//        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
-        final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
-
-        final DeleteGuarantorsRequest request = DeleteGuarantorsRequest.builder()
-            .loanId(loanId)
-            .guarantorId(guarantorId)
-            .guarantorFundingId(guarantorFundingId)
-            .build();
+        final UpdateGuarantorsRequest request = UpdateGuarantorsRequest.builder().loanId(loanId).guarantorId(guarantorId)
+                .request(guarantorsRequest).build();
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
@@ -231,7 +195,32 @@ public class GuarantorsApiResource {
 
     }
 
-    
+    @DELETE
+    @Path("{guarantorId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CommandProcessingResult deleteGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
+            @QueryParam("guarantorFundingId") final Long guarantorFundingId) {
+        // final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId,
+        // guarantorFundingId).build();
+        //
+        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
+
+        final DeleteGuarantorsRequest request = DeleteGuarantorsRequest.builder().loanId(loanId).guarantorId(guarantorId)
+                .guarantorFundingId(guarantorFundingId).build();
+
+        command.setId(UUID.randomUUID());
+        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        command.setPayload(request);
+
+        final Supplier<CommandProcessingResult> response = commandPipeline.send(command);
+
+        return response.get();
+
+    }
+
     @GET
     @Path("accounts/template")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -256,7 +245,6 @@ public class GuarantorsApiResource {
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GUARANTORS.toString(), officeId, null, dateFormat);
     }
 
-    
     @POST
     @Path("uploadtemplate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

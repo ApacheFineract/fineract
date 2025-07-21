@@ -13,11 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DeleteGuarantorsCommandHandler implements CommandHandler<DeleteGuarantorsRequest, CommandProcessingResult> {
-  private final GuarantorWritePlatformService writePlatformService;
 
-  @Override
-  public CommandProcessingResult handle(Command<DeleteGuarantorsRequest> command) {
-    return this.writePlatformService.removeGuarantor(command.getPayload().getLoanId(), command.getPayload().getGuarantorId(), command.getPayload().getGuarantorFundingId());
-  }
+    private final GuarantorWritePlatformService writePlatformService;
+
+    @Override
+    public CommandProcessingResult handle(Command<DeleteGuarantorsRequest> command) {
+        return this.writePlatformService.removeGuarantor(command.getPayload().getLoanId(), command.getPayload().getGuarantorId(),
+                command.getPayload().getGuarantorFundingId());
+    }
 
 }

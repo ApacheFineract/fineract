@@ -8,6 +8,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantors
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DeleteGuarantorsCommand extends Command<DeleteGuarantorsRequest> {
-  private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 
 }
