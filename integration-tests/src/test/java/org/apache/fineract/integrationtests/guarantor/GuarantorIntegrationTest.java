@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.fineract.integrationtests.guarantor;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -111,7 +129,7 @@ public class GuarantorIntegrationTest {
 
         final Integer externalSavigsId_2 = openSavingsAccount(savingsRequestExternal2, String.valueOf(EXTERNAL2_BALANCE));
         log.info("Saving Account External 2 Id: {}", externalSavigsId_2);
-        
+
         final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
         log.info("LoanProduct Id: {}", loanProductID.toString());
 
@@ -275,58 +293,59 @@ public class GuarantorIntegrationTest {
     }
 
     private Integer createLoanProductWithHoldFunds(final String mandatoryGuarantee, final String minimumGuaranteeFromGuarantor,
-        final String minimumGuaranteeFromOwnFunds) throws IOException {
+            final String minimumGuaranteeFromOwnFunds) throws IOException {
 
-      log.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
+        log.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
 
-      PostLoanProductsRequest request = new PostLoanProductsRequest();
-      request.setName("Test Loan Product");
-      request.setShortName("TLP");
-      request.setDescription("Product created from test builder");
-      request.setLocale("en_GB");
-      request.setDateFormat("dd MMMM yyyy");
+        PostLoanProductsRequest request = new PostLoanProductsRequest();
+        request.setName("Test Loan Product");
+        request.setShortName("TLP");
+        request.setDescription("Product created from test builder");
+        request.setLocale("en_GB");
+        request.setDateFormat("dd MMMM yyyy");
 
-      request.setPrincipal(10000.00);
-      request.setMinPrincipal(5000.00);
-      request.setMaxPrincipal(15000.00);
+        request.setPrincipal(10000.00);
+        request.setMinPrincipal(5000.00);
+        request.setMaxPrincipal(15000.00);
 
-      request.setNumberOfRepayments(4);
-      request.setRepaymentEvery(1);
-      request.setRepaymentFrequencyType(2L);
+        request.setNumberOfRepayments(4);
+        request.setRepaymentEvery(1);
+        request.setRepaymentFrequencyType(2L);
 
-      request.setInterestRatePerPeriod(2.0);
-      request.setMinInterestRatePerPeriod(0.0);
-      request.setMaxInterestRatePerPeriod(23.4);
-      request.setInterestRateFrequencyType(2);
+        request.setInterestRatePerPeriod(2.0);
+        request.setMinInterestRatePerPeriod(0.0);
+        request.setMaxInterestRatePerPeriod(23.4);
+        request.setInterestRateFrequencyType(2);
 
-      request.setAmortizationType(1);
-      request.setInterestType(0);
-      request.setInterestCalculationPeriodType(1);
+        request.setAmortizationType(1);
+        request.setInterestType(0);
+        request.setInterestCalculationPeriodType(1);
 
-      request.setCurrencyCode("USD");
-      request.setDigitsAfterDecimal(2);
+        request.setCurrencyCode("USD");
+        request.setDigitsAfterDecimal(2);
 
-      request.setHoldGuaranteeFunds(true);
-      request.setMultiDisburseLoan(false);
+        request.setHoldGuaranteeFunds(true);
+        request.setMultiDisburseLoan(false);
 
-      request.setInstallmentAmountInMultiplesOf(1);
-      request.setInMultiplesOf(1);
-      request.setAllowPartialPeriodInterestCalcualtion(true);
-      request.setDaysInMonthType(1);
-      request.setDaysInYearType(1);
-      request.setEnableAccrualActivityPosting(false);
+        request.setInstallmentAmountInMultiplesOf(1);
+        request.setInMultiplesOf(1);
+        request.setAllowPartialPeriodInterestCalcualtion(true);
+        request.setDaysInMonthType(1);
+        request.setDaysInYearType(1);
+        request.setEnableAccrualActivityPosting(false);
 
-      final Call<PostLoanProductsResponse> createLoanProduct = FineractClientHelper.getFineractClient().loanProducts.createLoanProduct(request);
-      final Response<PostLoanProductsResponse> response = createLoanProduct.execute();
+        final Call<PostLoanProductsResponse> createLoanProduct = FineractClientHelper.getFineractClient().loanProducts
+                .createLoanProduct(request);
+        final Response<PostLoanProductsResponse> response = createLoanProduct.execute();
 
-      if (response.isSuccessful() && response.body() != null) {
-        return response.body().getResourceId().intValue();
-      }
+        if (response.isSuccessful() && response.body() != null) {
+            return response.body().getResourceId().intValue();
+        }
 
-      final String error = response.errorBody() != null ? response.errorBody().string() : "No error body";
-      fail("Loan Product creation failed. HTTP Code: " + response.code() + ", Error: " + error);
+        final String error = response.errorBody() != null ? response.errorBody().string() : "No error body";
+        fail("Loan Product creation failed. HTTP Code: " + response.code() + ", Error: " + error);
 
-      return Integer.MIN_VALUE;
+        return Integer.MIN_VALUE;
     }
 
     private Integer openSavingsAccount(final PostSavingsAccountsRequest savingsRequest, final String selfBalanceVal) throws IOException {
@@ -344,7 +363,8 @@ public class GuarantorIntegrationTest {
         return Integer.MIN_VALUE;
     }
 
-    private GetClientsClientIdResponse verifyClientCreated(final Long clientID, final Boolean staffInSelectedOfficeOnly) throws IOException {
+    private GetClientsClientIdResponse verifyClientCreated(final Long clientID, final Boolean staffInSelectedOfficeOnly)
+            throws IOException {
         final Call<GetClientsClientIdResponse> verifyCall = FineractClientHelper.getFineractClient().clients
                 .retrieveOne11(clientID.longValue(), false);
 
