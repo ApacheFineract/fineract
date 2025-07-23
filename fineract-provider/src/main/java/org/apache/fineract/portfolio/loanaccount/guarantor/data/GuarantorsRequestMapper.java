@@ -16,20 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.guarantor.service;
+package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
-import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public interface GuarantorWritePlatformService {
+@Mapper(componentModel = "spring")
+public interface GuarantorsRequestMapper {
+  GuarantorsRequestMapper INSTANCE = Mappers.getMapper(GuarantorsRequestMapper.class);
 
-    CommandProcessingResult createGuarantor(Long loanId, JsonCommand command);
-    
-    CommandProcessingResult createGuarantor(Command<CreateGuarantorsRequest> command);
+  @Mapping(target = "loanId", ignore = true)
+  CreateGuarantorsRequest toCreateRequest(GuarantorsRequest source);
 
-    CommandProcessingResult updateGuarantor(Long loanId, Long guarantorId, JsonCommand command);
-
-    CommandProcessingResult removeGuarantor(Long loanId, Long guarantorId, Long guarantorFundingId);
-
+  GuarantorsRequest fromCreateRequest(CreateGuarantorsRequest source);
 }
