@@ -48,6 +48,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.GuarantorCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequestMapper;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.Guarantor;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundStatusType;
@@ -83,6 +84,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     private final SavingsAccountAssembler savingsAccountAssembler;
     private final AccountAssociationsRepository accountAssociationsRepository;
     private final GuarantorDomainService guarantorDomainService;
+    private final GuarantorsRequestMapper guarantorsRequestMapper;
 
     @Deprecated
     @Override
@@ -187,7 +189,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             final Collection<Guarantor> existGuarantorList) {
 
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String json = gson.toJson(command.getPayload().getRequest());
+        final String json = gson.toJson(command.getPayload());
 
         try {
 
@@ -348,7 +350,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     public CommandProcessingResult updateGuarantor(final Command<UpdateGuarantorsRequest> command) {
 
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String json = gson.toJson(command.getPayload().getRequest());
+        final String json = gson.toJson(guarantorsRequestMapper.fromUpdateRequest(command.getPayload()));
 
         try {
             final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(json);
@@ -361,7 +363,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
                 throw new GuarantorNotFoundException(command.getPayload().getLoanId(), command.getPayload().getGuarantorId());
             }
 
-            final Map<String, Object> changesOnly = guarantorForUpdate.update(command);
+            final Map<String, Object> changesOnly = guarantorForUpdate.update(command, guarantorsRequestMapper);
 
             if (changesOnly.containsKey(GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue())) {
                 final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();

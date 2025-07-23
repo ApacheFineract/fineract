@@ -44,12 +44,13 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequestMapper;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 
 @Entity
 @Table(name = "m_guarantor")
 public class Guarantor extends AbstractPersistableCustom<Long> {
-
+  
     private static final long serialVersionUID = 1L;
 
     @ManyToOne
@@ -167,23 +168,23 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
 
     public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType,
             final Command<CreateGuarantorsRequest> command, final List<GuarantorFundingDetails> fundingDetails) {
-        final Integer gurantorType = command.getPayload().getRequest().getGuarantorTypeId();// command.integerValueSansLocaleOfParameterNamed(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue());
-        final Long entityId = command.getPayload().getRequest().getEntityId(); // command.longValueOfParameterNamed(GuarantorJSONinputParams.ENTITY_ID.getValue());
+        final Integer gurantorType = command.getPayload().getGuarantorTypeId();// command.integerValueSansLocaleOfParameterNamed(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue());
+        final Long entityId = command.getPayload().getEntityId(); // command.longValueOfParameterNamed(GuarantorJSONinputParams.ENTITY_ID.getValue());
         final boolean active = true;
         if (GuarantorType.EXTERNAL.getValue().equals(gurantorType)) {
-            final String firstname = command.getPayload().getRequest().getFirstname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.FIRSTNAME.getValue());
-            final String lastname = command.getPayload().getRequest().getLastname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.LASTNAME.getValue());
+            final String firstname = command.getPayload().getFirstname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.FIRSTNAME.getValue());
+            final String lastname = command.getPayload().getLastname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.LASTNAME.getValue());
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-            final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getRequest().getDob(), formatter); // command.localDateValueOfParameterNamed(GuarantorJSONinputParams.DATE_OF_BIRTH.getValue());
-            final String addressLine1 = command.getPayload().getRequest().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_1.getValue());
-            final String addressLine2 = command.getPayload().getRequest().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_2.getValue());
-            final String city = command.getPayload().getRequest().getCity(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.CITY.getValue());
-            final String state = command.getPayload().getRequest().getState(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.STATE.getValue());
-            final String country = command.getPayload().getRequest().getCountry(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COUNTRY.getValue());
-            final String zip = command.getPayload().getRequest().getZip(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ZIP.getValue());
-            final String housePhoneNumber = command.getPayload().getRequest().getHousePhoneNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.PHONE_NUMBER.getValue());
-            final String mobilePhoneNumber = command.getPayload().getRequest().getMobileNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.MOBILE_NUMBER.getValue());
-            final String comment = command.getPayload().getRequest().getComment(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COMMENT.getValue());
+            final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getDob(), formatter); // command.localDateValueOfParameterNamed(GuarantorJSONinputParams.DATE_OF_BIRTH.getValue());
+            final String addressLine1 = command.getPayload().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_1.getValue());
+            final String addressLine2 = command.getPayload().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_2.getValue());
+            final String city = command.getPayload().getCity(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.CITY.getValue());
+            final String state = command.getPayload().getState(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.STATE.getValue());
+            final String country = command.getPayload().getCountry(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COUNTRY.getValue());
+            final String zip = command.getPayload().getZip(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ZIP.getValue());
+            final String housePhoneNumber = command.getPayload().getHousePhoneNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.PHONE_NUMBER.getValue());
+            final String mobilePhoneNumber = command.getPayload().getMobileNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.MOBILE_NUMBER.getValue());
+            final String comment = command.getPayload().getComment(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COMMENT.getValue());
 
             return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, firstname, lastname, dateOfBirth, addressLine1,
                     addressLine2, city, state, country, zip, housePhoneNumber, mobilePhoneNumber, comment, active, fundingDetails);
@@ -220,25 +221,25 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         return actualChanges;
     }
 
-    public Map<String, Object> update(final Command<UpdateGuarantorsRequest> command) {
+    public Map<String, Object> update(final Command<UpdateGuarantorsRequest> command, GuarantorsRequestMapper guarantorsRequestMapper) {
 
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
 
         handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue(), 0);
 
         if (isExternalGuarantor()) {
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.FIRSTNAME.getValue(), this.firstname);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.LASTNAME.getValue(), this.lastname);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.FIRSTNAME.getValue(), this.firstname, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.LASTNAME.getValue(), this.lastname, guarantorsRequestMapper);
             handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.DATE_OF_BIRTH.getValue(), this.dateOfBirth);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ADDRESS_LINE_1.getValue(), this.addressLine1);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ADDRESS_LINE_2.getValue(), this.addressLine2);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.CITY.getValue(), this.city);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.STATE.getValue(), this.state);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.COUNTRY.getValue(), this.country);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ZIP.getValue(), this.zip);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.PHONE_NUMBER.getValue(), this.housePhoneNumber);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.MOBILE_NUMBER.getValue(), this.mobilePhoneNumber);
-            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.COMMENT.getValue(), this.comment);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ADDRESS_LINE_1.getValue(), this.addressLine1, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ADDRESS_LINE_2.getValue(), this.addressLine2, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.CITY.getValue(), this.city, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.STATE.getValue(), this.state, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.COUNTRY.getValue(), this.country, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.ZIP.getValue(), this.zip, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.PHONE_NUMBER.getValue(), this.housePhoneNumber, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.MOBILE_NUMBER.getValue(), this.mobilePhoneNumber, guarantorsRequestMapper);
+            handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.COMMENT.getValue(), this.comment, guarantorsRequestMapper);
             updateExistingEntityToNull();
         }
 
@@ -280,8 +281,8 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
     private void handlePropertyUpdate(final Command<UpdateGuarantorsRequest> command, final Map<String, Object> actualChanges,
             final String paramName, Integer propertyToBeUpdated) {
 
-        if (!command.getPayload().getRequest().getClientRelationshipTypeId().equals(propertyToBeUpdated.longValue())) {
-            Integer newValue = command.getPayload().getRequest().getClientRelationshipTypeId().intValue();
+        if (!command.getPayload().getClientRelationshipTypeId().equals(propertyToBeUpdated.longValue())) {
+            Integer newValue = command.getPayload().getClientRelationshipTypeId().intValue();
             actualChanges.put(paramName, newValue);
             // propertyToBeUpdated = newValue;
 
@@ -328,9 +329,9 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
     }
 
     private void handlePropertyUpdate(final Command<UpdateGuarantorsRequest> command, final Map<String, Object> actualChanges,
-            final String paramName, String propertyToBeUpdated) {
-
-        final GuarantorsRequest request = command.getPayload().getRequest();
+            final String paramName, String propertyToBeUpdated, GuarantorsRequestMapper guarantorsRequestMapper) {
+      
+        final GuarantorsRequest request = guarantorsRequestMapper.fromUpdateRequest(command.getPayload());
 
         // Current entity field values
         Map<String, Supplier<String>> currentValues = Map.ofEntries(
@@ -404,9 +405,9 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
             final String paramName, LocalDate propertyToBeUpdated) {
 
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getRequest().getDob(), formatter);
+        final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getDob(), formatter);
 
-        if (command.getPayload().getRequest().getDob() != null && !dateOfBirth.equals(propertyToBeUpdated)
+        if (command.getPayload().getDob() != null && !dateOfBirth.equals(propertyToBeUpdated)
                 && !this.dateOfBirth.equals(dateOfBirth)) {
             final LocalDate newValue = dateOfBirth;
             actualChanges.put(paramName, newValue);

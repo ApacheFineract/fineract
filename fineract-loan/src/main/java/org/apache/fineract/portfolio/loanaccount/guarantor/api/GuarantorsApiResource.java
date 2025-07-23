@@ -155,8 +155,8 @@ public class GuarantorsApiResource {
         // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
-        final CreateGuarantorsRequest request = CreateGuarantorsRequest.builder().loanId(loanId).request(guarantorsRequest).build();
-
+        final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
+        request.setLoanId(loanId);
         // final CreateGuarantorsRequest request = guarantorsRequestMapper.toCreateRequest(guarantorsRequest);
 
         command.setId(UUID.randomUUID());
@@ -182,8 +182,9 @@ public class GuarantorsApiResource {
 
         final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
 
-        final UpdateGuarantorsRequest request = UpdateGuarantorsRequest.builder().loanId(loanId).guarantorId(guarantorId)
-                .request(guarantorsRequest).build();
+        final UpdateGuarantorsRequest request = guarantorsRequestMapper.toUpdateRequest(guarantorsRequest);
+        request.setLoanId(loanId);
+        request.setGuarantorId(guarantorId);
 
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
@@ -192,7 +193,6 @@ public class GuarantorsApiResource {
         final Supplier<CommandProcessingResult> response = commandPipeline.send(command);
 
         return response.get();
-
     }
 
     @DELETE
