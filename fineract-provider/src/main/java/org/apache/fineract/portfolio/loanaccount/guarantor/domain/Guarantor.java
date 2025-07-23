@@ -26,21 +26,30 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import java.io.Serial;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 
 @Entity
 @Table(name = "m_guarantor")
 public class Guarantor extends AbstractPersistableCustom<Long> {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
@@ -153,6 +162,34 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, null, null, null, null, null, null, null, null, null,
                 null, null, null, active, fundingDetails);
 
+    }
+    
+    public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType,
+        final Command<CreateGuarantorsRequest> command, final List<GuarantorFundingDetails> fundingDetails) {
+      final Integer gurantorType = command.getPayload().getGuarantorTypeId();
+      final Long entityId = command.getPayload().getEntityId();
+      final boolean active = true;
+      if (GuarantorType.EXTERNAL.getValue().equals(gurantorType)) {
+          final String firstname = command.getPayload().getFirstname();
+          final String lastname = command.getPayload().getLastname();
+          final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+          final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getDob(), formatter);
+          final String addressLine1 = command.getPayload().getAddressLine1();
+          final String addressLine2 = command.getPayload().getAddressLine1();
+          final String city = command.getPayload().getCity();
+          final String state = command.getPayload().getState();
+          final String country = command.getPayload().getCountry();
+          final String zip = command.getPayload().getZip();
+          final String housePhoneNumber = command.getPayload().getHousePhoneNumber();
+          final String mobilePhoneNumber = command.getPayload().getMobileNumber();
+          final String comment = command.getPayload().getComment(); 
+  
+          return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, firstname, lastname, dateOfBirth, addressLine1,
+                  addressLine2, city, state, country, zip, housePhoneNumber, mobilePhoneNumber, comment, active, fundingDetails);
+      }
+
+      return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, null, null, null, null, null, null, null, null, null,
+              null, null, null, active, fundingDetails);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
