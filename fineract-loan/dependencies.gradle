@@ -29,6 +29,9 @@ dependencies {
     implementation(project(path: ':fineract-charge'))
     implementation(project(path: ':fineract-rates'))
     implementation(project(path: ':fineract-tax'))
+    implementation(project(path: ':fineract-command'))
+    implementation(project(path: ':fineract-avro-schemas'))
+    implementation(project(path: ':fineract-validation'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',
