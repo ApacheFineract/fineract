@@ -27,16 +27,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.GuarantorJSONinputParams;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 
 @Entity
 @Table(name = "m_guarantor")
@@ -360,4 +364,34 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         }
         return isSelf;
     }
+
+    public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType,
+        final Command<CreateGuarantorsRequest> command, final List<GuarantorFundingDetails> fundingDetails) {
+    final Integer gurantorType = command.getPayload().getGuarantorTypeId();// command.integerValueSansLocaleOfParameterNamed(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue());
+    final Long entityId = command.getPayload().getEntityId(); // command.longValueOfParameterNamed(GuarantorJSONinputParams.ENTITY_ID.getValue());
+    final boolean active = true;
+    if (GuarantorType.EXTERNAL.getValue().equals(gurantorType)) {
+        final String firstname = command.getPayload().getFirstname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.FIRSTNAME.getValue());
+        final String lastname = command.getPayload().getLastname(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.LASTNAME.getValue());
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        final LocalDate dateOfBirth = LocalDate.parse(command.getPayload().getDob(), formatter); // command.localDateValueOfParameterNamed(GuarantorJSONinputParams.DATE_OF_BIRTH.getValue());
+        final String addressLine1 = command.getPayload().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_1.getValue());
+        final String addressLine2 = command.getPayload().getAddressLine1(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ADDRESS_LINE_2.getValue());
+        final String city = command.getPayload().getCity(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.CITY.getValue());
+        final String state = command.getPayload().getState(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.STATE.getValue());
+        final String country = command.getPayload().getCountry(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COUNTRY.getValue());
+        final String zip = command.getPayload().getZip(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.ZIP.getValue());
+        final String housePhoneNumber = command.getPayload().getHousePhoneNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.PHONE_NUMBER.getValue());
+        final String mobilePhoneNumber = command.getPayload().getMobileNumber(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.MOBILE_NUMBER.getValue());
+        final String comment = command.getPayload().getComment(); // command.stringValueOfParameterNamed(GuarantorJSONinputParams.COMMENT.getValue());
+
+        return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, firstname, lastname, dateOfBirth, addressLine1,
+                addressLine2, city, state, country, zip, housePhoneNumber, mobilePhoneNumber, comment, active, fundingDetails);
+    }
+
+    return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, null, null, null, null, null, null, null, null, null,
+            null, null, null, active, fundingDetails);
+
+    }
+
 }
