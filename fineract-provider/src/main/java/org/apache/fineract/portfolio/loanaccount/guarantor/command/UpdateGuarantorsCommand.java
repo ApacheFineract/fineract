@@ -16,26 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.guarantor.data;
+package org.apache.fineract.portfolio.loanaccount.guarantor.command;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import java.io.Serial;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 
-@Mapper(componentModel = "spring")
-public interface GuarantorsRequestMapper {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class UpdateGuarantorsCommand extends Command<UpdateGuarantorsRequest> {
 
-  GuarantorsRequestMapper INSTANCE = Mappers.getMapper(GuarantorsRequestMapper.class);
-
-  @Mapping(target = "loanId", ignore = true)
-  CreateGuarantorsRequest toCreateRequest(GuarantorsRequest source);
-
-  GuarantorsRequest fromCreateRequest(CreateGuarantorsRequest source);
-
-  @Mapping(target = "loanId", ignore = true)
-  @Mapping(target = "guarantorId", ignore = true)
-  UpdateGuarantorsRequest toUpdateRequest(GuarantorsRequest source);
-
-  GuarantorsRequest fromUpdateRequest(UpdateGuarantorsRequest source);
+  @Serial
+  private static final long serialVersionUID = 1L;
 
 }
