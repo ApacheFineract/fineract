@@ -344,7 +344,6 @@ allprojects  {
             // Apache-specific GitHub metadata settings file
             '/.asf.yaml',
             '**/*.sh',
-            '**/.metadata/**',
             "**/*.json"
         ]
     }
