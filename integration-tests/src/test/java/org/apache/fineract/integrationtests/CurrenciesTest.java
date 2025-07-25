@@ -92,6 +92,7 @@ public class CurrenciesTest {
         assertEquals(currenciesBeforeUpdate, currenciesAfterUpdate, "Verifying selected currencies match after update");
     }
 
+    // Test cases added
     @Test
     public void testCreateCurrencyPostApi_CurrencyCodeNotEqualToNull() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code(null).decimalPlaces(2).displaySymbol("¤")
