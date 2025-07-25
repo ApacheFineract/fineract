@@ -94,7 +94,7 @@ public class CurrenciesTest {
 
     @Test
     public void testCreateCurrencyPostApi_CurrencyCodeNotEqualToNull() throws IOException {
-        CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
+        CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code(null).decimalPlaces(2).displaySymbol("¤")
                 .inMultiplesOf(1).name("XYZ Token").nameCode("currency.XYZ");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
