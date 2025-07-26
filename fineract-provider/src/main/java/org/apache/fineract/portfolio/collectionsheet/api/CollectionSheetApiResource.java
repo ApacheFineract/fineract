@@ -56,7 +56,7 @@ import org.springframework.stereotype.Component;
 @Tag(name = "Collection Sheet", description = "")
 @RequiredArgsConstructor
 public class CollectionSheetApiResource {
-
+    // Comments added
     private final CollectionSheetReadPlatformService collectionSheetReadPlatformService;
     private final ToApiJsonSerializer<Object> toApiJsonSerializer;
     private final FromJsonHelper fromJsonHelper;
