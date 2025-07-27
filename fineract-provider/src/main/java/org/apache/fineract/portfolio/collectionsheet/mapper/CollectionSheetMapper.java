@@ -16,18 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.collectionsheet.service;
+package org.apache.fineract.portfolio.collectionsheet.mapper;
 
-import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.SaveCollectionSheetRequest;
+import org.mapstruct.Mapper;
 
-public interface CollectionSheetWritePlatformService {
+@Mapper(componentModel = "spring")
+public interface CollectionSheetMapper {
 
-    CommandProcessingResult updateCollectionSheet(JsonCommand command);
+    SaveCollectionSheetRequest toSaveRequest(CollectionSheetRequest request);
 
-    CommandProcessingResult saveIndividualCollectionSheet(JsonCommand command);
-
-    CommandProcessingResult saveIndividualCollectionSheet(Command<SaveCollectionSheetRequest> command);
+    CollectionSheetRequest toCollectionSheetRequest(SaveCollectionSheetRequest request);
 }

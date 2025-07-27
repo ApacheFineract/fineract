@@ -16,18 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.collectionsheet.service;
+package org.apache.fineract.portfolio.collectionsheet.data;
 
-import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.portfolio.collectionsheet.data.SaveCollectionSheetRequest;
+import java.io.Serial;
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 
-public interface CollectionSheetWritePlatformService {
+@Data
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@FieldNameConstants
+public class SaveCollectionSheetRequest implements Serializable {
 
-    CommandProcessingResult updateCollectionSheet(JsonCommand command);
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    CommandProcessingResult saveIndividualCollectionSheet(JsonCommand command);
-
-    CommandProcessingResult saveIndividualCollectionSheet(Command<SaveCollectionSheetRequest> command);
+    private Long officeId;
+    private String dateFormat;
+    private String locale;
+    private String actualDisbursementDate;
+    private String transactionDate;
+    private DisbursementTransactionsRequest bulkDisbursementTransactions;
 }

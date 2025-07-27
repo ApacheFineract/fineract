@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,12 +28,20 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.commands.domain.CommandWrapper;
+import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
+import org.apache.fineract.portfolio.collectionsheet.data.SaveCollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.mapper.CollectionSheetMapper;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
@@ -55,6 +66,9 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
     private final DepositAccountWritePlatformService accountWritePlatformService;
     private final PaymentDetailAssembler paymentDetailAssembler;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
+    private final CollectionSheetMapper mapper;
+    private final ToApiJsonSerializer<Object> toApiJsonSerializer;
+    private final FromJsonHelper fromApiJsonHelper;
 
     @Override
     public CommandProcessingResult updateCollectionSheet(final JsonCommand command) {
@@ -115,12 +129,51 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                 .with(changes).with(changes).build();
     }
 
+    @Override
+    public CommandProcessingResult saveIndividualCollectionSheet(Command<SaveCollectionSheetRequest> command) {
+
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        final CollectionSheetRequest request = mapper.toCollectionSheetRequest(command.getPayload());
+        final String json = gson.toJson(request);
+
+        this.transactionDataValidator.validateIndividualCollectionSheet(json);
+
+        final Map<String, Object> changes = new HashMap<>();
+        changes.put("locale", request.getLocale());
+        changes.put("dateFormat", request.getDateFormat());
+
+        final String payload = toApiJsonSerializer.serialize(request);
+        final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
+        final CommandWrapper wrapper = builder.saveIndividualCollectionSheet().build();
+        final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+
+        final JsonCommand jsonCommand = JsonCommand.from(json, parsedCommand, this.fromApiJsonHelper, wrapper.getEntityName(),
+                wrapper.getEntityId(), wrapper.getSubentityId(), wrapper.getGroupId(), wrapper.getClientId(), wrapper.getLoanId(),
+                wrapper.getSavingsId(), wrapper.getTransactionId(), wrapper.getHref(), wrapper.getProductId(), wrapper.getCreditBureauId(),
+                wrapper.getOrganisationCreditBureauId(), wrapper.getJobName(), wrapper.getLoanExternalId());
+
+        final PaymentDetail paymentDetail = null;
+
+        changes.putAll(updateBulkRepayments(json, paymentDetail));
+
+        changes.putAll(updateBulkDisbursals(jsonCommand));
+
+        changes.putAll(updateBulkMandatorySavingsDuePayments(json, paymentDetail));
+        return new CommandProcessingResultBuilder().withCommandId((long) command.getId().hashCode()).with(changes).with(changes).build();
+    }
+
     private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
         changes.putAll(this.loanWritePlatformService.makeLoanBulkRepayment(bulkRepaymentCommand));
         return changes;
+    }
+
+    private Map<String, Object> updateBulkRepayments(final String json, final PaymentDetail paymentDetail) {
+        final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
+                .commandFromApiJson(json, paymentDetail);
+        return new HashMap<>(this.loanWritePlatformService.makeLoanBulkRepayment(bulkRepaymentCommand));
     }
 
     private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
@@ -149,4 +202,21 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         return changes;
     }
 
+    private Map<String, Object> updateBulkMandatorySavingsDuePayments(final String json, final PaymentDetail paymentDetail) {
+        final Map<String, Object> changes = new HashMap<>();
+        final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler
+                .assembleBulkMandatorySavingsAccountTransactionDTOs(json, paymentDetail);
+        List<Long> depositTransactionIds = new ArrayList<>();
+        for (SavingsAccountTransactionDTO savingsAccountTransactionDTO : savingsTransactions) {
+            try {
+                SavingsAccountTransaction savingsAccountTransaction = this.accountWritePlatformService
+                        .mandatorySavingsAccountDeposit(savingsAccountTransactionDTO);
+                depositTransactionIds.add(savingsAccountTransaction.getId());
+            } catch (Exception e) {
+                throw new RuntimeException("Exception occurred while processing savings account transaction.", e);
+            }
+        }
+        changes.put("SavingsTransactions", depositTransactionIds);
+        return changes;
+    }
 }

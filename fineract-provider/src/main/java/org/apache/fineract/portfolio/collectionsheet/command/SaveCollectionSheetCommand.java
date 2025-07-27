@@ -16,18 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.collectionsheet.service;
+package org.apache.fineract.portfolio.collectionsheet.command;
 
+import java.io.Serial;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.portfolio.collectionsheet.data.SaveCollectionSheetRequest;
 
-public interface CollectionSheetWritePlatformService {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SaveCollectionSheetCommand extends Command<SaveCollectionSheetRequest> {
 
-    CommandProcessingResult updateCollectionSheet(JsonCommand command);
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    CommandProcessingResult saveIndividualCollectionSheet(JsonCommand command);
-
-    CommandProcessingResult saveIndividualCollectionSheet(Command<SaveCollectionSheetRequest> command);
 }
