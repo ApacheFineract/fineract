@@ -215,13 +215,14 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_NameSizeGreaterThanFifty() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token XYZ Token XYZ Token XYZ Token XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token XYZ Token XYZ Token XYZ Token XYZ  XYZ Token XYZ Token XYZ Token XYZ Token XYZ Token")
+                .nameCode("currency.XYZ");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
         Response<CurrencyCreateResponse> response = call.execute();
 
-        assertThat(response.code()).isEqualTo(403);
+        assertThat(response.code()).isEqualTo(400);
     }
 
     @Test
