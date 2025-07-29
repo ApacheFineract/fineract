@@ -95,7 +95,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_CurrencyCodeNotEqualToNull() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code(null).decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -107,7 +107,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_CurrencyCodeNotEqualToRegex() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYz").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -119,7 +119,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_CurrencyCodeNotEqualAlphabetsOnly() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("123").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("123 Token").nameCode("currency.123");
+                .inMultiplesOf(1).name("123 Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -129,21 +129,9 @@ public class CurrenciesTest {
     }
 
     @Test
-    public void testCreateCurrencyPostApi_CurrencyCodeDoesNotMatchNameCode() throws IOException {
-        CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("currency.ABC");
-
-        CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
-        Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
-        Response<CurrencyCreateResponse> response = call.execute();
-
-        assertThat(response.code()).isEqualTo(403);
-    }
-
-    @Test
     public void testCreateCurrencyPostApi_DecimalPlacesLessThanZero() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(-1).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -155,7 +143,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_DecimalPlacesMoreThanFive() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(6).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -167,7 +155,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_InMultiplesOfLessThanZero() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(-1).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(-1).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -179,7 +167,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_InMultiplesOfMoreThanThousand() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1001).name("XYZ Token").nameCode("currency.XYZ");
+                .inMultiplesOf(1001).name("XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -191,7 +179,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_duplicateCurrencyOrCurrencyExists() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("USD").decimalPlaces(2).displaySymbol("$")
-                .inMultiplesOf(1).name("US Dollar").nameCode("currency.USD");
+                .inMultiplesOf(1).name("US Dollar");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -203,7 +191,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_NameSizeLessThanFive() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ").nameCode("currency.XYZ");
+                .inMultiplesOf(1).name("XYZ");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
@@ -215,20 +203,7 @@ public class CurrenciesTest {
     @Test
     public void testCreateCurrencyPostApi_NameSizeGreaterThanFifty() throws IOException {
         CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token XYZ Token XYZ Token XYZ Token XYZ  XYZ Token XYZ Token XYZ Token XYZ Token XYZ Token")
-                .nameCode("currency.XYZ");
-
-        CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
-        Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);
-        Response<CurrencyCreateResponse> response = call.execute();
-
-        assertThat(response.code()).isEqualTo(400);
-    }
-
-    @Test
-    public void testCreateCurrencyPostApi_ErrorInNameCodePattern() throws IOException {
-        CurrencyCreateRequest createCurrencyData = new CurrencyCreateRequest().code("XYZ").decimalPlaces(2).displaySymbol("¤")
-                .inMultiplesOf(1).name("XYZ Token").nameCode("Currency.XYZ");
+                .inMultiplesOf(1).name("XYZ Token XYZ Token XYZ Token XYZ Token XYZ  XYZ Token XYZ Token XYZ Token XYZ Token XYZ Token");
 
         CurrencyApi currencyApi = FineractClientHelper.getFineractClient().currencies;
         Call<CurrencyCreateResponse> call = currencyApi.createCurrencies(createCurrencyData);

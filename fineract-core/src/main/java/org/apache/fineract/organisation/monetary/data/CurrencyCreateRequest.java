@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.organisation.monetary.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -26,14 +27,14 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
 public class CurrencyCreateRequest implements Serializable {
 
@@ -60,7 +61,6 @@ public class CurrencyCreateRequest implements Serializable {
     @NotBlank(message = "{currency.displaySymbol.notBlank}")
     private String displaySymbol;
 
-    @NotBlank(message = "{currency.nameCode.notBlank}")
-    @Pattern(regexp = "^currency\\.[A-Z]{3}$", message = "{currency.nameCode.invalidFormat}")
+    @JsonIgnore
     private String nameCode;
 }

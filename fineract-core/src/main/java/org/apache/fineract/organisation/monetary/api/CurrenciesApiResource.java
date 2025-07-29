@@ -90,6 +90,8 @@ public class CurrenciesApiResource {
     public CurrencyCreateResponse createCurrencies(@Valid CurrencyCreateRequest request) {
         final CurrencyCreateCommand command = new CurrencyCreateCommand();
 
+        request.setNameCode("currency." + request.getCode());
+
         command.setId(UUID.randomUUID());
         command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
         command.setPayload(request);
