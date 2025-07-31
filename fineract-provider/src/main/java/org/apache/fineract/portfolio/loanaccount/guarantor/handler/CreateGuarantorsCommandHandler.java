@@ -16,22 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.guarantor.service;
+package org.apache.fineract.portfolio.loanaccount.guarantor.handler;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsResponse;
+import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorWritePlatformService;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface GuarantorWritePlatformService {
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class CreateGuarantorsCommandHandler implements CommandHandler<CreateGuarantorsRequest,
+        CreateGuarantorsResponse> {
 
-    @Deprecated
-    CommandProcessingResult createGuarantor(Long loanId, JsonCommand command);
+  private final GuarantorWritePlatformService writePlatformService;
 
-    CommandProcessingResult updateGuarantor(Long loanId, Long guarantorId, JsonCommand command);
-
-    CommandProcessingResult removeGuarantor(Long loanId, Long guarantorId, Long guarantorFundingId);
-
-    CreateGuarantorsResponse createGuarantor(Command<CreateGuarantorsRequest> command);
+  @Transactional
+  @Override
+  public CreateGuarantorsResponse handle(Command<CreateGuarantorsRequest> command) {
+    return this.writePlatformService.createGuarantor(command);
+  }
 }

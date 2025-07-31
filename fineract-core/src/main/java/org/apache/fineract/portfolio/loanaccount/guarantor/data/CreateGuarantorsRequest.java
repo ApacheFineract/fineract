@@ -20,6 +20,8 @@ package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -66,7 +68,8 @@ public class CreateGuarantorsRequest implements Serializable {
 
     /*** Fields for current customers serving as guarantors **/
     @NotNull(message = "{guarantor.guarantorTypeId.notNull}")
-    @PositiveOrZero(message = "{guarantor.guarantorTypeId.positiveOrZero}")
+    @Min(value = 1, message = "{guarantor.guarantorTypeId.min}")
+    @Max(value = 3, message = "{guarantor.guarantorTypeId.max}")
     @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorTypeId.digits}")
     private Integer guarantorTypeId;
 
