@@ -31,14 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateGuarantorsCommandHandler implements CommandHandler<CreateGuarantorsRequest,
-        CreateGuarantorsResponse> {
+public class CreateGuarantorsCommandHandler implements CommandHandler<CreateGuarantorsRequest, CreateGuarantorsResponse> {
 
-  private final GuarantorWritePlatformService writePlatformService;
+    private final GuarantorWritePlatformService writePlatformService;
 
-  @Transactional
-  @Override
-  public CreateGuarantorsResponse handle(Command<CreateGuarantorsRequest> command) {
-    return this.writePlatformService.createGuarantor(command);
-  }
+    @Transactional
+    @Override
+    public CreateGuarantorsResponse handle(Command<CreateGuarantorsRequest> command) {
+        return this.writePlatformService.createGuarantor(command);
+    }
 }

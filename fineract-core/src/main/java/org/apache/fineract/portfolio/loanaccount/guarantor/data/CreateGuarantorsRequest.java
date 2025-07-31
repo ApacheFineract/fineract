@@ -87,38 +87,37 @@ public class CreateGuarantorsRequest implements Serializable {
     @Size(max = 50, message = "{guarantor.lastname.size}")
     private String lastname;
 
-    @NotBlank(message = "{guarantor.addressLine1.notBlank}")
     @Size(max = 500, message = "{guarantor.addressLine1.size}")
     private String addressLine1;
 
     @Size(max = 500, message = "{guarantor.addressLine2.size}")
     private String addressLine2;
 
-    @NotBlank(message = "{guarantor.city.notBlank}")
     @Size(max = 50, message = "{guarantor.city.size}")
     private String city;
 
     @Size(max = 50, message = "{guarantor.state.size}")
     private String state;
 
-    @NotBlank(message = "{guarantor.zip.notBlank}")
     @Size(max = 20, message = "{guarantor.zip.size}")
     private String zip;
 
     @Size(max = 20, message = "{guarantor.country.size}")
     private String country;
 
-    @NotBlank(message = "{guarantor.mobileNumber.notBlank}")
     @Pattern(regexp = "^[0-9]{10,15}$", message = "{guarantor.mobileNumber.invalid}")
+    @Size(max = 20, message = "{guarantor.mobileNumber.size}")
     private String mobileNumber;
 
     @Pattern(regexp = "^[0-9]{10,15}$", message = "{guarantor.housePhoneNumber.invalid}")
+    @Size(max = 20, message = "{guarantor.housePhoneNumber.size}")
     private String housePhoneNumber;
 
     @Size(max = 500, message = "{guarantor.comment.size}")
     private String comment;
 
     @NotNull(message = "{guarantor.dob.notNull}")
+    @Size(max = 50, message = "{guarantor.dob.size}")
     private String dob;
 
     @PositiveOrZero(message = "{guarantor.savingsId.positiveOrZero}")
