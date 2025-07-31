@@ -22,6 +22,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -59,6 +63,7 @@ import org.apache.fineract.portfolio.account.data.PortfolioAccountDTO;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
@@ -133,15 +138,25 @@ public class GuarantorsApiResource {
         return guarantorData;
     }
 
+    // @POST
+    // @Consumes({ MediaType.APPLICATION_JSON })
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest
+    // guarantorsRequest) {
+    //
+    // final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
+    // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+    //
+    // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // }
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest guarantorsRequest) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
-                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-
-        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    public CommandProcessingResult createGuarantor(
+            @PathParam("loanId") @NotNull(message = "{guarantor.loanId.notNull}") @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}") final Long loanId,
+            @Valid final CreateGuarantorsRequest request) {
+        return null;
     }
 
     @PUT
