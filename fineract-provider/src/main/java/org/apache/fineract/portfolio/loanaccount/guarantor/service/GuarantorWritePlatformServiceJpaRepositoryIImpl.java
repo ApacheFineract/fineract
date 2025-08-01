@@ -84,573 +84,568 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements GuarantorWritePlatformService {
 
-  private final ClientRepositoryWrapper clientRepositoryWrapper;
-  private final StaffRepositoryWrapper staffRepositoryWrapper;
-  private final LoanRepositoryWrapper loanRepositoryWrapper;
-  private final GuarantorRepository guarantorRepository;
-  private final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-  private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
-  private final SavingsAccountAssembler savingsAccountAssembler;
-  private final AccountAssociationsRepository accountAssociationsRepository;
-  private final GuarantorDomainService guarantorDomainService;
-  private final GuarantorMapper mapper;
+    private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final StaffRepositoryWrapper staffRepositoryWrapper;
+    private final LoanRepositoryWrapper loanRepositoryWrapper;
+    private final GuarantorRepository guarantorRepository;
+    private final GuarantorCommandFromApiJsonDeserializer fromApiJsonDeserializer;
+    private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
+    private final SavingsAccountAssembler savingsAccountAssembler;
+    private final AccountAssociationsRepository accountAssociationsRepository;
+    private final GuarantorDomainService guarantorDomainService;
+    private final GuarantorMapper mapper;
 
-  @Deprecated
-  @Override
-  @Transactional
-  public CommandProcessingResult createGuarantor(final Long loanId, final JsonCommand command) {
-    final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
-    final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-    final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
-    return createGuarantor(loan, command, guarantorCommand, existGuarantorList);
-  }
+    @Deprecated
+    @Override
+    @Transactional
+    public CommandProcessingResult createGuarantor(final Long loanId, final JsonCommand command) {
+        final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+        return createGuarantor(loan, command, guarantorCommand, existGuarantorList);
+    }
 
-  @Deprecated
-  private CommandProcessingResult createGuarantor(final Loan loan, final JsonCommand command, final GuarantorCommand guarantorCommand,
-                                                  final Collection<Guarantor> existGuarantorList) {
-    try {
-      guarantorCommand.validateForCreate();
-      validateLoanStatus(loan);
-      final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
-      final boolean backdatedTxnsAllowedTill = false;
-      AccountAssociations accountAssociations = null;
-      if (guarantorCommand.getSavingsId() != null) {
-        final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(guarantorCommand.getSavingsId(),
-                backdatedTxnsAllowedTill);
-        validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
-        accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
-                AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
+    @Deprecated
+    private CommandProcessingResult createGuarantor(final Loan loan, final JsonCommand command, final GuarantorCommand guarantorCommand,
+            final Collection<Guarantor> existGuarantorList) {
+        try {
+            guarantorCommand.validateForCreate();
+            validateLoanStatus(loan);
+            final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
+            final boolean backdatedTxnsAllowedTill = false;
+            AccountAssociations accountAssociations = null;
+            if (guarantorCommand.getSavingsId() != null) {
+                final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(guarantorCommand.getSavingsId(),
+                        backdatedTxnsAllowedTill);
+                validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
+                accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
+                        AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
 
-        GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,
-                GuarantorFundStatusType.ACTIVE.getValue(), guarantorCommand.getAmount());
-        guarantorFundingDetails.add(fundingDetails);
-        if (loan.isDisbursed()
-                || (loan.isApproved() && (loan.getGuaranteeAmount() != null || loan.loanProduct().isHoldGuaranteeFunds()))) {
-          this.guarantorDomainService.assignGuarantor(fundingDetails, DateUtils.getBusinessLocalDate());
-          loan.updateGuaranteeAmount(fundingDetails.getAmount());
-        }
-      }
-
-      final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
-      CodeValue clientRelationshipType = null;
-
-      if (clientRelationshipId != null) {
-        clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
-                GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
-      }
-
-      final Long entityId = guarantorCommand.getEntityId();
-      final Integer guarantorTypeId = guarantorCommand.getGuarantorTypeId();
-      Guarantor guarantor = null;
-      for (final Guarantor avilableGuarantor : existGuarantorList) {
-        if (entityId != null && avilableGuarantor.getEntityId() != null && avilableGuarantor.getEntityId().equals(entityId)
-                && avilableGuarantor.getGurantorType().equals(guarantorTypeId) && avilableGuarantor.isActive()) {
-          if (guarantorCommand.getSavingsId() == null || avilableGuarantor.hasGuarantor(guarantorCommand.getSavingsId())) {
-            /** Get the right guarantor based on guarantorType **/
-            String defaultUserMessage = null;
-            if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
-              defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).displayName();
-            } else {
-              defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,
+                        GuarantorFundStatusType.ACTIVE.getValue(), guarantorCommand.getAmount());
+                guarantorFundingDetails.add(fundingDetails);
+                if (loan.isDisbursed()
+                        || (loan.isApproved() && (loan.getGuaranteeAmount() != null || loan.loanProduct().isHoldGuaranteeFunds()))) {
+                    this.guarantorDomainService.assignGuarantor(fundingDetails, DateUtils.getBusinessLocalDate());
+                    loan.updateGuaranteeAmount(fundingDetails.getAmount());
+                }
             }
 
-            defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
-            final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
-            throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
-                    loan.getId());
-          }
-          guarantor = avilableGuarantor;
-          break;
-        }
-      }
+            final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
+            CodeValue clientRelationshipType = null;
 
-      if (guarantor == null) {
-        guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
-      } else {
-        guarantor.addFundingDetails(guarantorFundingDetails);
-      }
-      validateGuarantorBusinessRules(guarantor);
-      for (GuarantorFundingDetails fundingDetails : guarantorFundingDetails) {
-        fundingDetails.updateGuarantor(guarantor);
-      }
-
-      if (accountAssociations != null) {
-        this.accountAssociationsRepository.saveAndFlush(accountAssociations);
-      }
-      this.guarantorRepository.saveAndFlush(guarantor);
-      return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(guarantor.getOfficeId())
-              .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
-    } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-      final Throwable throwable = dve.getMostSpecificCause();
-      handleGuarantorDataIntegrityIssues(throwable, dve);
-      return CommandProcessingResult.empty();
-    }
-  }
-
-  @Transactional
-  @Override
-  public CreateGuarantorsResponse createGuarantor(Command<CreateGuarantorsRequest> command) {
-    final Long loanId = command.getPayload().getLoanId();
-    final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-    final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
-    return createGuarantor(loan, command, existGuarantorList);
-  }
-
-  private CreateGuarantorsResponse createGuarantor(final Loan loan, final Command<CreateGuarantorsRequest> command,
-                                                   final List<Guarantor> existGuarantorList) {
-    try {
-      // Already Validated - Request
-      // guarantorCommand.validateForCreate(); // Not Required
-      validateLoanStatus(loan); // use existing
-      final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
-      final boolean backdatedTxnsAllowedTill = false;
-      AccountAssociations accountAssociations = null;
-
-      if (command.getPayload().getSavingsId() != null) {
-        final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(command.getPayload().getSavingsId(),
-                backdatedTxnsAllowedTill);
-        validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
-        accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
-                AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
-
-        GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,
-                GuarantorFundStatusType.ACTIVE.getValue(), command.getPayload().getAmount());
-        guarantorFundingDetails.add(fundingDetails);
-        if (loan.isDisbursed()
-                || (loan.isApproved() && (loan.getGuaranteeAmount() != null || loan.loanProduct().isHoldGuaranteeFunds()))) {
-          this.guarantorDomainService.assignGuarantor(fundingDetails, DateUtils.getBusinessLocalDate());
-          loan.updateGuaranteeAmount(fundingDetails.getAmount());
-        }
-      }
-
-      final Long clientRelationshipId = command.getPayload().getClientRelationshipTypeId();
-      CodeValue clientRelationshipType = null;
-
-      if (clientRelationshipId != null) {
-        clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
-                GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
-      }
-
-      final Long entityId = command.getPayload().getEntityId();
-      final Integer guarantorTypeId = command.getPayload().getGuarantorTypeId();
-      Guarantor guarantor = null;
-      for (final Guarantor availableGuarantor : existGuarantorList) {
-        if (entityId != null && availableGuarantor.getEntityId() != null && availableGuarantor.getEntityId().equals(entityId)
-                && availableGuarantor.getGurantorType().equals(guarantorTypeId) && availableGuarantor.isActive()) {
-          if (command.getPayload().getSavingsId() == null
-                  || availableGuarantor.hasGuarantor(command.getPayload().getSavingsId())) {
-            /** Get the right guarantor based on guarantorType **/
-            String defaultUserMessage = null;
-            if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
-              defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).displayName();
-            } else {
-              defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+            if (clientRelationshipId != null) {
+                clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                        GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
             }
 
-            defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
-            final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
-            throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
-                    loan.getId());
-          }
-          guarantor = availableGuarantor;
-          break;
+            final Long entityId = guarantorCommand.getEntityId();
+            final Integer guarantorTypeId = guarantorCommand.getGuarantorTypeId();
+            Guarantor guarantor = null;
+            for (final Guarantor avilableGuarantor : existGuarantorList) {
+                if (entityId != null && avilableGuarantor.getEntityId() != null && avilableGuarantor.getEntityId().equals(entityId)
+                        && avilableGuarantor.getGurantorType().equals(guarantorTypeId) && avilableGuarantor.isActive()) {
+                    if (guarantorCommand.getSavingsId() == null || avilableGuarantor.hasGuarantor(guarantorCommand.getSavingsId())) {
+                        /** Get the right guarantor based on guarantorType **/
+                        String defaultUserMessage = null;
+                        if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
+                            defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).displayName();
+                        } else {
+                            defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        }
+
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
+                                loan.getId());
+                    }
+                    guarantor = avilableGuarantor;
+                    break;
+                }
+            }
+
+            if (guarantor == null) {
+                guarantor = Guarantor.fromJson(loan, clientRelationshipType, command, guarantorFundingDetails);
+            } else {
+                guarantor.addFundingDetails(guarantorFundingDetails);
+            }
+            validateGuarantorBusinessRules(guarantor);
+            for (GuarantorFundingDetails fundingDetails : guarantorFundingDetails) {
+                fundingDetails.updateGuarantor(guarantor);
+            }
+
+            if (accountAssociations != null) {
+                this.accountAssociationsRepository.saveAndFlush(accountAssociations);
+            }
+            this.guarantorRepository.saveAndFlush(guarantor);
+            return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(guarantor.getOfficeId())
+                    .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return CommandProcessingResult.empty();
         }
-      }
-
-      if (guarantor == null) {
-        // Map The Command payload from DTO to Entity
-        guarantor = mapper.toEntity(command.getPayload());
-        guarantor.setDateOfBirth(this.toLocalDate(command.getPayload().getDob(), command.getPayload().getDateFormat(),
-                command.getPayload().getLocale()));
-        guarantor.setLoan(loan);
-        guarantor.setClientRelationshipType(clientRelationshipType);
-        guarantor.setGuarantorFundDetails(guarantorFundingDetails);
-      } else {
-        guarantor.addFundingDetails(guarantorFundingDetails);
-      }
-      validateGuarantorBusinessRules(guarantor);
-      for (GuarantorFundingDetails fundingDetails : guarantorFundingDetails) {
-        fundingDetails.updateGuarantor(guarantor);
-      }
-
-      if (accountAssociations != null) {
-        this.accountAssociationsRepository.saveAndFlush(accountAssociations);
-      }
-      this.guarantorRepository.saveAndFlush(guarantor);
-
-      // return new
-      // CommandProcessingResultBuilder().withCommandId(command.getId()).withOfficeId(guarantor.getOfficeId())
-      // .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
-
-      return CreateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantor.getOfficeId())
-              .entityId(guarantor.getEntityId()).loanId(guarantor.getLoanId()).build();
-
-    } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-      final Throwable throwable = dve.getMostSpecificCause();
-      handleGuarantorDataIntegrityIssues(throwable, dve);
-      return new CreateGuarantorsResponse();
     }
-  }
 
-  private void validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(final Loan loan,
-                                                                                    final SavingsAccount savingsAccount) {
-    if (DateUtils.isBefore(loan.getSubmittedOnDate(), savingsAccount.getActivationDate())) {
-      throw new GeneralPlatformDomainRuleException(
-              "error.msg.guarantor.saving.account.activation.date.is.on.or.before.loan.submitted.on.date",
-              "Guarantor saving account activation date [" + savingsAccount.getActivationDate()
-                      + "] is on or before the loan submitted on date [" + loan.getSubmittedOnDate() + "]",
-              savingsAccount.getActivationDate(), loan.getSubmittedOnDate());
+    @Transactional
+    @Override
+    public CreateGuarantorsResponse createGuarantor(Command<CreateGuarantorsRequest> command) {
+        final Long loanId = command.getPayload().getLoanId();
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+        return createGuarantor(loan, command, existGuarantorList);
     }
-  }
 
-  @Deprecated
-  @Override
-  @Transactional
-  public CommandProcessingResult updateGuarantor(final Long loanId, final Long guarantorId, final JsonCommand command) {
-    try {
-      final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
-      guarantorCommand.validateForUpdate();
+    private CreateGuarantorsResponse createGuarantor(final Loan loan, final Command<CreateGuarantorsRequest> command,
+            final List<Guarantor> existGuarantorList) {
+        try {
+            // Already Validated - Request
+            // guarantorCommand.validateForCreate(); // Not Required
+            validateLoanStatus(loan); // use existing
+            final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
+            final boolean backdatedTxnsAllowedTill = false;
+            AccountAssociations accountAssociations = null;
 
-      final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-      validateLoanStatus(loan);
-      final Guarantor guarantorForUpdate = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
-      if (guarantorForUpdate == null) {
-        throw new GuarantorNotFoundException(loanId, guarantorId);
-      }
+            if (command.getPayload().getSavingsId() != null) {
+                final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(command.getPayload().getSavingsId(),
+                        backdatedTxnsAllowedTill);
+                validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(loan, savingsAccount);
+                accountAssociations = AccountAssociations.associateSavingsAccount(loan, savingsAccount,
+                        AccountAssociationType.GUARANTOR_ACCOUNT_ASSOCIATION.getValue(), backdatedTxnsAllowedTill);
 
-      final Map<String, Object> changesOnly = guarantorForUpdate.update(command);
+                GuarantorFundingDetails fundingDetails = new GuarantorFundingDetails(accountAssociations,
+                        GuarantorFundStatusType.ACTIVE.getValue(), command.getPayload().getAmount());
+                guarantorFundingDetails.add(fundingDetails);
+                if (loan.isDisbursed()
+                        || (loan.isApproved() && (loan.getGuaranteeAmount() != null || loan.loanProduct().isHoldGuaranteeFunds()))) {
+                    this.guarantorDomainService.assignGuarantor(fundingDetails, DateUtils.getBusinessLocalDate());
+                    loan.updateGuaranteeAmount(fundingDetails.getAmount());
+                }
+            }
 
-      if (changesOnly.containsKey(GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue())) {
-        final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
-        CodeValue clientRelationshipType = null;
-        if (clientRelationshipId != null) {
-          clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
-                  GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
+            final Long clientRelationshipId = command.getPayload().getClientRelationshipTypeId();
+            CodeValue clientRelationshipType = null;
+
+            if (clientRelationshipId != null) {
+                clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                        GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
+            }
+
+            final Long entityId = command.getPayload().getEntityId();
+            final Integer guarantorTypeId = command.getPayload().getGuarantorTypeId();
+            Guarantor guarantor = null;
+            for (final Guarantor availableGuarantor : existGuarantorList) {
+                if (entityId != null && availableGuarantor.getEntityId() != null && availableGuarantor.getEntityId().equals(entityId)
+                        && availableGuarantor.getGurantorType().equals(guarantorTypeId) && availableGuarantor.isActive()) {
+                    if (command.getPayload().getSavingsId() == null
+                            || availableGuarantor.hasGuarantor(command.getPayload().getSavingsId())) {
+                        /** Get the right guarantor based on guarantorType **/
+                        String defaultUserMessage = null;
+                        if (guarantorTypeId.equals(GuarantorType.STAFF.getValue())) {
+                            defaultUserMessage = this.staffRepositoryWrapper.findOneWithNotFoundDetection(entityId).displayName();
+                        } else {
+                            defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        }
+
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId,
+                                loan.getId());
+                    }
+                    guarantor = availableGuarantor;
+                    break;
+                }
+            }
+
+            if (guarantor == null) {
+                // Map The Command payload from DTO to Entity
+                guarantor = mapper.toEntity(command.getPayload());
+                guarantor.setDateOfBirth(this.toLocalDate(command.getPayload().getDob(), command.getPayload().getDateFormat(),
+                        command.getPayload().getLocale()));
+                guarantor.setLoan(loan);
+                guarantor.setClientRelationshipType(clientRelationshipType);
+                guarantor.setGuarantorFundDetails(guarantorFundingDetails);
+            } else {
+                guarantor.addFundingDetails(guarantorFundingDetails);
+            }
+            validateGuarantorBusinessRules(guarantor);
+            for (GuarantorFundingDetails fundingDetails : guarantorFundingDetails) {
+                fundingDetails.updateGuarantor(guarantor);
+            }
+
+            if (accountAssociations != null) {
+                this.accountAssociationsRepository.saveAndFlush(accountAssociations);
+            }
+            this.guarantorRepository.saveAndFlush(guarantor);
+
+            // return new
+            // CommandProcessingResultBuilder().withCommandId(command.getId()).withOfficeId(guarantor.getOfficeId())
+            // .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
+
+            return CreateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantor.getOfficeId())
+                    .entityId(guarantor.getEntityId()).loanId(guarantor.getLoanId()).build();
+
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return new CreateGuarantorsResponse();
         }
-        guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
-      }
+    }
 
-      final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
-      final Integer guarantorTypeId = guarantorCommand.getGuarantorTypeId();
-      final GuarantorType guarantorType = GuarantorType.fromInt(guarantorTypeId);
-      if (guarantorType.isCustomer() || guarantorType.isStaff()) {
-        final Long entityId = guarantorCommand.getEntityId();
-        for (final Guarantor guarantor : existGuarantorList) {
-          if (guarantor.getEntityId().equals(entityId) && guarantor.getGurantorType().equals(guarantorTypeId)
-                  && !guarantorForUpdate.getId().equals(guarantor.getId())) {
-            String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
-            defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
-            final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
-            throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, loanId);
-          }
+    private void validateGuarantorSavingsAccountActivationDateWithLoanSubmittedOnDate(final Loan loan,
+            final SavingsAccount savingsAccount) {
+        if (DateUtils.isBefore(loan.getSubmittedOnDate(), savingsAccount.getActivationDate())) {
+            throw new GeneralPlatformDomainRuleException(
+                    "error.msg.guarantor.saving.account.activation.date.is.on.or.before.loan.submitted.on.date",
+                    "Guarantor saving account activation date [" + savingsAccount.getActivationDate()
+                            + "] is on or before the loan submitted on date [" + loan.getSubmittedOnDate() + "]",
+                    savingsAccount.getActivationDate(), loan.getSubmittedOnDate());
         }
-      }
-
-      if (changesOnly.containsKey(GuarantorJSONinputParams.ENTITY_ID.getValue())
-              || changesOnly.containsKey(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue())) {
-        validateGuarantorBusinessRules(guarantorForUpdate);
-      }
-
-      if (!changesOnly.isEmpty()) {
-        this.guarantorRepository.saveAndFlush(guarantorForUpdate);
-      }
-
-      return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(guarantorForUpdate.getOfficeId())
-              .withEntityId(guarantorForUpdate.getId()).withOfficeId(guarantorForUpdate.getLoanId()).with(changesOnly).build();
-    } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-      final Throwable throwable = dve.getMostSpecificCause();
-      handleGuarantorDataIntegrityIssues(throwable, dve);
-      return CommandProcessingResult.empty();
     }
-  }
 
-  @Transactional
-  @Override
-  public UpdateGuarantorsResponse updateGuarantor(Command<UpdateGuarantorsRequest> command) {
-    try {
-      final Long loanId = command.getPayload().getLoanId();
-      final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-      validateLoanStatus(loan);
-      final Long guarantorId = command.getPayload().getGuarantorId();
-      final Guarantor guarantorForUpdate = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
-      if (guarantorForUpdate == null) {
-        throw new GuarantorNotFoundException(loanId, guarantorId);
-      }
+    @Deprecated
+    @Override
+    @Transactional
+    public CommandProcessingResult updateGuarantor(final Long loanId, final Long guarantorId, final JsonCommand command) {
+        try {
+            final GuarantorCommand guarantorCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
+            guarantorCommand.validateForUpdate();
 
-      final Map<String, Object> changesOnly = getUpdateChanges(guarantorForUpdate, command.getPayload());
+            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+            validateLoanStatus(loan);
+            final Guarantor guarantorForUpdate = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
+            if (guarantorForUpdate == null) {
+                throw new GuarantorNotFoundException(loanId, guarantorId);
+            }
 
-      if (changesOnly.containsKey("clientRelationshipTypeId")) {
-        final Long clientRelationshipId = command.getPayload().getClientRelationshipTypeId();
-        CodeValue clientRelationshipType = null;
-        if (clientRelationshipId != null) {
-          clientRelationshipType = this.codeValueRepositoryWrapper
-                  .findOneByCodeNameAndIdWithNotFoundDetection("GuarantorRelationship", clientRelationshipId);
+            final Map<String, Object> changesOnly = guarantorForUpdate.update(command);
+
+            if (changesOnly.containsKey(GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue())) {
+                final Long clientRelationshipId = guarantorCommand.getClientRelationshipTypeId();
+                CodeValue clientRelationshipType = null;
+                if (clientRelationshipId != null) {
+                    clientRelationshipType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(
+                            GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME, clientRelationshipId);
+                }
+                guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
+            }
+
+            final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+            final Integer guarantorTypeId = guarantorCommand.getGuarantorTypeId();
+            final GuarantorType guarantorType = GuarantorType.fromInt(guarantorTypeId);
+            if (guarantorType.isCustomer() || guarantorType.isStaff()) {
+                final Long entityId = guarantorCommand.getEntityId();
+                for (final Guarantor guarantor : existGuarantorList) {
+                    if (guarantor.getEntityId().equals(entityId) && guarantor.getGurantorType().equals(guarantorTypeId)
+                            && !guarantorForUpdate.getId().equals(guarantor.getId())) {
+                        String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, loanId);
+                    }
+                }
+            }
+
+            if (changesOnly.containsKey(GuarantorJSONinputParams.ENTITY_ID.getValue())
+                    || changesOnly.containsKey(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue())) {
+                validateGuarantorBusinessRules(guarantorForUpdate);
+            }
+
+            if (!changesOnly.isEmpty()) {
+                this.guarantorRepository.saveAndFlush(guarantorForUpdate);
+            }
+
+            return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(guarantorForUpdate.getOfficeId())
+                    .withEntityId(guarantorForUpdate.getId()).withOfficeId(guarantorForUpdate.getLoanId()).with(changesOnly).build();
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return CommandProcessingResult.empty();
         }
-        guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
-      }
+    }
 
-      final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
-      final Integer guarantorTypeId = command.getPayload().getGuarantorTypeId();
-      final GuarantorType guarantorType = GuarantorType.fromInt(guarantorTypeId);
-      if (guarantorType.isCustomer() || guarantorType.isStaff()) {
-        final Long entityId = command.getPayload().getEntityId();
-        for (final Guarantor guarantor : existGuarantorList) {
-          if (guarantor.getEntityId().equals(entityId) && guarantor.getGurantorType().equals(guarantorTypeId)
-                  && !guarantorForUpdate.getId().equals(guarantor.getId())) {
-            String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
-            defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
-            final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
-            throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, loanId);
-          }
+    @Transactional
+    @Override
+    public UpdateGuarantorsResponse updateGuarantor(Command<UpdateGuarantorsRequest> command) {
+        try {
+            final Long loanId = command.getPayload().getLoanId();
+            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+            validateLoanStatus(loan);
+            final Long guarantorId = command.getPayload().getGuarantorId();
+            final Guarantor guarantorForUpdate = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
+            if (guarantorForUpdate == null) {
+                throw new GuarantorNotFoundException(loanId, guarantorId);
+            }
+
+            final Map<String, Object> changesOnly = getUpdateChanges(guarantorForUpdate, command.getPayload());
+
+            if (changesOnly.containsKey("clientRelationshipTypeId")) {
+                final Long clientRelationshipId = command.getPayload().getClientRelationshipTypeId();
+                CodeValue clientRelationshipType = null;
+                if (clientRelationshipId != null) {
+                    clientRelationshipType = this.codeValueRepositoryWrapper
+                            .findOneByCodeNameAndIdWithNotFoundDetection("GuarantorRelationship", clientRelationshipId);
+                }
+                guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
+            }
+
+            final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+            final Integer guarantorTypeId = command.getPayload().getGuarantorTypeId();
+            final GuarantorType guarantorType = GuarantorType.fromInt(guarantorTypeId);
+            if (guarantorType.isCustomer() || guarantorType.isStaff()) {
+                final Long entityId = command.getPayload().getEntityId();
+                for (final Guarantor guarantor : existGuarantorList) {
+                    if (guarantor.getEntityId().equals(entityId) && guarantor.getGurantorType().equals(guarantorTypeId)
+                            && !guarantorForUpdate.getId().equals(guarantor.getId())) {
+                        String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, loanId);
+                    }
+                }
+            }
+            if (changesOnly.containsKey("entityId") || changesOnly.containsKey("guarantorTypeId")) {
+                validateGuarantorBusinessRules(guarantorForUpdate);
+            }
+            if (!changesOnly.isEmpty()) {
+                this.guarantorRepository.saveAndFlush(guarantorForUpdate);
+            }
+            return UpdateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantorForUpdate.getOfficeId())
+                    .entityId(guarantorForUpdate.getEntityId()).loanId(guarantorForUpdate.getLoanId())
+                    .changesOnly(new HashMap<>(changesOnly)).build();
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return new UpdateGuarantorsResponse();
         }
-      }
-      if (changesOnly.containsKey("entityId") || changesOnly.containsKey("guarantorTypeId")) {
-        validateGuarantorBusinessRules(guarantorForUpdate);
-      }
-      if (!changesOnly.isEmpty()) {
-        this.guarantorRepository.saveAndFlush(guarantorForUpdate);
-      }
-      return UpdateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantorForUpdate.getOfficeId())
-              .entityId(guarantorForUpdate.getEntityId()).loanId(guarantorForUpdate.getLoanId())
-              .changesOnly(new HashMap<>(changesOnly)).build();
-    } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-      final Throwable throwable = dve.getMostSpecificCause();
-      handleGuarantorDataIntegrityIssues(throwable, dve);
-      return new UpdateGuarantorsResponse();
     }
-  }
 
-  @Transactional
-  @Override
-  public DeleteGuarantorsResponse removeGuarantor(Command<DeleteGuarantorsRequest> command) {
-    final Long loanId = command.getPayload().getLoanId();
-    final Long guarantorId = command.getPayload().getGuarantorId();
-    final Long guarantorFundingId = command.getPayload().getGuarantorFundingId();
+    @Transactional
+    @Override
+    public DeleteGuarantorsResponse removeGuarantor(Command<DeleteGuarantorsRequest> command) {
+        final Long loanId = command.getPayload().getLoanId();
+        final Long guarantorId = command.getPayload().getGuarantorId();
+        final Long guarantorFundingId = command.getPayload().getGuarantorFundingId();
 
-    final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-    validateLoanStatus(loan);
-    final Guarantor guarantorForDelete = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
-    if (guarantorForDelete == null || (guarantorFundingId == null && !guarantorForDelete.getGuarantorFundDetails().isEmpty())) {
-      throw new GuarantorNotFoundException(loanId, guarantorId, guarantorFundingId);
-    }
-    DeleteGuarantorsResponse response = removeGuarantor(guarantorForDelete, guarantorFundingId);
-    if (loan.isApproved() || loan.isDisbursed()) {
-      this.guarantorDomainService.validateGuarantorBusinessRules(loan);
-    }
-    return response;
-  }
-
-  private DeleteGuarantorsResponse removeGuarantor(final Guarantor guarantorForDelete,
-                                                   final Long guarantorFundingId) {
-    guarantorForDelete.updateStatus(false);
-    GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
-    removeguarantorFundDetails(guarantorForDelete, guarantorFundingDetails);
-
-    this.guarantorRepository.saveAndFlush(guarantorForDelete);
-
-    return DeleteGuarantorsResponse.builder()
-            .entityId(guarantorForDelete.getEntityId())
-            .loanId(guarantorForDelete.getLoanId())
-            .officeId(guarantorForDelete.getOfficeId())
-            .build();
-  }
-
-  private Map<String, Object> getUpdateChanges(Guarantor originalData, UpdateGuarantorsRequest updateData) {
-    Map<String, Object> changes = new LinkedHashMap<>();
-
-    if (!Objects.equals(originalData.getFirstname(), updateData.getFirstname())) {
-      changes.put("firstname", updateData.getFirstname());
-      originalData.setFirstname(updateData.getFirstname());
-    }
-    if (!Objects.equals(originalData.getLastname(), updateData.getLastname())) {
-      changes.put("lastname", updateData.getLastname());
-      originalData.setLastname(updateData.getLastname());
-    }
-    if (!Objects.equals(originalData.getAddressLine1(), updateData.getAddressLine1())) {
-      changes.put("addressLine1", updateData.getAddressLine1());
-      originalData.setAddressLine1(updateData.getAddressLine1());
-    }
-    if (!Objects.equals(originalData.getAddressLine2(), updateData.getAddressLine2())) {
-      changes.put("addressLine2", updateData.getAddressLine2());
-      originalData.setAddressLine2(updateData.getAddressLine2());
-    }
-    if (!Objects.equals(originalData.getCity(), updateData.getCity())) {
-      changes.put("city", updateData.getCity());
-      originalData.setCity(updateData.getCity());
-    }
-    if (!Objects.equals(originalData.getState(), updateData.getState())) {
-      changes.put("state", updateData.getState());
-      originalData.setState(updateData.getState());
-    }
-    if (!Objects.equals(originalData.getZip(), updateData.getZip())) {
-      changes.put("zip", updateData.getZip());
-      originalData.setZip(updateData.getZip());
-    }
-    if (!Objects.equals(originalData.getCountry(), updateData.getCountry())) {
-      changes.put("country", updateData.getCountry());
-      originalData.setCountry(updateData.getCountry());
-    }
-    if (!Objects.equals(originalData.getMobilePhoneNumber(), updateData.getMobileNumber())) {
-      changes.put("mobileNumber", updateData.getMobileNumber());
-      originalData.setMobilePhoneNumber(updateData.getMobileNumber());
-    }
-    if (!Objects.equals(originalData.getHousePhoneNumber(), updateData.getHousePhoneNumber())) {
-      changes.put("housePhoneNumber", updateData.getHousePhoneNumber());
-      originalData.setHousePhoneNumber(updateData.getHousePhoneNumber());
-    }
-    if (!Objects.equals(originalData.getComment(), updateData.getComment())) {
-      changes.put("comment", updateData.getComment());
-      originalData.setComment(updateData.getComment());
-    }
-    final LocalDate dob = this.toLocalDate(updateData.getDob(), updateData.getDateFormat(), updateData.getLocale());
-    if (!Objects.equals(originalData.getDateOfBirth(), dob)) {
-      changes.put("dob", dob);
-      originalData.setDateOfBirth(dob);
-    }
-    if (!Objects.equals(originalData.getGurantorType(), updateData.getGuarantorTypeId())) {
-      changes.put("guarantorTypeId", updateData.getGuarantorTypeId());
-      originalData.setGurantorType(updateData.getGuarantorTypeId());
-    }
-    if (!Objects.equals(originalData.getLoanId(), updateData.getLoanId())) {
-      changes.put("loanId", updateData.getLoanId());
-      originalData.getLoan().setId(updateData.getLoanId());
-    }
-    if (!Objects.equals(originalData.getClientRelationshipType().getId(), updateData.getClientRelationshipTypeId())) {
-      changes.put("clientRelationshipTypeId", updateData.getClientRelationshipTypeId());
-      originalData.getClientRelationshipType().setId(updateData.getClientRelationshipTypeId());
-    }
-    if (!Objects.equals(originalData.getEntityId(), updateData.getEntityId())) {
-      changes.put("entityId", updateData.getEntityId());
-      originalData.setEntityId(updateData.getEntityId());
-    }
-    return changes;
-  }
-
-  @Deprecated
-  @Override
-  @Transactional
-  public CommandProcessingResult removeGuarantor(final Long loanId, final Long guarantorId, final Long guarantorFundingId) {
-    final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
-    validateLoanStatus(loan);
-    final Guarantor guarantorForDelete = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
-    if (guarantorForDelete == null || (guarantorFundingId == null && !guarantorForDelete.getGuarantorFundDetails().isEmpty())) {
-      throw new GuarantorNotFoundException(loanId, guarantorId, guarantorFundingId);
-    }
-    CommandProcessingResult commandProcessingResult = removeGuarantor(guarantorForDelete, loanId, guarantorFundingId);
-    if (loan.isApproved() || loan.isDisbursed()) {
-      this.guarantorDomainService.validateGuarantorBusinessRules(loan);
-    }
-    return commandProcessingResult;
-  }
-
-  @Deprecated
-  private CommandProcessingResult removeGuarantor(final Guarantor guarantorForDelete, final Long loanId, final Long guarantorFundingId) {
-    final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Guarantor");
-
-    if (guarantorFundingId == null) {
-      if (!guarantorForDelete.isActive()) {
-        baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
-      }
-      guarantorForDelete.updateStatus(false);
-    } else {
-      GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
-      if (guarantorFundingDetails == null) {
-        throw new GuarantorNotFoundException(loanId, guarantorForDelete.getId(), guarantorFundingId);
-      }
-      removeguarantorFundDetails(guarantorForDelete, baseDataValidator, guarantorFundingDetails);
-
-    }
-    if (!dataValidationErrors.isEmpty()) {
-      throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-              dataValidationErrors);
-    }
-    this.guarantorRepository.saveAndFlush(guarantorForDelete);
-    CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder()
-            .withEntityId(guarantorForDelete.getId()).withLoanId(guarantorForDelete.getLoanId())
-            .withOfficeId(guarantorForDelete.getOfficeId());
-    if (guarantorFundingId != null) {
-      commandProcessingResultBuilder.withSubEntityId(guarantorFundingId);
-    }
-    return commandProcessingResultBuilder.build();
-  }
-
-  @Deprecated
-  private void removeguarantorFundDetails(final Guarantor guarantorForDelete, final DataValidatorBuilder baseDataValidator,
-                                          GuarantorFundingDetails guarantorFundingDetails) {
-    if (!guarantorFundingDetails.getStatus().isActive()) {
-      baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
-    }
-    GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
-    if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
-      fundStatusType = GuarantorFundStatusType.WITHDRAWN;
-      this.guarantorDomainService.releaseGuarantor(guarantorFundingDetails, DateUtils.getBusinessLocalDate());
-    }
-    guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
-  }
-
-  private void removeguarantorFundDetails(final Guarantor guarantorForDelete,
-                                          GuarantorFundingDetails guarantorFundingDetails) {
-    if (!guarantorFundingDetails.getStatus().isActive()) {
-      throw new GuarantorNotFoundException(guarantorForDelete.getLoanId(),
-              guarantorForDelete.getGurantorType().longValue(), guarantorFundingDetails.getId());
-    }
-    GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
-    if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
-      fundStatusType = GuarantorFundStatusType.WITHDRAWN;
-      this.guarantorDomainService.releaseGuarantor(guarantorFundingDetails, DateUtils.getBusinessLocalDate());
-    }
-    guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
-  }
-
-  private void validateGuarantorBusinessRules(final Guarantor guarantor) {
-    // validate guarantor conditions
-    if (guarantor.isExistingCustomer()) {
-      // check client exists
-      this.clientRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
-      // validate that the client is not set as a self guarantor
-      if (guarantor.getClientId() != null && guarantor.getClientId().equals(guarantor.getEntityId())) {
-        String errorCode = null;
-        if (guarantor.getGuarantorFundDetails().isEmpty()) {
-          errorCode = "guarantor.can.not.be.own";
-        } else if (guarantor.getClientRelationshipType() != null) {
-          errorCode = "guarantor.relation.should.be.empty.for.own";
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        validateLoanStatus(loan);
+        final Guarantor guarantorForDelete = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
+        if (guarantorForDelete == null || (guarantorFundingId == null && !guarantorForDelete.getGuarantorFundDetails().isEmpty())) {
+            throw new GuarantorNotFoundException(loanId, guarantorId, guarantorFundingId);
         }
-        if (errorCode != null) {
-          throw new InvalidGuarantorException(guarantor.getEntityId(), guarantor.getLoanId(), errorCode);
+        DeleteGuarantorsResponse response = removeGuarantor(guarantorForDelete, guarantorFundingId);
+        if (loan.isApproved() || loan.isDisbursed()) {
+            this.guarantorDomainService.validateGuarantorBusinessRules(loan);
         }
-      }
-
-    } else if (guarantor.isExistingEmployee()) {
-      this.staffRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
+        return response;
     }
-  }
 
-  private void validateLoanStatus(Loan loan) {
-    if (!loan.getStatus().isActiveOrAwaitingApprovalOrDisbursal()) {
-      final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-      final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.guarantor");
-      baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("loan.is.closed");
-      throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-              dataValidationErrors);
+    private DeleteGuarantorsResponse removeGuarantor(final Guarantor guarantorForDelete, final Long guarantorFundingId) {
+        guarantorForDelete.updateStatus(false);
+        GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
+        removeguarantorFundDetails(guarantorForDelete, guarantorFundingDetails);
+
+        this.guarantorRepository.saveAndFlush(guarantorForDelete);
+
+        return DeleteGuarantorsResponse.builder().entityId(guarantorForDelete.getEntityId()).loanId(guarantorForDelete.getLoanId())
+                .officeId(guarantorForDelete.getOfficeId()).build();
     }
-  }
 
-  private void handleGuarantorDataIntegrityIssues(final Throwable realCause, final NonTransientDataAccessException dve) {
-    log.error("Error occured.", dve);
-    throw ErrorHandler.getMappable(dve, "error.msg.guarantor.unknown.data.integrity.issue",
-            "Unknown data integrity issue with resource Guarantor: " + realCause.getMessage());
-  }
+    private Map<String, Object> getUpdateChanges(Guarantor originalData, UpdateGuarantorsRequest updateData) {
+        Map<String, Object> changes = new LinkedHashMap<>();
 
-  private LocalDate toLocalDate(String date, String format, String locale) {
-    if (date == null || format == null || locale == null) {
-      return null;
+        if (!Objects.equals(originalData.getFirstname(), updateData.getFirstname())) {
+            changes.put("firstname", updateData.getFirstname());
+            originalData.setFirstname(updateData.getFirstname());
+        }
+        if (!Objects.equals(originalData.getLastname(), updateData.getLastname())) {
+            changes.put("lastname", updateData.getLastname());
+            originalData.setLastname(updateData.getLastname());
+        }
+        if (!Objects.equals(originalData.getAddressLine1(), updateData.getAddressLine1())) {
+            changes.put("addressLine1", updateData.getAddressLine1());
+            originalData.setAddressLine1(updateData.getAddressLine1());
+        }
+        if (!Objects.equals(originalData.getAddressLine2(), updateData.getAddressLine2())) {
+            changes.put("addressLine2", updateData.getAddressLine2());
+            originalData.setAddressLine2(updateData.getAddressLine2());
+        }
+        if (!Objects.equals(originalData.getCity(), updateData.getCity())) {
+            changes.put("city", updateData.getCity());
+            originalData.setCity(updateData.getCity());
+        }
+        if (!Objects.equals(originalData.getState(), updateData.getState())) {
+            changes.put("state", updateData.getState());
+            originalData.setState(updateData.getState());
+        }
+        if (!Objects.equals(originalData.getZip(), updateData.getZip())) {
+            changes.put("zip", updateData.getZip());
+            originalData.setZip(updateData.getZip());
+        }
+        if (!Objects.equals(originalData.getCountry(), updateData.getCountry())) {
+            changes.put("country", updateData.getCountry());
+            originalData.setCountry(updateData.getCountry());
+        }
+        if (!Objects.equals(originalData.getMobilePhoneNumber(), updateData.getMobileNumber())) {
+            changes.put("mobileNumber", updateData.getMobileNumber());
+            originalData.setMobilePhoneNumber(updateData.getMobileNumber());
+        }
+        if (!Objects.equals(originalData.getHousePhoneNumber(), updateData.getHousePhoneNumber())) {
+            changes.put("housePhoneNumber", updateData.getHousePhoneNumber());
+            originalData.setHousePhoneNumber(updateData.getHousePhoneNumber());
+        }
+        if (!Objects.equals(originalData.getComment(), updateData.getComment())) {
+            changes.put("comment", updateData.getComment());
+            originalData.setComment(updateData.getComment());
+        }
+        final LocalDate dob = this.toLocalDate(updateData.getDob(), updateData.getDateFormat(), updateData.getLocale());
+        if (!Objects.equals(originalData.getDateOfBirth(), dob)) {
+            changes.put("dob", dob);
+            originalData.setDateOfBirth(dob);
+        }
+        if (!Objects.equals(originalData.getGurantorType(), updateData.getGuarantorTypeId())) {
+            changes.put("guarantorTypeId", updateData.getGuarantorTypeId());
+            originalData.setGurantorType(updateData.getGuarantorTypeId());
+        }
+        if (!Objects.equals(originalData.getLoanId(), updateData.getLoanId())) {
+            changes.put("loanId", updateData.getLoanId());
+            originalData.getLoan().setId(updateData.getLoanId());
+        }
+        if (!Objects.equals(originalData.getClientRelationshipType().getId(), updateData.getClientRelationshipTypeId())) {
+            changes.put("clientRelationshipTypeId", updateData.getClientRelationshipTypeId());
+            originalData.getClientRelationshipType().setId(updateData.getClientRelationshipTypeId());
+        }
+        if (!Objects.equals(originalData.getEntityId(), updateData.getEntityId())) {
+            changes.put("entityId", updateData.getEntityId());
+            originalData.setEntityId(updateData.getEntityId());
+        }
+        return changes;
     }
-    final DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient()
-            .appendPattern(format.replace("y", "u")).optionalStart().appendPattern(" HH:mm:ss").optionalEnd()
-            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter(Locale.forLanguageTag(locale))
-            .withResolverStyle(ResolverStyle.STRICT);
-    return LocalDate.parse(date, formatter);
-  }
+
+    @Deprecated
+    @Override
+    @Transactional
+    public CommandProcessingResult removeGuarantor(final Long loanId, final Long guarantorId, final Long guarantorFundingId) {
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        validateLoanStatus(loan);
+        final Guarantor guarantorForDelete = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
+        if (guarantorForDelete == null || (guarantorFundingId == null && !guarantorForDelete.getGuarantorFundDetails().isEmpty())) {
+            throw new GuarantorNotFoundException(loanId, guarantorId, guarantorFundingId);
+        }
+        CommandProcessingResult commandProcessingResult = removeGuarantor(guarantorForDelete, loanId, guarantorFundingId);
+        if (loan.isApproved() || loan.isDisbursed()) {
+            this.guarantorDomainService.validateGuarantorBusinessRules(loan);
+        }
+        return commandProcessingResult;
+    }
+
+    @Deprecated
+    private CommandProcessingResult removeGuarantor(final Guarantor guarantorForDelete, final Long loanId, final Long guarantorFundingId) {
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Guarantor");
+
+        if (guarantorFundingId == null) {
+            if (!guarantorForDelete.isActive()) {
+                baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
+            }
+            guarantorForDelete.updateStatus(false);
+        } else {
+            GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
+            if (guarantorFundingDetails == null) {
+                throw new GuarantorNotFoundException(loanId, guarantorForDelete.getId(), guarantorFundingId);
+            }
+            removeguarantorFundDetails(guarantorForDelete, baseDataValidator, guarantorFundingDetails);
+
+        }
+        if (!dataValidationErrors.isEmpty()) {
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                    dataValidationErrors);
+        }
+        this.guarantorRepository.saveAndFlush(guarantorForDelete);
+        CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder()
+                .withEntityId(guarantorForDelete.getId()).withLoanId(guarantorForDelete.getLoanId())
+                .withOfficeId(guarantorForDelete.getOfficeId());
+        if (guarantorFundingId != null) {
+            commandProcessingResultBuilder.withSubEntityId(guarantorFundingId);
+        }
+        return commandProcessingResultBuilder.build();
+    }
+
+    @Deprecated
+    private void removeguarantorFundDetails(final Guarantor guarantorForDelete, final DataValidatorBuilder baseDataValidator,
+            GuarantorFundingDetails guarantorFundingDetails) {
+        if (!guarantorFundingDetails.getStatus().isActive()) {
+            baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
+        }
+        GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
+        if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
+            fundStatusType = GuarantorFundStatusType.WITHDRAWN;
+            this.guarantorDomainService.releaseGuarantor(guarantorFundingDetails, DateUtils.getBusinessLocalDate());
+        }
+        guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
+    }
+
+    private void removeguarantorFundDetails(final Guarantor guarantorForDelete, GuarantorFundingDetails guarantorFundingDetails) {
+        if (!guarantorFundingDetails.getStatus().isActive()) {
+            throw new GuarantorNotFoundException(guarantorForDelete.getLoanId(), guarantorForDelete.getGurantorType().longValue(),
+                    guarantorFundingDetails.getId());
+        }
+        GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
+        if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
+            fundStatusType = GuarantorFundStatusType.WITHDRAWN;
+            this.guarantorDomainService.releaseGuarantor(guarantorFundingDetails, DateUtils.getBusinessLocalDate());
+        }
+        guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
+    }
+
+    private void validateGuarantorBusinessRules(final Guarantor guarantor) {
+        // validate guarantor conditions
+        if (guarantor.isExistingCustomer()) {
+            // check client exists
+            this.clientRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
+            // validate that the client is not set as a self guarantor
+            if (guarantor.getClientId() != null && guarantor.getClientId().equals(guarantor.getEntityId())) {
+                String errorCode = null;
+                if (guarantor.getGuarantorFundDetails().isEmpty()) {
+                    errorCode = "guarantor.can.not.be.own";
+                } else if (guarantor.getClientRelationshipType() != null) {
+                    errorCode = "guarantor.relation.should.be.empty.for.own";
+                }
+                if (errorCode != null) {
+                    throw new InvalidGuarantorException(guarantor.getEntityId(), guarantor.getLoanId(), errorCode);
+                }
+            }
+
+        } else if (guarantor.isExistingEmployee()) {
+            this.staffRepositoryWrapper.findOneWithNotFoundDetection(guarantor.getEntityId());
+        }
+    }
+
+    private void validateLoanStatus(Loan loan) {
+        if (!loan.getStatus().isActiveOrAwaitingApprovalOrDisbursal()) {
+            final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.guarantor");
+            baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("loan.is.closed");
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                    dataValidationErrors);
+        }
+    }
+
+    private void handleGuarantorDataIntegrityIssues(final Throwable realCause, final NonTransientDataAccessException dve) {
+        log.error("Error occured.", dve);
+        throw ErrorHandler.getMappable(dve, "error.msg.guarantor.unknown.data.integrity.issue",
+                "Unknown data integrity issue with resource Guarantor: " + realCause.getMessage());
+    }
+
+    private LocalDate toLocalDate(String date, String format, String locale) {
+        if (date == null || format == null || locale == null) {
+            return null;
+        }
+        final DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient()
+                .appendPattern(format.replace("y", "u")).optionalStart().appendPattern(" HH:mm:ss").optionalEnd()
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter(Locale.forLanguageTag(locale))
+                .withResolverStyle(ResolverStyle.STRICT);
+        return LocalDate.parse(date, formatter);
+    }
 }

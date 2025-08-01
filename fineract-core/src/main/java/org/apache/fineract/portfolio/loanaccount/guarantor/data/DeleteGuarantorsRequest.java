@@ -17,18 +17,18 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public class DeleteGuarantorsRequest implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-  @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}")
-  @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}")
-  private Long loanId;
+    @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}")
+    private Long loanId;
 
-  @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}")
-  @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}")
-  private Long guarantorId;
+    @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}")
+    private Long guarantorId;
 
-  @PositiveOrZero(message = "{guarantor.guarantorFundingId.positiveOrZero}")
-  @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorFundingId.digits}")
-  private Long guarantorFundingId;
+    @PositiveOrZero(message = "{guarantor.guarantorFundingId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorFundingId.digits}")
+    private Long guarantorFundingId;
 }
