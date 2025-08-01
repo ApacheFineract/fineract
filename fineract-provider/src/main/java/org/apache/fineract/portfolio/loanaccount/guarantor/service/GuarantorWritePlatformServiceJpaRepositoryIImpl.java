@@ -25,9 +25,12 @@ import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
@@ -54,6 +57,8 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.Gu
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.GuarantorCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsResponse;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.Guarantor;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundStatusType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorFundingDetails;
@@ -296,6 +301,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         }
     }
 
+    @Deprecated
     @Override
     @Transactional
     public CommandProcessingResult updateGuarantor(final Long loanId, final Long guarantorId, final JsonCommand command) {
@@ -354,6 +360,133 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
             handleGuarantorDataIntegrityIssues(throwable, dve);
             return CommandProcessingResult.empty();
         }
+    }
+
+    @Transactional
+    @Override
+    public UpdateGuarantorsResponse updateGuarantor(Command<UpdateGuarantorsRequest> command) {
+        try {
+            final Long loanId = command.getPayload().getLoanId();
+            final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+            validateLoanStatus(loan);
+            final Long guarantorId = command.getPayload().getGuarantorId();
+            final Guarantor guarantorForUpdate = this.guarantorRepository.findByLoanAndId(loan, guarantorId);
+            if (guarantorForUpdate == null) {
+                throw new GuarantorNotFoundException(loanId, guarantorId);
+            }
+
+            final Map<String, Object> changesOnly = getUpdateChanges(guarantorForUpdate, command.getPayload());
+
+            if (changesOnly.containsKey("clientRelationshipTypeId")) {
+                final Long clientRelationshipId = command.getPayload().getClientRelationshipTypeId();
+                CodeValue clientRelationshipType = null;
+                if (clientRelationshipId != null) {
+                    clientRelationshipType = this.codeValueRepositoryWrapper
+                            .findOneByCodeNameAndIdWithNotFoundDetection("GuarantorRelationship", clientRelationshipId);
+                }
+                guarantorForUpdate.updateClientRelationshipType(clientRelationshipType);
+            }
+
+            final List<Guarantor> existGuarantorList = this.guarantorRepository.findByLoan(loan);
+            final Integer guarantorTypeId = command.getPayload().getGuarantorTypeId();
+            final GuarantorType guarantorType = GuarantorType.fromInt(guarantorTypeId);
+            if (guarantorType.isCustomer() || guarantorType.isStaff()) {
+                final Long entityId = command.getPayload().getEntityId();
+                for (final Guarantor guarantor : existGuarantorList) {
+                    if (guarantor.getEntityId().equals(entityId) && guarantor.getGurantorType().equals(guarantorTypeId)
+                            && !guarantorForUpdate.getId().equals(guarantor.getId())) {
+                        String defaultUserMessage = this.clientRepositoryWrapper.findOneWithNotFoundDetection(entityId).getDisplayName();
+                        defaultUserMessage = defaultUserMessage + " is already exist as a guarantor for this loan";
+                        final String action = loan.client() != null ? "client.guarantor" : "group.guarantor";
+                        throw new DuplicateGuarantorException(action, "is.already.exist.same.loan", defaultUserMessage, entityId, loanId);
+                    }
+                }
+            }
+            if (changesOnly.containsKey("entityId") || changesOnly.containsKey("guarantorTypeId")) {
+                validateGuarantorBusinessRules(guarantorForUpdate);
+            }
+            if (!changesOnly.isEmpty()) {
+                this.guarantorRepository.saveAndFlush(guarantorForUpdate);
+            }
+            return UpdateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantorForUpdate.getOfficeId())
+                    .entityId(guarantorForUpdate.getEntityId()).loanId(guarantorForUpdate.getLoanId())
+                    .changesOnly(new HashMap<>(changesOnly)).build();
+        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+            final Throwable throwable = dve.getMostSpecificCause();
+            handleGuarantorDataIntegrityIssues(throwable, dve);
+            return new UpdateGuarantorsResponse();
+        }
+    }
+
+    private Map<String, Object> getUpdateChanges(Guarantor originalData, UpdateGuarantorsRequest updateData) {
+        Map<String, Object> changes = new LinkedHashMap<>();
+
+        if (!Objects.equals(originalData.getFirstname(), updateData.getFirstname())) {
+            changes.put("firstname", updateData.getFirstname());
+            originalData.setFirstname(updateData.getFirstname());
+        }
+        if (!Objects.equals(originalData.getLastname(), updateData.getLastname())) {
+            changes.put("lastname", updateData.getLastname());
+            originalData.setLastname(updateData.getLastname());
+        }
+        if (!Objects.equals(originalData.getAddressLine1(), updateData.getAddressLine1())) {
+            changes.put("addressLine1", updateData.getAddressLine1());
+            originalData.setAddressLine1(updateData.getAddressLine1());
+        }
+        if (!Objects.equals(originalData.getAddressLine2(), updateData.getAddressLine2())) {
+            changes.put("addressLine2", updateData.getAddressLine2());
+            originalData.setAddressLine2(updateData.getAddressLine2());
+        }
+        if (!Objects.equals(originalData.getCity(), updateData.getCity())) {
+            changes.put("city", updateData.getCity());
+            originalData.setCity(updateData.getCity());
+        }
+        if (!Objects.equals(originalData.getState(), updateData.getState())) {
+            changes.put("state", updateData.getState());
+            originalData.setState(updateData.getState());
+        }
+        if (!Objects.equals(originalData.getZip(), updateData.getZip())) {
+            changes.put("zip", updateData.getZip());
+            originalData.setZip(updateData.getZip());
+        }
+        if (!Objects.equals(originalData.getCountry(), updateData.getCountry())) {
+            changes.put("country", updateData.getCountry());
+            originalData.setCountry(updateData.getCountry());
+        }
+        if (!Objects.equals(originalData.getMobilePhoneNumber(), updateData.getMobileNumber())) {
+            changes.put("mobileNumber", updateData.getMobileNumber());
+            originalData.setMobilePhoneNumber(updateData.getMobileNumber());
+        }
+        if (!Objects.equals(originalData.getHousePhoneNumber(), updateData.getHousePhoneNumber())) {
+            changes.put("housePhoneNumber", updateData.getHousePhoneNumber());
+            originalData.setHousePhoneNumber(updateData.getHousePhoneNumber());
+        }
+        if (!Objects.equals(originalData.getComment(), updateData.getComment())) {
+            changes.put("comment", updateData.getComment());
+            originalData.setComment(updateData.getComment());
+        }
+        final LocalDate dob = this.toLocalDate(updateData.getDob(), updateData.getDateFormat(), updateData.getLocale());
+        if (!Objects.equals(originalData.getDateOfBirth(), dob)) {
+            changes.put("dob", dob);
+            originalData.setDateOfBirth(dob);
+        }
+        if (!Objects.equals(originalData.getGurantorType(), updateData.getGuarantorTypeId())) {
+            changes.put("guarantorTypeId", updateData.getGuarantorTypeId());
+            originalData.setGurantorType(updateData.getGuarantorTypeId());
+        }
+        if (!Objects.equals(originalData.getLoanId(), updateData.getLoanId())) {
+            changes.put("loanId", updateData.getLoanId());
+            originalData.getLoan().setId(updateData.getLoanId());
+        }
+        if (!Objects.equals(originalData.getClientRelationshipType().getId(), updateData.getClientRelationshipTypeId())) {
+            changes.put("clientRelationshipTypeId", updateData.getClientRelationshipTypeId());
+            originalData.getClientRelationshipType().setId(updateData.getClientRelationshipTypeId());
+        }
+        if (!Objects.equals(originalData.getEntityId(), updateData.getEntityId())) {
+            changes.put("entityId", updateData.getEntityId());
+            originalData.setEntityId(updateData.getEntityId());
+        }
+        return changes;
     }
 
     @Override

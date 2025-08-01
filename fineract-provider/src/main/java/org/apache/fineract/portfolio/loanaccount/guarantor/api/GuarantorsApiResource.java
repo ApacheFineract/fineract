@@ -68,10 +68,12 @@ import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.CreateGuarantorsCommand;
+import org.apache.fineract.portfolio.loanaccount.guarantor.command.UpdateGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
-import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
+import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorReadPlatformService;
@@ -183,12 +185,31 @@ public class GuarantorsApiResource {
     @Path("{guarantorId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CommandProcessingResult updateGuarantor(@PathParam("loanId") final Long loanId, @PathParam("guarantorId") final Long guarantorId,
-            final GuarantorsRequest guarantorsRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
-                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+    public UpdateGuarantorsResponse updateGuarantor(
+            @PathParam("loanId") @NotNull(message = "{guarantor.loanId.notNull}") @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}") final Long loanId,
+            @NotNull(message = "{guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}") @PathParam("guarantorId") final Long guarantorId,
+            @Valid final UpdateGuarantorsRequest request) {
+        // final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
+        // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        //
+        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
+
+        if (request.getLoanId() == null) {
+            request.setLoanId(loanId);
+        }
+        if (request.getGuarantorId() == null) {
+            request.setGuarantorId(guarantorId);
+        }
+
+        command.setId(UUID.randomUUID());
+        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        command.setPayload(request);
+
+        final Supplier<UpdateGuarantorsResponse> response = commandPipeline.send(command);
+
+        return response.get();
     }
 
     @DELETE

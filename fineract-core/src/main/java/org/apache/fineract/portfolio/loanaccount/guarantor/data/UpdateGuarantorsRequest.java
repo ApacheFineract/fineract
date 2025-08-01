@@ -1,21 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -42,15 +24,18 @@ import org.apache.fineract.validation.constraints.ValidAge;
 @Builder
 @AllArgsConstructor
 @ValidAge(dateField = "dob", formatField = "dateFormat", localeField = "locale", min = 15, max = 75, message = "{guarantor.dob.validAge}")
-public class CreateGuarantorsRequest implements Serializable {
+public class UpdateGuarantorsRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "{guarantor.loanId.notNull}")
     @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}")
     @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}")
     private Long loanId;
+
+    @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}")
+    private Long guarantorId;
 
     @NotBlank(message = "{guarantor.locale.notBlank}")
     @Size(max = 50, message = "{guarantor.locale.size}")
