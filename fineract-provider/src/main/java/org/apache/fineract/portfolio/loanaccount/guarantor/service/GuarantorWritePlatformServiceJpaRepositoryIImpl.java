@@ -412,8 +412,8 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
       }
 
       return UpdateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantorForUpdate.getOfficeId())
-              .entityId(guarantorForUpdate.getId()).loanId(guarantorForUpdate.getLoanId())
-              .changesOnly(new HashMap<>(changesOnly)).build();
+              .resourceId(guarantorForUpdate.getId()).loanId(guarantorForUpdate.getLoanId())
+              .changes(new HashMap<>(changesOnly)).build();
     } catch (final JpaSystemException | DataIntegrityViolationException dve) {
       final Throwable throwable = dve.getMostSpecificCause();
       handleGuarantorDataIntegrityIssues(throwable, dve);

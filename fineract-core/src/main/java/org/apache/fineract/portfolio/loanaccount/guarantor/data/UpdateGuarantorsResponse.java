@@ -21,6 +21,6 @@ public class UpdateGuarantorsResponse implements Serializable {
     private UUID commandId;
     private Long officeId;
     private Long loanId;
-    private Long entityId;
-    private Map<String, Object> changesOnly;
+    private Long resourceId;
+    private Map<String, Object> changes;
 }
