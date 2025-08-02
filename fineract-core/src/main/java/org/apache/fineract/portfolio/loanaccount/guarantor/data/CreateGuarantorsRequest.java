@@ -80,11 +80,11 @@ public class CreateGuarantorsRequest implements Serializable {
     private Long entityId;
 
     /*** Fields for external persons serving as guarantors ***/
-    @NotBlank(message = "{guarantor.firstname.notBlank}")
+//    @NotBlank(message = "{guarantor.firstname.notBlank}")
     @Size(max = 50, message = "{guarantor.firstname.size}")
     private String firstname;
 
-    @NotBlank(message = "{guarantor.lastname.notBlank}")
+//    @NotBlank(message = "{guarantor.lastname.notBlank}")
     @Size(max = 50, message = "{guarantor.lastname.size}")
     private String lastname;
 
