@@ -38,5 +38,5 @@ public class CreateGuarantorsResponse implements Serializable {
     private UUID commandId;
     private Long officeId;
     private Long loanId;
-    private Long entityId;
+    private Long resourceId;
 }
