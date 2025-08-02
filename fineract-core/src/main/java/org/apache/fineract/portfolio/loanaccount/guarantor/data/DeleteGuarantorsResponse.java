@@ -2,7 +2,6 @@ package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +21,4 @@ public class DeleteGuarantorsResponse implements Serializable {
     private Long officeId;
     private Long loanId;
     private Long entityId;
-    private Map<String, Object> changesOnly;
 }

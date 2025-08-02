@@ -237,7 +237,6 @@ public class GuarantorsApiResource {
         final Supplier<DeleteGuarantorsResponse> response = commandPipeline.send(command);
 
         return response.get();
-
     }
 
     @GET

@@ -42,7 +42,7 @@ public class AgeValidator implements ConstraintValidator<ValidAge, Object> {
             final var locale = (String) localeAttr.get(value);
 
             if (StringUtils.isBlank(dateStr) || StringUtils.isBlank(format) || StringUtils.isBlank(locale)) {
-                return false;
+                return true;
             }
 
             final LocalDate parsedDate = toLocalDate(dateStr, format, locale);
