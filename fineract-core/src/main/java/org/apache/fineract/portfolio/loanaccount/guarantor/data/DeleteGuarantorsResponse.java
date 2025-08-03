@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteGuarantorsResponse implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-  private UUID commandId;
-  private Long officeId;
-  private Long loanId;
-  private Long resourceId;
+    private UUID commandId;
+    private Long officeId;
+    private Long loanId;
+    private Long resourceId;
 }
