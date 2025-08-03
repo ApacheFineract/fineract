@@ -435,8 +435,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     return response;
   }
 
-  private DeleteGuarantorsResponse removeGuarantorFromDatabase(final Guarantor guarantorForDelete
-          , final Long loanId, final Long guarantorFundingId) {
+  private DeleteGuarantorsResponse removeGuarantorFromDatabase(final Guarantor guarantorForDelete,final Long loanId, final Long guarantorFundingId) {
     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Guarantor");
 
