@@ -177,10 +177,6 @@ public class GuarantorsApiResource {
             @PathParam("loanId") @NotNull(message = "{guarantor.loanId.notNull}") @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}") final Long loanId,
             @PathParam("guarantorId") @NotNull(message = "{guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}") final Long guarantorId,
             @Valid final UpdateGuarantorsRequest request) {
-        // final CommandWrapper commandRequest = new CommandWrapperBuilder().updateGuarantor(loanId, guarantorId)
-        // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-        //
-        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
 
@@ -208,10 +204,6 @@ public class GuarantorsApiResource {
             @PathParam("loanId") @NotNull(message = "{guarantor.loanId.notNull}") @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}") final Long loanId,
             @PathParam("guarantorId") @NotNull(message = "{guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}") final Long guarantorId,
             @QueryParam("guarantorFundingId") @PositiveOrZero(message = "{guarantor.guarantorFundingId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorFundingId.digits}") final Long guarantorFundingId) {
-        // final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId,
-        // guarantorFundingId).build();
-        //
-        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
 
