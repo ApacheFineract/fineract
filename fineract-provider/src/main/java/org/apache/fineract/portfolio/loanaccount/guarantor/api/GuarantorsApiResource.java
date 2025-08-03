@@ -147,18 +147,6 @@ public class GuarantorsApiResource {
         return guarantorData;
     }
 
-    // @POST
-    // @Consumes({ MediaType.APPLICATION_JSON })
-    // @Produces({ MediaType.APPLICATION_JSON })
-    // public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest
-    // guarantorsRequest) {
-    //
-    // final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
-    // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-    //
-    // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-    // }
-
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
