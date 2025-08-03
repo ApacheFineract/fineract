@@ -47,7 +47,6 @@ public class CreateGuarantorsRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  //    @NotNull(message = "{guarantor.loanId.notNull}")
   @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}")
   @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}")
   private Long loanId;
@@ -57,12 +56,10 @@ public class CreateGuarantorsRequest implements Serializable {
   @Locale()
   private String locale;
 
-  //    @NotBlank(message = "{guarantor.dateFormat.notBlank}")
   @Pattern(regexp = "dd MMMM yyyy", message = "{guarantor.dateFormat.invalid}")
   private String dateFormat;
 
   /*** Fields for capturing relationship of Guarantor with customer **/
-//    @NotNull(message = "{guarantor.clientRelationshipTypeId.notNull}")
   @PositiveOrZero(message = "{guarantor.clientRelationshipTypeId.positiveOrZero}")
   @Digits(integer = 10, fraction = 0, message = "{guarantor.clientRelationshipTypeId.digits}")
   private Long clientRelationshipTypeId;
@@ -74,17 +71,14 @@ public class CreateGuarantorsRequest implements Serializable {
   @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorTypeId.digits}")
   private Integer guarantorTypeId;
 
-  //    @NotNull(message = "{guarantor.entityId.notNull}")
   @PositiveOrZero(message = "{guarantor.entityId.positiveOrZero}")
   @Digits(integer = 10, fraction = 0, message = "{guarantor.entityId.digits}")
   private Long entityId;
 
   /*** Fields for external persons serving as guarantors ***/
-//    @NotBlank(message = "{guarantor.firstname.notBlank}")
   @Size(max = 50, message = "{guarantor.firstname.size}")
   private String firstname;
 
-  //    @NotBlank(message = "{guarantor.lastname.notBlank}")
   @Size(max = 50, message = "{guarantor.lastname.size}")
   private String lastname;
 
@@ -117,7 +111,6 @@ public class CreateGuarantorsRequest implements Serializable {
   @Size(max = 500, message = "{guarantor.comment.size}")
   private String comment;
 
-  //    @NotNull(message = "{guarantor.dob.notNull}")
   @Size(max = 50, message = "{guarantor.dob.size}")
   private String dob;
 

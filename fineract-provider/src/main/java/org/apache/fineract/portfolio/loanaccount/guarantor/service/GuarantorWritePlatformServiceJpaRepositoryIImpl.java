@@ -199,9 +199,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
   private CreateGuarantorsResponse createGuarantor(final Loan loan, final Command<CreateGuarantorsRequest> command,
                                                    final List<Guarantor> existGuarantorList) {
     try {
-      // Already Validated - Request
-      // guarantorCommand.validateForCreate(); // Not Required
-      validateLoanStatus(loan); // use existing
+      validateLoanStatus(loan);
       final List<GuarantorFundingDetails> guarantorFundingDetails = new ArrayList<>();
       final boolean backdatedTxnsAllowedTill = false;
       AccountAssociations accountAssociations = null;
@@ -278,14 +276,8 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         this.accountAssociationsRepository.saveAndFlush(accountAssociations);
       }
       this.guarantorRepository.saveAndFlush(guarantor);
-
-      // return new
-      // CommandProcessingResultBuilder().withCommandId(command.getId()).withOfficeId(guarantor.getOfficeId())
-      // .withEntityId(guarantor.getId()).withLoanId(loan.getId()).build();
-
       return CreateGuarantorsResponse.builder().commandId(command.getId()).officeId(guarantor.getOfficeId())
               .resourceId(guarantor.getId()).loanId(loan.getId()).build();
-
     } catch (final JpaSystemException | DataIntegrityViolationException dve) {
       final Throwable throwable = dve.getMostSpecificCause();
       handleGuarantorDataIntegrityIssues(throwable, dve);
@@ -445,15 +437,6 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
 
   private DeleteGuarantorsResponse removeGuarantorFromDatabase(final Guarantor guarantorForDelete
           , final Long loanId, final Long guarantorFundingId) {
-//    guarantorForDelete.updateStatus(false);
-//    GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
-//    removeguarantorFundDetails(guarantorForDelete, guarantorFundingDetails);
-//
-//    this.guarantorRepository.saveAndFlush(guarantorForDelete);
-//
-//    return DeleteGuarantorsResponse.builder().resourceId(guarantorForDelete.getId()).loanId(guarantorForDelete.getLoanId())
-//            .officeId(guarantorForDelete.getOfficeId()).build();
-
     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Guarantor");
 
@@ -474,12 +457,6 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
               dataValidationErrors);
     }
     this.guarantorRepository.saveAndFlush(guarantorForDelete);
-//    CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder()
-//            .withEntityId(guarantorForDelete.getId()).withLoanId(guarantorForDelete.getLoanId())
-//            .withOfficeId(guarantorForDelete.getOfficeId());
-//    if (guarantorFundingId != null) {
-//      commandProcessingResultBuilder.withSubEntityId(guarantorFundingId);
-//    }
     return DeleteGuarantorsResponse
             .builder()
             .resourceId(guarantorForDelete.getId())
@@ -607,24 +584,10 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     return commandProcessingResultBuilder.build();
   }
 
-  @Deprecated
   private void removeguarantorFundDetails(final Guarantor guarantorForDelete, final DataValidatorBuilder baseDataValidator,
                                           GuarantorFundingDetails guarantorFundingDetails) {
     if (!guarantorFundingDetails.getStatus().isActive()) {
       baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
-    }
-    GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
-    if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
-      fundStatusType = GuarantorFundStatusType.WITHDRAWN;
-      this.guarantorDomainService.releaseGuarantor(guarantorFundingDetails, DateUtils.getBusinessLocalDate());
-    }
-    guarantorForDelete.updateStatus(guarantorFundingDetails, fundStatusType);
-  }
-
-  private void removeguarantorFundDetails(final Guarantor guarantorForDelete, GuarantorFundingDetails guarantorFundingDetails) {
-    if (!guarantorFundingDetails.getStatus().isActive()) {
-      throw new GuarantorNotFoundException(guarantorForDelete.getLoanId(), guarantorForDelete.getGurantorType().longValue(),
-              guarantorFundingDetails.getId());
     }
     GuarantorFundStatusType fundStatusType = GuarantorFundStatusType.DELETED;
     if (guarantorForDelete.getLoan().isDisbursed() || guarantorForDelete.getLoan().isApproved()) {
