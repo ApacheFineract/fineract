@@ -265,6 +265,7 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         guarantor.setLoan(loan);
         guarantor.setClientRelationshipType(clientRelationshipType);
         guarantor.setGuarantorFundDetails(guarantorFundingDetails);
+        guarantor.setActive(true);
       } else {
         guarantor.addFundingDetails(guarantorFundingDetails);
       }
