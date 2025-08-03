@@ -8,17 +8,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DeleteGuarantorsResponse implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private UUID commandId;
-    private Long officeId;
-    private Long loanId;
-    private Long entityId;
+  private UUID commandId;
+  private Long officeId;
+  private Long loanId;
+  private Long resourceId;
 }

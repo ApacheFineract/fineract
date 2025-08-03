@@ -434,22 +434,57 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
     if (guarantorForDelete == null || (guarantorFundingId == null && !guarantorForDelete.getGuarantorFundDetails().isEmpty())) {
       throw new GuarantorNotFoundException(loanId, guarantorId, guarantorFundingId);
     }
-    DeleteGuarantorsResponse response = removeGuarantor(guarantorForDelete, guarantorFundingId);
+    DeleteGuarantorsResponse response = removeGuarantorFromDatabase(guarantorForDelete, loanId,
+            guarantorFundingId);
     if (loan.isApproved() || loan.isDisbursed()) {
       this.guarantorDomainService.validateGuarantorBusinessRules(loan);
     }
     return response;
   }
 
-  private DeleteGuarantorsResponse removeGuarantor(final Guarantor guarantorForDelete, final Long guarantorFundingId) {
-    guarantorForDelete.updateStatus(false);
-    GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
-    removeguarantorFundDetails(guarantorForDelete, guarantorFundingDetails);
+  private DeleteGuarantorsResponse removeGuarantorFromDatabase(final Guarantor guarantorForDelete
+          , final Long loanId, final Long guarantorFundingId) {
+//    guarantorForDelete.updateStatus(false);
+//    GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
+//    removeguarantorFundDetails(guarantorForDelete, guarantorFundingDetails);
+//
+//    this.guarantorRepository.saveAndFlush(guarantorForDelete);
+//
+//    return DeleteGuarantorsResponse.builder().resourceId(guarantorForDelete.getId()).loanId(guarantorForDelete.getLoanId())
+//            .officeId(guarantorForDelete.getOfficeId()).build();
 
+    final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Guarantor");
+
+    if (guarantorFundingId == null) {
+      if (!guarantorForDelete.isActive()) {
+        baseDataValidator.failWithCodeNoParameterAddedToErrorCode(GuarantorConstants.GUARANTOR_NOT_ACTIVE_ERROR);
+      }
+      guarantorForDelete.updateStatus(false);
+    } else {
+      GuarantorFundingDetails guarantorFundingDetails = guarantorForDelete.getGuarantorFundingDetail(guarantorFundingId);
+      if (guarantorFundingDetails == null) {
+        throw new GuarantorNotFoundException(loanId, guarantorForDelete.getId(), guarantorFundingId);
+      }
+      removeguarantorFundDetails(guarantorForDelete, baseDataValidator, guarantorFundingDetails);
+    }
+    if (!dataValidationErrors.isEmpty()) {
+      throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+              dataValidationErrors);
+    }
     this.guarantorRepository.saveAndFlush(guarantorForDelete);
-
-    return DeleteGuarantorsResponse.builder().entityId(guarantorForDelete.getEntityId()).loanId(guarantorForDelete.getLoanId())
-            .officeId(guarantorForDelete.getOfficeId()).build();
+//    CommandProcessingResultBuilder commandProcessingResultBuilder = new CommandProcessingResultBuilder()
+//            .withEntityId(guarantorForDelete.getId()).withLoanId(guarantorForDelete.getLoanId())
+//            .withOfficeId(guarantorForDelete.getOfficeId());
+//    if (guarantorFundingId != null) {
+//      commandProcessingResultBuilder.withSubEntityId(guarantorFundingId);
+//    }
+    return DeleteGuarantorsResponse
+            .builder()
+            .resourceId(guarantorForDelete.getId())
+            .loanId(guarantorForDelete.getLoanId())
+            .officeId(guarantorForDelete.getOfficeId())
+            .build();
   }
 
   private Map<String, Object> getUpdateChanges(Guarantor originalData, UpdateGuarantorsRequest updateData) {
@@ -556,7 +591,6 @@ public class GuarantorWritePlatformServiceJpaRepositoryIImpl implements Guaranto
         throw new GuarantorNotFoundException(loanId, guarantorForDelete.getId(), guarantorFundingId);
       }
       removeguarantorFundDetails(guarantorForDelete, baseDataValidator, guarantorFundingDetails);
-
     }
     if (!dataValidationErrors.isEmpty()) {
       throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",

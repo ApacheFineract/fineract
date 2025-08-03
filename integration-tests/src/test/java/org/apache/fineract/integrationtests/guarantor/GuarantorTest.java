@@ -80,169 +80,9 @@ public class GuarantorTest {
     savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Test
-  public void testGuarantor() {
-
-    Float self1_hold_funds = Float.valueOf((float) 0);
-    Float external1_hold_funds = Float.valueOf((float) 0);
-    Float external2_hold_funds = Float.valueOf((float) 0);
-    final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
-    ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
-    final Integer clientID_external = ClientHelper.createClient(this.requestSpec, this.responseSpec);
-    final Integer clientID_external2 = ClientHelper.createClient(this.requestSpec, this.responseSpec);
-
-    ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID_external);
-
-    final Integer selfSavigsId = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID,
-            String.valueOf(SELF1_BALANCE));
-    final Integer externalSavigsId_1 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
-            String.valueOf(EXTERNAL1_BALANCE));
-    final Integer externalSavigsId_2 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external2,
-            String.valueOf(EXTERNAL2_BALANCE));
-
-    final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
-    DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-    Calendar todaysDate = Calendar.getInstance();
-    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 4);
-    final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
-    final Integer loanID = applyForLoanApplication(clientID, loanProductID, loanDisbursementDate);
-    Assertions.assertNotNull(loanID);
-    HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
-    LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
-    String guarantorJSON = new GuarantorTestBuilder().externalCustomer().build();
-    Integer externalGuarantor = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-    Assertions.assertNotNull(externalGuarantor);
-
-    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithoutGuaranteeAmount(String.valueOf(clientID_external)).build();
-    Integer withoutGuaranteeAmount = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-    Assertions.assertNotNull(withoutGuaranteeAmount);
-
-    ArrayList<HashMap> errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
-            CommonConstants.RESPONSE_ERROR);
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
-
-    guarantorJSON = new GuarantorTestBuilder()
-            .existingCustomerWithGuaranteeAmount(String.valueOf(clientID), String.valueOf(selfSavigsId), String.valueOf(SELF1_GURANTEE))
-            .build();
-    Integer selfGuarantee = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-    verifySavingsOnHoldBalance(selfSavigsId, null);
-    Assertions.assertNotNull(selfGuarantee);
-
-    errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
-            CommonConstants.RESPONSE_ERROR);
-    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
-
-    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external),
-            String.valueOf(externalSavigsId_1), String.valueOf(EXTERNAL1_GURANTEE)).build();
-    Integer externalGuarantee_1 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-    verifySavingsOnHoldBalance(externalSavigsId_1, null);
-    Assertions.assertNotNull(externalGuarantee_1);
-
-    errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
-            CommonConstants.RESPONSE_ERROR);
-    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
-    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
-    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
-
-    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external2),
-            String.valueOf(externalSavigsId_2), String.valueOf(EXTERNAL2_GURANTEE)).build();
-    Integer externalGuarantee_2 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-    verifySavingsOnHoldBalance(externalSavigsId_2, null);
-    Assertions.assertNotNull(externalGuarantee_2);
-
-    LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-    loanStatusHashMap = this.loanTransactionHelper.approveLoan(loanDisbursementDate, loanID);
-    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
-    self1_hold_funds += SELF1_GURANTEE;
-    external1_hold_funds += EXTERNAL1_GURANTEE;
-    external2_hold_funds += EXTERNAL2_GURANTEE;
-    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
-
-    LOG.info("-----------------------------------UNDO APPROVE LOAN-----------------------------------------");
-    loanStatusHashMap = this.loanTransactionHelper.undoApproval(loanID);
-    LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) 0));
-    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
-    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
-
-    LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-    loanStatusHashMap = this.loanTransactionHelper.approveLoan(loanDisbursementDate, loanID);
-    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
-    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
-
-    LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
-    String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanID);
-    loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount(loanDisbursementDate, loanID,
-            JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
-    LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
-    // First repayment
-    ArrayList<HashMap> loanSchedule = this.loanTransactionHelper.getLoanRepaymentSchedule(this.requestSpec, this.responseSpec, loanID);
-    todaysDate = Calendar.getInstance();
-    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 3);
-    String loanRepaymentDate = dateFormat.format(todaysDate.getTime());
-    Float totalDueForCurrentPeriod = (Float) loanSchedule.get(1).get("totalDueForPeriod");
-    external1_hold_funds -= Float.valueOf((float) 827.5867);
-    external2_hold_funds -= Float.valueOf((float) 413.7933);
-    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
-    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
-
-    // Second repayment
-    todaysDate = Calendar.getInstance();
-    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 2);
-    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
-    totalDueForCurrentPeriod = (Float) loanSchedule.get(2).get("totalDueForPeriod");
-    external1_hold_funds -= Float.valueOf((float) 831.4067);
-    external2_hold_funds -= Float.valueOf((float) 415.7033333);
-    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
-    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
-
-    // third repayment
-    todaysDate = Calendar.getInstance();
-    todaysDate.add(Calendar.DAY_OF_MONTH, -7);
-    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
-    totalDueForCurrentPeriod = (Float) loanSchedule.get(3).get("totalDueForPeriod");
-    self1_hold_funds -= Float.valueOf((float) 741.355);
-    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
-    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
-    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
-
-    // forth repayment
-    todaysDate = Calendar.getInstance();
-    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
-    totalDueForCurrentPeriod = (Float) loanSchedule.get(3).get("totalDueForPeriod");
-    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
-    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) 0));
-    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
-    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
-
-    loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
-    LoanStatusChecker.verifyLoanAccountIsClosed(loanStatusHashMap);
-
-  }
-
-
-//  @Disabled
 //  @SuppressWarnings({ "rawtypes", "unchecked" })
 //  @Test
-//  public void testGuarantor_UNDO_DISBURSAL() {
+//  public void testGuarantor() {
 //
 //    Float self1_hold_funds = Float.valueOf((float) 0);
 //    Float external1_hold_funds = Float.valueOf((float) 0);
@@ -257,8 +97,6 @@ public class GuarantorTest {
 //    final Integer selfSavigsId = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID,
 //            String.valueOf(SELF1_BALANCE));
 //    final Integer externalSavigsId_1 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
-//            String.valueOf(EXTERNAL1_BALANCE));
-//    final Integer externalSavigsId_3 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
 //            String.valueOf(EXTERNAL1_BALANCE));
 //    final Integer externalSavigsId_2 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external2,
 //            String.valueOf(EXTERNAL2_BALANCE));
@@ -315,8 +153,8 @@ public class GuarantorTest {
 //    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external2),
 //            String.valueOf(externalSavigsId_2), String.valueOf(EXTERNAL2_GURANTEE)).build();
 //    Integer externalGuarantee_2 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-//    Assertions.assertNotNull(externalGuarantee_2);
 //    verifySavingsOnHoldBalance(externalSavigsId_2, null);
+//    Assertions.assertNotNull(externalGuarantee_2);
 //
 //    LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
 //    loanStatusHashMap = this.loanTransactionHelper.approveLoan(loanDisbursementDate, loanID);
@@ -343,42 +181,6 @@ public class GuarantorTest {
 //    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
 //    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
 //    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
-//    List<HashMap> guarantors = this.guarantorHelper.getAllGuarantor(loanID);
-//    HashMap response = this.guarantorHelper.deleteGuarantor(externalGuarantor, loanID);
-//    assertEquals(externalGuarantor, response.get("resourceId"));
-//    assertFalse((Boolean) this.guarantorHelper.getGuarantor(externalGuarantor, loanID, "status"));
-//    HashMap errorlog = this.guarantorHelper.deleteGuarantor(withoutGuaranteeAmount, loanID);
-//    ArrayList<HashMap> error = (ArrayList<HashMap>) errorlog.get(CommonConstants.RESPONSE_ERROR);
-//    assertTrue(checkForErrorCode(error, "error.msg.loan.guarantor.not.found"));
-//    guarantors = this.guarantorHelper.getAllGuarantor(loanID);
-//    assertEquals(4, guarantors.size());
-//    List<HashMap> externalGuarantee_1_details = (List<HashMap>) this.guarantorHelper.getGuarantor(externalGuarantee_1, loanID,
-//            "guarantorFundingDetails");
-//    Integer fundDetailId = (Integer) externalGuarantee_1_details.get(0).get("id");
-//    errorlog = this.guarantorHelper.deleteGuarantor(externalGuarantee_1, fundDetailId, loanID);
-//    error = (ArrayList<HashMap>) errorlog.get(CommonConstants.RESPONSE_ERROR);
-//    assertTrue(checkForErrorCode(error, "validation.msg.loan.guarantor.min.external.guarantee.required"));
-//
-//    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external),
-//            String.valueOf(externalSavigsId_3), String.valueOf(EXTERNAL1_GURANTEE)).build();
-//    Integer externalGuarantee_3 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
-//    verifySavingsOnHoldBalance(externalSavigsId_3, EXTERNAL1_GURANTEE);
-//    Assertions.assertNotNull(externalGuarantee_3);
-//
-//    response = this.guarantorHelper.deleteGuarantor(externalGuarantee_3, fundDetailId, loanID);
-//    assertEquals(externalGuarantee_3, response.get("resourceId"));
-//    guarantors = this.guarantorHelper.getAllGuarantor(loanID);
-//    assertEquals(4, guarantors.size());
-//    externalGuarantee_1_details = (List<HashMap>) this.guarantorHelper.getGuarantor(externalGuarantee_1, loanID,
-//            "guarantorFundingDetails");
-//    assertEquals(2, externalGuarantee_1_details.size());
-//
-//    for (HashMap map : externalGuarantee_1_details) {
-//      if (map.get("id").equals(fundDetailId)) {
-//        HashMap status = (HashMap) map.get("status");
-//        assertEquals("guarantorFundStatusType.withdrawn", status.get("code"));
-//      }
-//    }
 //
 //    LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
 //    String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanID);
@@ -396,7 +198,7 @@ public class GuarantorTest {
 //    external2_hold_funds -= Float.valueOf((float) 413.7933);
 //    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
 //    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-//    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
+//    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
 //    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
 //
 //    // Second repayment
@@ -408,7 +210,7 @@ public class GuarantorTest {
 //    external2_hold_funds -= Float.valueOf((float) 415.7033333);
 //    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
 //    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-//    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
+//    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
 //    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
 //
 //    // third repayment
@@ -416,29 +218,224 @@ public class GuarantorTest {
 //    todaysDate.add(Calendar.DAY_OF_MONTH, -7);
 //    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
 //    totalDueForCurrentPeriod = (Float) loanSchedule.get(3).get("totalDueForPeriod");
-//    Float self1_hold_funds_temp = self1_hold_funds - Float.valueOf((float) 741.355);
-//    HashMap transactionDetail = this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
-//    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds_temp);
-//    verifySavingsOnHoldBalance(externalSavigsId_3, Float.valueOf((float) 0));
+//    self1_hold_funds -= Float.valueOf((float) 741.355);
+//    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
+//    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+//    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
 //    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
 //
-//    // undo repayment
-//    this.loanTransactionHelper.adjustLoanTransaction(loanID, (Integer) transactionDetail.get(CommonConstants.RESPONSE_RESOURCE_ID),
-//            loanRepaymentDate, "0", "");
-//    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
-//    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
-//    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+//    // forth repayment
+//    todaysDate = Calendar.getInstance();
+//    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
+//    totalDueForCurrentPeriod = (Float) loanSchedule.get(3).get("totalDueForPeriod");
+//    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
+//    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) 0));
+//    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
+//    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
 //
-//    // undo disbursal
-//    loanStatusHashMap = this.loanTransactionHelper.undoDisbursal(loanID);
-//    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-//    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
-//    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) SELF1_GURANTEE));
-//    verifySavingsOnHoldBalance(externalSavigsId_3, Float.valueOf((float) EXTERNAL1_GURANTEE));
-//    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) EXTERNAL2_GURANTEE));
+//    loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
+//    LoanStatusChecker.verifyLoanAccountIsClosed(loanStatusHashMap);
+//
 //  }
-//
-//  @Disabled
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Test
+  public void testGuarantor_UNDO_DISBURSAL() {
+
+    Float self1_hold_funds = Float.valueOf((float) 0);
+    Float external1_hold_funds = Float.valueOf((float) 0);
+    Float external2_hold_funds = Float.valueOf((float) 0);
+    final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+    ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
+    final Integer clientID_external = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+    final Integer clientID_external2 = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+
+    ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID_external);
+
+    final Integer selfSavigsId = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID,
+            String.valueOf(SELF1_BALANCE));
+    final Integer externalSavigsId_1 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
+            String.valueOf(EXTERNAL1_BALANCE));
+    final Integer externalSavigsId_3 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external,
+            String.valueOf(EXTERNAL1_BALANCE));
+    final Integer externalSavigsId_2 = SavingsAccountHelper.openSavingsAccount(this.requestSpec, this.responseSpec, clientID_external2,
+            String.valueOf(EXTERNAL2_BALANCE));
+
+    final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
+    DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+    Calendar todaysDate = Calendar.getInstance();
+    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 4);
+    final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
+    final Integer loanID = applyForLoanApplication(clientID, loanProductID, loanDisbursementDate);
+    Assertions.assertNotNull(loanID);
+    HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
+    LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
+
+    String guarantorJSON = new GuarantorTestBuilder().externalCustomer().build();
+    Integer externalGuarantor = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    Assertions.assertNotNull(externalGuarantor);
+
+    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithoutGuaranteeAmount(String.valueOf(clientID_external)).build();
+    Integer withoutGuaranteeAmount = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    Assertions.assertNotNull(withoutGuaranteeAmount);
+
+    ArrayList<HashMap> errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
+            CommonConstants.RESPONSE_ERROR);
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
+
+    guarantorJSON = new GuarantorTestBuilder()
+            .existingCustomerWithGuaranteeAmount(String.valueOf(clientID), String.valueOf(selfSavigsId), String.valueOf(SELF1_GURANTEE))
+            .build();
+    Integer selfGuarantee = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    verifySavingsOnHoldBalance(selfSavigsId, null);
+    Assertions.assertNotNull(selfGuarantee);
+
+    errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
+            CommonConstants.RESPONSE_ERROR);
+    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
+
+    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external),
+            String.valueOf(externalSavigsId_1), String.valueOf(EXTERNAL1_GURANTEE)).build();
+    Integer externalGuarantee_1 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    verifySavingsOnHoldBalance(externalSavigsId_1, null);
+    Assertions.assertNotNull(externalGuarantee_1);
+
+    errorData = (ArrayList<HashMap>) this.loanTransactionHelper.approveLoan(loanDisbursementDate, null, loanID,
+            CommonConstants.RESPONSE_ERROR);
+    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.self.guarantee.required"));
+    assertFalse(checkForErrorCode(errorData, "validation.msg.loan.guarantor.min.external.guarantee.required"));
+    assertTrue(checkForErrorCode(errorData, "validation.msg.loan.guarantor.mandated.guarantee.required"));
+
+    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external2),
+            String.valueOf(externalSavigsId_2), String.valueOf(EXTERNAL2_GURANTEE)).build();
+    Integer externalGuarantee_2 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    Assertions.assertNotNull(externalGuarantee_2);
+    verifySavingsOnHoldBalance(externalSavigsId_2, null);
+
+    LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
+    loanStatusHashMap = this.loanTransactionHelper.approveLoan(loanDisbursementDate, loanID);
+    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
+    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
+    self1_hold_funds += SELF1_GURANTEE;
+    external1_hold_funds += EXTERNAL1_GURANTEE;
+    external2_hold_funds += EXTERNAL2_GURANTEE;
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+
+    LOG.info("-----------------------------------UNDO APPROVE LOAN-----------------------------------------");
+    loanStatusHashMap = this.loanTransactionHelper.undoApproval(loanID);
+    LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
+    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) 0));
+    verifySavingsOnHoldBalance(externalSavigsId_1, Float.valueOf((float) 0));
+    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
+
+    LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
+    loanStatusHashMap = this.loanTransactionHelper.approveLoan(loanDisbursementDate, loanID);
+    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
+    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_1, external1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+    List<HashMap> guarantors = this.guarantorHelper.getAllGuarantor(loanID);
+    HashMap response = this.guarantorHelper.deleteGuarantor(externalGuarantor, loanID);
+    assertEquals(externalGuarantor, response.get("resourceId"));
+    assertFalse((Boolean) this.guarantorHelper.getGuarantor(externalGuarantor, loanID, "status"));
+    HashMap errorlog = this.guarantorHelper.deleteGuarantor(withoutGuaranteeAmount, loanID);
+    ArrayList<HashMap> error = (ArrayList<HashMap>) errorlog.get(CommonConstants.RESPONSE_ERROR);
+    assertTrue(checkForErrorCode(error, "error.msg.loan.guarantor.not.found"));
+    guarantors = this.guarantorHelper.getAllGuarantor(loanID);
+    assertEquals(4, guarantors.size());
+    List<HashMap> externalGuarantee_1_details = (List<HashMap>) this.guarantorHelper.getGuarantor(externalGuarantee_1, loanID,
+            "guarantorFundingDetails");
+    Integer fundDetailId = (Integer) externalGuarantee_1_details.get(0).get("id");
+    errorlog = this.guarantorHelper.deleteGuarantor(externalGuarantee_1, fundDetailId, loanID);
+    error = (ArrayList<HashMap>) errorlog.get(CommonConstants.RESPONSE_ERROR);
+    assertTrue(checkForErrorCode(error, "validation.msg.loan.guarantor.min.external.guarantee.required"));
+
+    guarantorJSON = new GuarantorTestBuilder().existingCustomerWithGuaranteeAmount(String.valueOf(clientID_external),
+            String.valueOf(externalSavigsId_3), String.valueOf(EXTERNAL1_GURANTEE)).build();
+    Integer externalGuarantee_3 = this.guarantorHelper.createGuarantor(loanID, guarantorJSON);
+    verifySavingsOnHoldBalance(externalSavigsId_3, EXTERNAL1_GURANTEE);
+    Assertions.assertNotNull(externalGuarantee_3);
+
+    response = this.guarantorHelper.deleteGuarantor(externalGuarantee_3, fundDetailId, loanID);
+    assertEquals(externalGuarantee_3, response.get("resourceId"));
+    guarantors = this.guarantorHelper.getAllGuarantor(loanID);
+    assertEquals(4, guarantors.size());
+    externalGuarantee_1_details = (List<HashMap>) this.guarantorHelper.getGuarantor(externalGuarantee_1, loanID,
+            "guarantorFundingDetails");
+    assertEquals(2, externalGuarantee_1_details.size());
+
+    for (HashMap map : externalGuarantee_1_details) {
+      if (map.get("id").equals(fundDetailId)) {
+        HashMap status = (HashMap) map.get("status");
+        assertEquals("guarantorFundStatusType.withdrawn", status.get("code"));
+      }
+    }
+
+    LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
+    String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanID);
+    loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount(loanDisbursementDate, loanID,
+            JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+    LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
+
+    // First repayment
+    ArrayList<HashMap> loanSchedule = this.loanTransactionHelper.getLoanRepaymentSchedule(this.requestSpec, this.responseSpec, loanID);
+    todaysDate = Calendar.getInstance();
+    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 3);
+    String loanRepaymentDate = dateFormat.format(todaysDate.getTime());
+    Float totalDueForCurrentPeriod = (Float) loanSchedule.get(1).get("totalDueForPeriod");
+    external1_hold_funds -= Float.valueOf((float) 827.5867);
+    external2_hold_funds -= Float.valueOf((float) 413.7933);
+    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+
+    // Second repayment
+    todaysDate = Calendar.getInstance();
+    todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 2);
+    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
+    totalDueForCurrentPeriod = (Float) loanSchedule.get(2).get("totalDueForPeriod");
+    external1_hold_funds -= Float.valueOf((float) 831.4067);
+    external2_hold_funds -= Float.valueOf((float) 415.7033333);
+    this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+
+    // third repayment
+    todaysDate = Calendar.getInstance();
+    todaysDate.add(Calendar.DAY_OF_MONTH, -7);
+    loanRepaymentDate = dateFormat.format(todaysDate.getTime());
+    totalDueForCurrentPeriod = (Float) loanSchedule.get(3).get("totalDueForPeriod");
+    Float self1_hold_funds_temp = self1_hold_funds - Float.valueOf((float) 741.355);
+    HashMap transactionDetail = this.loanTransactionHelper.makeRepayment(loanRepaymentDate, totalDueForCurrentPeriod, loanID);
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds_temp);
+    verifySavingsOnHoldBalance(externalSavigsId_3, Float.valueOf((float) 0));
+    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) 0));
+
+    // undo repayment
+    this.loanTransactionHelper.adjustLoanTransaction(loanID, (Integer) transactionDetail.get(CommonConstants.RESPONSE_RESOURCE_ID),
+            loanRepaymentDate, "0", "");
+    verifySavingsOnHoldBalance(selfSavigsId, self1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_3, external1_hold_funds);
+    verifySavingsOnHoldBalance(externalSavigsId_2, external2_hold_funds);
+
+    // undo disbursal
+    loanStatusHashMap = this.loanTransactionHelper.undoDisbursal(loanID);
+    LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
+    LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
+    verifySavingsOnHoldBalance(selfSavigsId, Float.valueOf((float) SELF1_GURANTEE));
+    verifySavingsOnHoldBalance(externalSavigsId_3, Float.valueOf((float) EXTERNAL1_GURANTEE));
+    verifySavingsOnHoldBalance(externalSavigsId_2, Float.valueOf((float) EXTERNAL2_GURANTEE));
+  }
+
 //  @SuppressWarnings({ "rawtypes", "unchecked" })
 //  @Test
 //  public void testGuarantor_RECOVER_GUARANTEES() {
@@ -510,7 +507,6 @@ public class GuarantorTest {
 //
 //  }
 //
-//  @Disabled
 //  @SuppressWarnings({ "rawtypes", "unchecked" })
 //  @Test
 //  public void testGuarantor_RECOVER_GUARANTEES_WITH_MORE_GUARANTEE() {
@@ -588,7 +584,6 @@ public class GuarantorTest {
 //
 //  }
 //
-//  @Disabled
 //  @SuppressWarnings({ "rawtypes", "unchecked" })
 //  @Test
 //  public void testGuarantor_WRITE_OFF_LOAN() {

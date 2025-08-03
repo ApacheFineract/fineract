@@ -219,7 +219,7 @@ public class GuarantorsApiResource {
     public DeleteGuarantorsResponse deleteGuarantor(
             @PathParam("loanId") @NotNull(message = "{guarantor.loanId.notNull}") @PositiveOrZero(message = "{guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.loanId.digits}") final Long loanId,
             @PathParam("guarantorId") @NotNull(message = "{guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorId.digits}") final Long guarantorId,
-            @QueryParam("guarantorFundingId") @NotNull(message = "{guarantor.guarantorFundingId.notNull}") @PositiveOrZero(message = "{guarantor.guarantorFundingId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorFundingId.digits}") final Long guarantorFundingId) {
+            @QueryParam("guarantorFundingId") @PositiveOrZero(message = "{guarantor.guarantorFundingId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{guarantor.guarantorFundingId.digits}") final Long guarantorFundingId) {
         // final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteGuarantor(loanId, guarantorId,
         // guarantorFundingId).build();
         //
