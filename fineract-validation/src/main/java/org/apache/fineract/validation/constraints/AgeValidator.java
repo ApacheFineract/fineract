@@ -22,6 +22,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
@@ -74,7 +75,7 @@ public class AgeValidator implements ConstraintValidator<ValidAge, Object> {
     }
 
     private boolean isAgeInRange(final LocalDate date) {
-        final LocalDate now = LocalDate.now();
+        final LocalDate now = LocalDate.now(ZoneId.systemDefault());
         if (date.isAfter(now)) {
             return false;
         }
