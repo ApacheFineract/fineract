@@ -1,14 +1,11 @@
 package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 
 @Builder
 @Data
