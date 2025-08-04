@@ -16,16 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cob.exceptions;
+package org.apache.fineract.portfolio.loanaccount.data;
 
-public class LoanAccountLockCannotBeOverruledException extends RuntimeException {
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-    public LoanAccountLockCannotBeOverruledException(String message) {
-        super(message);
-    }
-
-    public LoanAccountLockCannotBeOverruledException(String message, Exception e) {
-        super(message, e);
-    }
+public record BuyDownFeeAmortizationDetails(Long id, Long loanId, Long transactionId, LocalDate buyDownFeeDate, BigDecimal buyDownFeeAmount,
+        BigDecimal amortizedAmount, BigDecimal notYetAmortizedAmount, BigDecimal adjustedAmount, BigDecimal chargedOffAmount) {
 
 }

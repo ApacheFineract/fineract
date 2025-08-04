@@ -20,7 +20,7 @@ package org.apache.fineract.cob.data;
 
 import java.time.LocalDate;
 
-public interface LoanIdAndLastClosedBusinessDate {
+public interface COBIdAndLastClosedBusinessDate {
 
     Long getId();
 

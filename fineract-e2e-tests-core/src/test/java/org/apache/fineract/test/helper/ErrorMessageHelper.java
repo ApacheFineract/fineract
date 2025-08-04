@@ -179,6 +179,11 @@ public final class ErrorMessageHelper {
         return "Capitalized income transaction cannot be reversed when non-reversed adjustment exists for it.";
     }
 
+    public static String buyDownFeeUndoFailureAdjustmentExists(Long loanId) {
+        String loanIdStr = String.valueOf(loanId);
+        return String.format("Undo Loan Transaction: %s is not allowed. Loan transaction has not reversed transaction related", loanIdStr);
+    }
+
     public static String wrongAmountInRepaymentSchedule(int line, BigDecimal actual, BigDecimal expected) {
         String lineToStr = String.valueOf(line);
         String actualToStr = actual.toString();
@@ -999,5 +1004,31 @@ public final class ErrorMessageHelper {
 
     public static String updateApprovedLoanLessMinAllowedAmountFailure() {
         return "The parameter `amount` must be greater than 0.";
+    }
+
+    public static String wrongValueInLineInBuyDownFeeTab(String resourceId, int line, List<List<String>> actualList,
+            List<String> expected) {
+        String actual = actualList.stream().map(Object::toString).collect(Collectors.joining(System.lineSeparator()));
+        return String.format("%nWrong value in Buy Down Fee tab of resource %s line %s." //
+                + "%nActual values in line (with the same date) are: %n%s %nExpected values in line: %n%s", resourceId, line, actual,
+                expected);
+    }
+
+    public static String nrOfLinesWrongInBuyDownFeeTab(String resourceId, int actual, int expected) {
+        return String.format("%nNumber of lines does not match in Buy Down Fee tab and expected datatable of resource %s." //
+                + "%nNumber of transaction tab lines: %s %nNumber of expected datatable lines: %s%n", resourceId, actual, expected);
+    }
+
+    public static String wrongValueInLineInDeferredIncomeTab(String resourceId, int line, List<List<String>> actualList,
+            List<String> expected) {
+        String actual = actualList.stream().map(Object::toString).collect(Collectors.joining(System.lineSeparator()));
+        return String.format("%nWrong value in Deferred Income tab of resource %s line %s." //
+                + "%nActual values in line (with the same date) are: %n%s %nExpected values in line: %n%s", resourceId, line, actual,
+                expected);
+    }
+
+    public static String nrOfLinesWrongInDeferredIncomeTab(String resourceId, int actual, int expected) {
+        return String.format("%nNumber of lines does not match in Deferred Income tab and expected datatable of resource %s." //
+                + "%nNumber of transaction tab lines: %s %nNumber of expected datatable lines: %s%n", resourceId, actual, expected);
     }
 }

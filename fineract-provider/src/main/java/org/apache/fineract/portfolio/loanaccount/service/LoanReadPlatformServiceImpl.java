@@ -195,6 +195,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
     private final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository;
     private final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository;
     private final InterestRefundServiceDelegate interestRefundServiceDelegate;
+    private final LoanMaximumAmountCalculator loanMaximumAmountCalculator;
 
     @Override
     public LoanAccountData retrieveOne(final Long loanId) {
@@ -488,36 +489,20 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
             case CAPITALIZED_INCOME:
                 final Loan loan = loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
                 BigDecimal capitalizedIncomeBalance = BigDecimal.ZERO;
-                BigDecimal buyDownFeeBalance = BigDecimal.ZERO;
                 if (loan.getLoanProduct().getLoanProductRelatedDetail().isEnableIncomeCapitalization()) {
                     capitalizedIncomeBalance = loanCapitalizedIncomeBalanceRepository.findAllByLoanId(loanId).stream()
                             .map(LoanCapitalizedIncomeBalance::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                 }
-                // Calculate Buy Down Fee balance to subtract from Capitalized Income formula
-                buyDownFeeBalance = loanBuyDownFeeBalanceRepository.findAllByLoanId(loanId).stream().map(LoanBuyDownFeeBalance::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-                transactionAmount = loan.getApprovedPrincipal().subtract(loan.getDisbursedAmount()).subtract(capitalizedIncomeBalance)
-                        .subtract(buyDownFeeBalance);
+                transactionAmount = loan.getLoanProduct().isAllowApprovedDisbursedAmountsOverApplied()
+                        ? loanMaximumAmountCalculator.getOverAppliedMax(loan)
+                        : loan.getApprovedPrincipal();
+                transactionAmount = transactionAmount.subtract(loan.getDisbursedAmount()).subtract(capitalizedIncomeBalance);
                 paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
                 loanTransactionData = LoanTransactionData.loanTransactionDataForCreditTemplate(
                         LoanEnumerations.transactionType(transactionType), DateUtils.getBusinessLocalDate(), transactionAmount,
                         paymentOptions, retriveLoanCurrencyData(loanId));
             break;
             case BUY_DOWN_FEE:
-                final Loan buyDownLoan = loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
-                BigDecimal buyDownFeeBalanceForCalc = BigDecimal.ZERO;
-                BigDecimal capitalizedIncomeBalanceForCalc = BigDecimal.ZERO;
-
-                // Calculate existing Buy Down Fee balance
-                buyDownFeeBalanceForCalc = loanBuyDownFeeBalanceRepository.findAllByLoanId(loanId).stream()
-                        .map(LoanBuyDownFeeBalance::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                // Calculate Capitalized Income balance to subtract from Buy Down Fee formula
-                if (buyDownLoan.getLoanProduct().getLoanProductRelatedDetail().isEnableIncomeCapitalization()) {
-                    capitalizedIncomeBalanceForCalc = loanCapitalizedIncomeBalanceRepository.findAllByLoanId(loanId).stream()
-                            .map(LoanCapitalizedIncomeBalance::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                }
-                transactionAmount = buyDownLoan.getApprovedPrincipal().subtract(buyDownLoan.getDisbursedAmount())
-                        .subtract(buyDownFeeBalanceForCalc).subtract(capitalizedIncomeBalanceForCalc);
                 paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
                 loanTransactionData = LoanTransactionData.loanTransactionDataForCreditTemplate(
                         LoanEnumerations.transactionType(transactionType), DateUtils.getBusinessLocalDate(), transactionAmount,
@@ -2482,6 +2467,19 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
 
         return LoanTransactionData.loanTransactionDataForCreditTemplate(transactionType, targetTxn.getTransactionDate(),
                 interestRefundAmount, paymentTypeOptions, loan.getCurrency().toData());
+    }
+
+    @Override
+    public Long getResolvedLoanId(final ExternalId loanExternalId) {
+        loanExternalId.throwExceptionIfEmpty();
+
+        final Long resolvedLoanId = retrieveLoanIdByExternalId(loanExternalId);
+
+        if (resolvedLoanId == null) {
+            throw new LoanNotFoundException(loanExternalId);
+        }
+
+        return resolvedLoanId;
     }
 
     private LoanTransaction deriveDefaultInterestWaiverTransaction(final Loan loan) {
