@@ -70,9 +70,6 @@ public class CollectionSheetApiResource {
             + "This Api retrieves repayment details of all individual loans under a office as on a specified meeting date.\n\n"
             + "Save Collection Sheet:\n\n"
             + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
-    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CollectionSheetRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollectionSheetApiResourceSwagger.PostCollectionSheetResponse.class))) })
     public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
