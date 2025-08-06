@@ -51,7 +51,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, Object
       var locale = (String) getFieldValue(clazz, value, localeField);
 
       if (StringUtils.isBlank(dateFieldVal) || StringUtils.isBlank(format) || StringUtils.isBlank(locale)) {
-        return false;
+        return true;
       }
 
       var formatter = new DateTimeFormatterBuilder()

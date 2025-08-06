@@ -16,20 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.collectionsheet.service;
+package org.apache.fineract.portfolio.collectionsheet.data;
 
-import org.apache.fineract.command.core.Command;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
-import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetResponse;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-public interface CollectionSheetWritePlatformService {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    CommandProcessingResult updateCollectionSheet(JsonCommand command);
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CollectionSheetResponse implements Serializable {
 
-    @Deprecated
-    CommandProcessingResult saveIndividualCollectionSheet(JsonCommand command);
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    CollectionSheetResponse saveIndividualCollectionSheet(Command<CollectionSheetRequest> command);
+  private UUID commandId;
+  private Long entityId;
+  private Long groupId;
+  Map<String, Object> changes;
 }
