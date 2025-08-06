@@ -24,12 +24,8 @@ import static org.apache.fineract.infrastructure.core.service.CommandParameterUt
 import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -71,7 +67,7 @@ public class CollectionSheetApiResource {
             + "Save Collection Sheet:\n\n"
             + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
     public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
+            @Parameter(hidden = true) @Valid CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
 

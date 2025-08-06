@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.data;
 
+import jakarta.validation.Valid;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -37,6 +38,9 @@ public class DisbursementTransactionsRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Valid
     private List<RepaymentTransactionRequest> bulkRepaymentTransactions;
+
+    @Valid
     private List<SavingDueTransactionRequest> bulkSavingsDueTransactions;
 }

@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.data;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -37,9 +40,17 @@ public class RepaymentTransactionRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @PositiveOrZero(message = "{collection.sheet.repayment.transactions.loanId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{collection.sheet.repayment.transactions.loanId.digits}")
     private Long loanId;
+
+    @DecimalMin(value = "0.01", message = "{collection.sheet.repayment.transactions.transaction.amount.min}")
     private BigDecimal transactionAmount;
+
+    @PositiveOrZero(message = "{collection.sheet.repayment.transactions.payment.type.id.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{collection.sheet.repayment.transactions.payment.type.id.digits}")
     private Long paymentTypeId;
+
     private String accountNumber;
     private String checkNumber;
     private String routingCode;
