@@ -84,6 +84,10 @@ public final class RepaymentPeriod {
     @Getter
     private BigDecimal totalDisbursedAmount;
 
+    @Setter
+    @Getter
+    private BigDecimal totalCapitalizedIncomeAmount;
+
     @JsonExclude
     @Getter
     private final LoanProductMinimumRepaymentScheduleRelatedDetail loanProductRelatedDetail;
@@ -377,6 +381,15 @@ public final class RepaymentPeriod {
         return previous == null;
     }
 
+    /**
+     * Gives back getDueInterest minus paid interest
+     *
+     * @return
+     */
+    public Money getOutstandingInterest() {
+        return MathUtil.negativeToZero(getDueInterest().minus(getPaidInterest()), mc);
+    }
+
     public Money getOutstandingPrincipal() {
         return MathUtil.negativeToZero(getDuePrincipal().minus(getPaidPrincipal()), mc);
     }
@@ -389,16 +402,21 @@ public final class RepaymentPeriod {
     /**
      * @param tillPeriod
      *            can be null. if null it calculates total disbursement including last interest period.
-     * @return disbursed amount til interest period.
+     * @return disbursed and capitalized income amount till interest period.
      */
-    public BigDecimal calculateTotalDisbursedAmountTillGivenPeriod(InterestPeriod tillPeriod) {
-        BigDecimal res = MathUtil.nullToZero(getTotalDisbursedAmount());
+    public BigDecimal calculateTotalDisbursedAndCapitalizedIncomeAmountTillGivenPeriod(InterestPeriod tillPeriod) {
+        BigDecimal res = MathUtil.nullToZero(getTotalDisbursedAmount()).add(MathUtil.nullToZero(getTotalCapitalizedIncomeAmount()));
         for (InterestPeriod interestPeriod : this.interestPeriods) {
             if (interestPeriod.equals(tillPeriod)) {
                 break;
             }
-            if (!interestPeriod.getDueDate().equals(getFromDate()) && interestPeriod.getDisbursementAmount() != null) {
-                res = res.add(interestPeriod.getDisbursementAmount().getAmount());
+            if (!interestPeriod.getDueDate().equals(getFromDate())) {
+                if (interestPeriod.getDisbursementAmount() != null) {
+                    res = res.add(interestPeriod.getDisbursementAmount().getAmount());
+                }
+                if (interestPeriod.getCapitalizedIncomePrincipal() != null) {
+                    res = res.add(interestPeriod.getCapitalizedIncomePrincipal().getAmount());
+                }
             }
         }
         return res;
