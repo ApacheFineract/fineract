@@ -45,6 +45,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements CollectionSheetWritePlatformService {
@@ -120,17 +121,52 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         return result;
     }
 
+  @Transactional
   @Override
   public CollectionSheetResponse saveIndividualCollectionSheet(Command<CollectionSheetRequest> command) {
+//    this.transactionDataValidator.validateIndividualCollectionSheet(command);
+
+    final Map<String, Object> changes = new HashMap<>();
+    changes.put("locale", command.getPayload().getLocale());
+    changes.put("dateFormat", command.getPayload().getDateFormat());
+
+//    final String noteText = command.stringValueOfParameterNamed("note");
+//    if (StringUtils.isNotBlank(noteText)) {
+//      changes.put("note", noteText);
+//    }
+
+//    final PaymentDetail paymentDetail = null;
+//
+//    changes.putAll(updateBulkRepayments(command, paymentDetail));
+//
+//    changes.putAll(updateBulkDisbursals(command));
+//
+//    changes.putAll(updateBulkMandatorySavingsDuePayments(command, paymentDetail));
+
+//    final var result = new CommandProcessingResultBuilder()
+//            .withCommandId(command.commandId())
+//            .withEntityId(command.entityId())
+//            .withGroupId(command.entityId())
+//            .with(changes).with(changes).build();
+
     return null;
   }
 
+  @Deprecated
   private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
         changes.putAll(this.loanWritePlatformService.makeLoanBulkRepayment(bulkRepaymentCommand));
         return changes;
+    }
+
+    private Map<String, Object> updateBulkRepayments(final Command<CollectionSheetRequest> command, final PaymentDetail paymentDetail) {
+      final Map<String, Object> changes = new HashMap<>();
+//      final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
+//              .commandFromApiJson(command.json(), paymentDetail);
+//      changes.putAll(this.loanWritePlatformService.makeLoanBulkRepayment(bulkRepaymentCommand));
+      return changes;
     }
 
     private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
