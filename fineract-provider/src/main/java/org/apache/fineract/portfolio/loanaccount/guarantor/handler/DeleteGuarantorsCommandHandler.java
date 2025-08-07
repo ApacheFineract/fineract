@@ -26,6 +26,7 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantors
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorWritePlatformService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -34,6 +35,7 @@ public class DeleteGuarantorsCommandHandler implements CommandHandler<DeleteGuar
 
     private final GuarantorWritePlatformService writePlatformService;
 
+    @Transactional
     @Override
     public DeleteGuarantorsResponse handle(Command<DeleteGuarantorsRequest> command) {
         return this.writePlatformService.removeGuarantor(command);
