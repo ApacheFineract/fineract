@@ -16,17 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.test.messaging.event.loan.transaction;
 
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.springframework.transaction.annotation.Transactional;
+public class LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent extends AbstractLoanTransactionEvent {
 
-public interface BuyDownFeePlatformService {
-
-    @Transactional
-    CommandProcessingResult makeLoanBuyDownFee(Long loanId, JsonCommand command);
-
-    @Transactional
-    CommandProcessingResult buyDownFeeAdjustment(Long loanId, Long buyDownFeeTransactionId, JsonCommand command);
+    @Override
+    public String getEventName() {
+        return "LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent";
+    }
 }

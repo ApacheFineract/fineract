@@ -16,17 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.loanaccount.service;
+package org.apache.fineract.portfolio.delinquency.service;
 
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
-public interface BuyDownFeePlatformService {
+public interface PossibleNextRepaymentCalculationService {
 
-    @Transactional
-    CommandProcessingResult makeLoanBuyDownFee(Long loanId, JsonCommand command);
+    boolean canAccept(Loan loan);
 
-    @Transactional
-    CommandProcessingResult buyDownFeeAdjustment(Long loanId, Long buyDownFeeTransactionId, JsonCommand command);
+    BigDecimal possibleNextRepaymentAmount(Loan loan, LocalDate nextPaymentDueDate);
 }
