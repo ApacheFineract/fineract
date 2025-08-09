@@ -32,6 +32,7 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface LoanWritePlatformService {
@@ -127,4 +128,6 @@ public interface LoanWritePlatformService {
     CommandProcessingResult makeRefund(Long loanId, LoanTransactionType loanTransactionType, JsonCommand command);
 
     CommandProcessingResult makeManualInterestRefund(Long loanId, Long transactionId, JsonCommand command);
+
+    AppUser getAppUserIfPresent();
 }

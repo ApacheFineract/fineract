@@ -34,24 +34,25 @@ import java.lang.annotation.Target;
 @Repeatable(DateRange.List.class)
 public @interface DateRange {
 
-  String message() default "{org.apache.fineract.validation.date-range}";
+    String message() default "{org.apache.fineract.validation.date-range}";
 
-  String dateField();
+    String dateField();
 
-  String formatField();
+    String formatField();
 
-  String localeField();
+    String localeField();
 
-  int maxYearsAgo();
+    int maxYearsAgo();
 
-  Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-  Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
-  @Target({ ElementType.TYPE })
-  @Retention(RetentionPolicy.RUNTIME)
-  @Documented
-  @interface List {
-    DateRange[] value();
-  }
+    @Target({ ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface List {
+
+        DateRange[] value();
+    }
 }

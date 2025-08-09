@@ -50,6 +50,7 @@ public @interface LocalDate {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
-      LocalDate[] value();
+
+        LocalDate[] value();
     }
 }

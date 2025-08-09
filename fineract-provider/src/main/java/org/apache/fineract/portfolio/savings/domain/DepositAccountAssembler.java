@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.portfolio.savings.domain;
 
-import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.bulkSavingsDueTransactionsParamName;
+//import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.bulkSavingsDueTransactionsParamName;
 import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.savingsIdParamName;
 import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.transactionAmountParamName;
 import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.transactionDateParamName;
@@ -64,7 +64,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -463,64 +462,67 @@ public class DepositAccountAssembler {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withLocale(locale);
 
         if (topLevelJsonElement != null && topLevelJsonElement.isJsonObject()) {
-          JsonObject root = topLevelJsonElement.getAsJsonObject();
+            JsonObject root = topLevelJsonElement.getAsJsonObject();
 
-          if (root.has("bulkDisbursementTransactions")) {
-            JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
+            if (root.has("bulkDisbursementTransactions")) {
+                JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
 
-            if (disbursementElement != null && disbursementElement.isJsonObject()) {
-              JsonObject disbursementObj = disbursementElement.getAsJsonObject();
+                if (disbursementElement != null && disbursementElement.isJsonObject()) {
+                    JsonObject disbursementObj = disbursementElement.getAsJsonObject();
 
-              if (disbursementObj.has("bulkSavingsDueTransactions")) {
-                JsonElement savingsElement = disbursementObj.get("bulkSavingsDueTransactions");
+                    if (disbursementObj.has("bulkSavingsDueTransactions")) {
+                        JsonElement savingsElement = disbursementObj.get("bulkSavingsDueTransactions");
 
-                if (savingsElement != null && savingsElement.isJsonArray()) {
-                  JsonArray array = savingsElement.getAsJsonArray();
+                        if (savingsElement != null && savingsElement.isJsonArray()) {
+                            JsonArray array = savingsElement.getAsJsonArray();
 
-                  for (int i = 0; i < array.size(); i++) {
-                    final JsonObject savingsTransactionElement = array.get(i).getAsJsonObject();
-                    final Long savingsId = this.fromApiJsonHelper.extractLongNamed(savingsIdParamName, savingsTransactionElement);
-                    final BigDecimal dueAmount = this.fromApiJsonHelper.extractBigDecimalNamed(transactionAmountParamName,
-                            savingsTransactionElement, locale);
-                    final Integer depositAccountType = this.fromApiJsonHelper
-                            .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
-                    PaymentDetail detail = paymentDetail;
-                    if (paymentDetail == null) {
-                      detail = this.paymentDetailAssembler.fetchPaymentDetail(savingsTransactionElement);
+                            for (int i = 0; i < array.size(); i++) {
+                                final JsonObject savingsTransactionElement = array.get(i).getAsJsonObject();
+                                final Long savingsId = this.fromApiJsonHelper.extractLongNamed(savingsIdParamName,
+                                        savingsTransactionElement);
+                                final BigDecimal dueAmount = this.fromApiJsonHelper.extractBigDecimalNamed(transactionAmountParamName,
+                                        savingsTransactionElement, locale);
+                                final Integer depositAccountType = this.fromApiJsonHelper.extractIntegerNamed(
+                                        CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
+                                PaymentDetail detail = paymentDetail;
+                                if (paymentDetail == null) {
+                                    detail = this.paymentDetailAssembler.fetchPaymentDetail(savingsTransactionElement);
+                                }
+                                final SavingsAccountTransactionDTO savingsAccountTransactionDTO = new SavingsAccountTransactionDTO(
+                                        formatter, transactionDate, dueAmount, detail, savingsId, depositAccountType);
+                                savingsAccountTransactions.add(savingsAccountTransactionDTO);
+                            }
+                            log.info("✅ Found bulkSavingsDueTransactions array with size: {}", array.size());
+                        }
                     }
-                    final SavingsAccountTransactionDTO savingsAccountTransactionDTO = new SavingsAccountTransactionDTO(formatter,
-                            transactionDate, dueAmount, detail, savingsId, depositAccountType);
-                    savingsAccountTransactions.add(savingsAccountTransactionDTO);
-                  }
-                  log.info("✅ Found bulkSavingsDueTransactions array with size: {}", array.size());
                 }
-              }
             }
-          }
         }
 
-//        if (element.isJsonObject()) {
-//            if (topLevelJsonElement.has(bulkSavingsDueTransactionsParamName)
-//                    && topLevelJsonElement.get(bulkSavingsDueTransactionsParamName).isJsonArray()) {
-//                final JsonArray array = topLevelJsonElement.get(bulkSavingsDueTransactionsParamName).getAsJsonArray();
-//
-//                for (int i = 0; i < array.size(); i++) {
-//                    final JsonObject savingsTransactionElement = array.get(i).getAsJsonObject();
-//                    final Long savingsId = this.fromApiJsonHelper.extractLongNamed(savingsIdParamName, savingsTransactionElement);
-//                    final BigDecimal dueAmount = this.fromApiJsonHelper.extractBigDecimalNamed(transactionAmountParamName,
-//                            savingsTransactionElement, locale);
-//                    final Integer depositAccountType = this.fromApiJsonHelper
-//                            .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement, locale);
-//                    PaymentDetail detail = paymentDetail;
-//                    if (paymentDetail == null) {
-//                        detail = this.paymentDetailAssembler.fetchPaymentDetail(savingsTransactionElement);
-//                    }
-//                    final SavingsAccountTransactionDTO savingsAccountTransactionDTO = new SavingsAccountTransactionDTO(formatter,
-//                            transactionDate, dueAmount, detail, savingsId, depositAccountType);
-//                    savingsAccountTransactions.add(savingsAccountTransactionDTO);
-//                }
-//            }
-//        }
+        // if (element.isJsonObject()) {
+        // if (topLevelJsonElement.has(bulkSavingsDueTransactionsParamName)
+        // && topLevelJsonElement.get(bulkSavingsDueTransactionsParamName).isJsonArray()) {
+        // final JsonArray array = topLevelJsonElement.get(bulkSavingsDueTransactionsParamName).getAsJsonArray();
+        //
+        // for (int i = 0; i < array.size(); i++) {
+        // final JsonObject savingsTransactionElement = array.get(i).getAsJsonObject();
+        // final Long savingsId = this.fromApiJsonHelper.extractLongNamed(savingsIdParamName,
+        // savingsTransactionElement);
+        // final BigDecimal dueAmount = this.fromApiJsonHelper.extractBigDecimalNamed(transactionAmountParamName,
+        // savingsTransactionElement, locale);
+        // final Integer depositAccountType = this.fromApiJsonHelper
+        // .extractIntegerNamed(CollectionSheetConstants.depositAccountTypeParamName, savingsTransactionElement,
+        // locale);
+        // PaymentDetail detail = paymentDetail;
+        // if (paymentDetail == null) {
+        // detail = this.paymentDetailAssembler.fetchPaymentDetail(savingsTransactionElement);
+        // }
+        // final SavingsAccountTransactionDTO savingsAccountTransactionDTO = new SavingsAccountTransactionDTO(formatter,
+        // transactionDate, dueAmount, detail, savingsId, depositAccountType);
+        // savingsAccountTransactions.add(savingsAccountTransactionDTO);
+        // }
+        // }
+        // }
 
         return savingsAccountTransactions;
     }

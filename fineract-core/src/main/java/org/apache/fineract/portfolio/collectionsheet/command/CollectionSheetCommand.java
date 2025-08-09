@@ -10,6 +10,6 @@ import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest
 @EqualsAndHashCode(callSuper = true)
 public class CollectionSheetCommand extends Command<CollectionSheetRequest> {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 }

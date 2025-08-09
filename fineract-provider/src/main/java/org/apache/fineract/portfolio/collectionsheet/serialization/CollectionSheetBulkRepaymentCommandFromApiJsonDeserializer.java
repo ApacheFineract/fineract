@@ -31,17 +31,14 @@ import org.apache.fineract.infrastructure.core.serialization.AbstractFromApiJson
 import org.apache.fineract.infrastructure.core.serialization.FromApiJsonDeserializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailAssembler;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.savingsIdParamName;
-import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.transactionAmountParamName;
+//import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.savingsIdParamName;
+//import static org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants.transactionAmountParamName;
 
 /**
  * Implementation of {@link FromApiJsonDeserializer} for {@link CollectionSheetBulkRepaymentCommand}'s.
@@ -88,70 +85,70 @@ public final class CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer
 
         SingleRepaymentCommand[] loanRepaymentTransactions = null;
 
-      if (topLevelJsonElement != null && topLevelJsonElement.isJsonObject()) {
-        JsonObject root = topLevelJsonElement.getAsJsonObject();
+        if (topLevelJsonElement != null && topLevelJsonElement.isJsonObject()) {
+            JsonObject root = topLevelJsonElement.getAsJsonObject();
 
-        if (root.has("bulkDisbursementTransactions")) {
-          JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
+            if (root.has("bulkDisbursementTransactions")) {
+                JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
 
-          if (disbursementElement != null && disbursementElement.isJsonObject()) {
-            JsonObject disbursementObj = disbursementElement.getAsJsonObject();
+                if (disbursementElement != null && disbursementElement.isJsonObject()) {
+                    JsonObject disbursementObj = disbursementElement.getAsJsonObject();
 
-            if (disbursementObj.has("bulkRepaymentTransactions")) {
-              JsonElement savingsElement = disbursementObj.get("bulkRepaymentTransactions");
+                    if (disbursementObj.has("bulkRepaymentTransactions")) {
+                        JsonElement savingsElement = disbursementObj.get("bulkRepaymentTransactions");
 
-              if (savingsElement != null && savingsElement.isJsonArray()) {
-                final JsonArray array = savingsElement.getAsJsonArray();
-                loanRepaymentTransactions = new SingleRepaymentCommand[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                  final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
+                        if (savingsElement != null && savingsElement.isJsonArray()) {
+                            final JsonArray array = savingsElement.getAsJsonArray();
+                            loanRepaymentTransactions = new SingleRepaymentCommand[array.size()];
+                            for (int i = 0; i < array.size(); i++) {
+                                final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
 
-                  final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
-                  final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", loanTransactionElement);
-                  final ExternalId externalId = ExternalIdFactory.produce(externalIdStr);
-                  final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
-                          loanTransactionElement, locale);
-                  PaymentDetail detail = paymentDetail;
-                  if (paymentDetail == null) {
-                    detail = this.paymentDetailAssembler.fetchPaymentDetail(loanTransactionElement);
-                  }
-                  if (transactionAmount != null && transactionAmount.intValue() > 0) {
-                    loanRepaymentTransactions[i] = new SingleRepaymentCommand(loanId, externalId, transactionAmount, transactionDate,
-                            detail);
-                  }
+                                final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
+                                final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId",
+                                        loanTransactionElement);
+                                final ExternalId externalId = ExternalIdFactory.produce(externalIdStr);
+                                final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
+                                        loanTransactionElement, locale);
+                                PaymentDetail detail = paymentDetail;
+                                if (paymentDetail == null) {
+                                    detail = this.paymentDetailAssembler.fetchPaymentDetail(loanTransactionElement);
+                                }
+                                if (transactionAmount != null && transactionAmount.intValue() > 0) {
+                                    loanRepaymentTransactions[i] = new SingleRepaymentCommand(loanId, externalId, transactionAmount,
+                                            transactionDate, detail);
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
 
-
-
-//        if (element.isJsonObject()) {
-//            if (topLevelJsonElement.has("bulkRepaymentTransactions")
-//                    && topLevelJsonElement.get("bulkRepaymentTransactions").isJsonArray()) {
-//                final JsonArray array = topLevelJsonElement.get("bulkRepaymentTransactions").getAsJsonArray();
-//                loanRepaymentTransactions = new SingleRepaymentCommand[array.size()];
-//                for (int i = 0; i < array.size(); i++) {
-//                    final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
-//
-//                    final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
-//                    final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", loanTransactionElement);
-//                    final ExternalId externalId = ExternalIdFactory.produce(externalIdStr);
-//                    final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
-//                            loanTransactionElement, locale);
-//                    PaymentDetail detail = paymentDetail;
-//                    if (paymentDetail == null) {
-//                        detail = this.paymentDetailAssembler.fetchPaymentDetail(loanTransactionElement);
-//                    }
-//                    if (transactionAmount != null && transactionAmount.intValue() > 0) {
-//                        loanRepaymentTransactions[i] = new SingleRepaymentCommand(loanId, externalId, transactionAmount, transactionDate,
-//                                detail);
-//                    }
-//                }
-//            }
-//        }
+        // if (element.isJsonObject()) {
+        // if (topLevelJsonElement.has("bulkRepaymentTransactions")
+        // && topLevelJsonElement.get("bulkRepaymentTransactions").isJsonArray()) {
+        // final JsonArray array = topLevelJsonElement.get("bulkRepaymentTransactions").getAsJsonArray();
+        // loanRepaymentTransactions = new SingleRepaymentCommand[array.size()];
+        // for (int i = 0; i < array.size(); i++) {
+        // final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
+        //
+        // final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
+        // final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", loanTransactionElement);
+        // final ExternalId externalId = ExternalIdFactory.produce(externalIdStr);
+        // final BigDecimal transactionAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
+        // loanTransactionElement, locale);
+        // PaymentDetail detail = paymentDetail;
+        // if (paymentDetail == null) {
+        // detail = this.paymentDetailAssembler.fetchPaymentDetail(loanTransactionElement);
+        // }
+        // if (transactionAmount != null && transactionAmount.intValue() > 0) {
+        // loanRepaymentTransactions[i] = new SingleRepaymentCommand(loanId, externalId, transactionAmount,
+        // transactionDate,
+        // detail);
+        // }
+        // }
+        // }
+        // }
         return new CollectionSheetBulkRepaymentCommand(note, transactionDate, loanRepaymentTransactions);
     }
 

@@ -227,9 +227,11 @@ import org.apache.fineract.portfolio.transfer.api.TransferApiConstants;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatformService {
 
@@ -764,7 +766,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             // disbursement date and next available meeting dates
             // assuming repayment schedule won't regenerate because expected
             // disbursement and actual disbursement happens on same date
-            loanDownPaymentTransactionValidator.validateAccountStatus(loan, LoanEvent.LOAN_DISBURSED);
+//            loanDownPaymentTransactionValidator.validateAccountStatus(loan, LoanEvent.LOAN_DISBURSED);
             updateLoanCounters(loan, actualDisbursementDate);
             if (canDisburse(loan)) {
                 Money amountBeforeAdjust = loan.getPrincipal();
@@ -1155,7 +1157,6 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Transactional
     @Override
     public Map<String, Object> makeLoanBulkRepayment(final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand) {
-
         final SingleRepaymentCommand[] repaymentCommand = bulkRepaymentCommand.getLoanTransactions();
         final Map<String, Object> changes = new LinkedHashMap<>();
         final boolean isRecoveryRepayment = false;
@@ -2659,7 +2660,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         }
     }
 
-    private AppUser getAppUserIfPresent() {
+    @Override
+    public AppUser getAppUserIfPresent() {
         AppUser user = null;
         if (this.context != null) {
             user = this.context.getAuthenticatedUserIfPresent();
@@ -3636,7 +3638,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private boolean canDisburse(final Loan loan) {
         final LoanStatus statusEnum = this.loanLifecycleStateMachine.dryTransition(LoanEvent.LOAN_DISBURSED, loan);
 
-        boolean isMultiTrancheDisburse = false;
+        boolean isMultiTrancheDisburse = true;
         LoanStatus actualLoanStatus = loan.getStatus();
         if ((actualLoanStatus.isActive() || actualLoanStatus.isClosedObligationsMet() || actualLoanStatus.isOverpaid())
                 && loan.isAllTranchesNotDisbursed()) {

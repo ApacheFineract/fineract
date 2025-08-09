@@ -22,6 +22,8 @@ import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformSer
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.organisation.holiday.domain.HolidayRepositoryWrapper;
+import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
@@ -35,11 +37,16 @@ import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWrit
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.serialization.LoanTransactionValidator;
+import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
 import org.apache.fineract.portfolio.meeting.attendance.service.AttendanceDropdownReadPlatformService;
 import org.apache.fineract.portfolio.meeting.service.MeetingWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailAssembler;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
 import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
@@ -75,10 +82,15 @@ public class CollectionSheetConfiguration {
             CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer bulkDisbursalCommandFromApiJsonDeserializer,
             CollectionSheetTransactionDataValidator transactionDataValidator, MeetingWritePlatformService meetingWritePlatformService,
             DepositAccountAssembler accountAssembler, DepositAccountWritePlatformService accountWritePlatformService,
-            PaymentDetailAssembler paymentDetailAssembler, PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
+            PaymentDetailAssembler paymentDetailAssembler, PaymentDetailWritePlatformService paymentDetailWritePlatformService,
+            PaymentTypeRepositoryWrapper repositoryWrapper, ConfigurationDomainService configurationDomainService,
+            LoanRepositoryWrapper loanRepositoryWrapper, HolidayRepositoryWrapper holidayRepository,
+            WorkingDaysRepositoryWrapper workingDaysRepository, LoanTransactionValidator loanTransactionValidator,
+            LoanAssembler loanAssembler, LoanAccountDomainService loanAccountDomainService) {
         return new CollectionSheetWritePlatformServiceJpaRepositoryImpl(loanWritePlatformService,
                 bulkRepaymentCommandFromApiJsonDeserializer, bulkDisbursalCommandFromApiJsonDeserializer, transactionDataValidator,
                 meetingWritePlatformService, accountAssembler, accountWritePlatformService, paymentDetailAssembler,
-                paymentDetailWritePlatformService);
+                paymentDetailWritePlatformService, repositoryWrapper, configurationDomainService, loanRepositoryWrapper, holidayRepository,
+                workingDaysRepository, loanTransactionValidator, loanAssembler, loanAccountDomainService);
     }
 }

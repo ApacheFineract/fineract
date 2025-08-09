@@ -34,6 +34,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.apache.fineract.command.core.CommandPipeline;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -41,11 +42,17 @@ import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
+import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetResponse;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+import java.util.function.Supplier;
 
 @Path("/v1/collectionsheet")
 @Component
@@ -58,6 +65,7 @@ public class CollectionSheetApiResource {
     private final FromJsonHelper fromJsonHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final PlatformSecurityContext context;
+    private final CommandPipeline commandPipeline;
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -77,9 +85,20 @@ public class CollectionSheetApiResource {
             final JsonQuery query = JsonQuery.from(payload, parsedQuery, this.fromJsonHelper);
             return Response.ok(this.collectionSheetReadPlatformService.generateIndividualCollectionSheet(query)).build();
         } else if (CommandParameterUtil.is(commandParam, SAVE_COLLECTION_SHEET_COMMAND_VALUE)) {
+
+//             final CollectionSheetCommand command = new CollectionSheetCommand();
+//
+//             command.setId(UUID.randomUUID());
+//             command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+//             command.setPayload(collectionSheetRequest);
+//
+//             final Supplier<CollectionSheetResponse> response = commandPipeline.send(command);
+//
+//             return Response.ok(response.get()).build();
+
             final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
             return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
         }
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 }

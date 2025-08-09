@@ -20,10 +20,8 @@ package org.apache.fineract.portfolio.collectionsheet.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,11 +33,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CollectionSheetResponse implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-  private UUID commandId;
-  private Long entityId;
-  private Long groupId;
-  Map<String, Object> changes;
+    private UUID commandId;
+    private Long entityId;
+    private Long groupId;
+    Map<String, Object> changes;
 }

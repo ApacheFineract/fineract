@@ -40,14 +40,10 @@ import org.apache.fineract.validation.constraints.Locale;
 @Builder
 @AllArgsConstructor
 @FieldNameConstants
-@LocalDate(dateField = "actualDisbursementDate", formatField = "dateFormat", localeField =
-        "locale", message = "{collection.sheet.actual.disbursement.date.local.date}")
-@LocalDate(dateField = "transactionDate", formatField = "dateFormat", localeField = "locale",
-        message = "{collection.sheet.transaction.date.local.date}")
-@DateRange(maxYearsAgo = 10, dateField = "actualDisbursementDate", formatField = "dateFormat",
-        localeField = "locale", message = "{collection.sheet.actual.disbursement.date.format}")
-@DateRange(maxYearsAgo = 10, dateField = "transactionDate", formatField = "dateFormat",
-        localeField = "locale", message = "{collection.sheet.transaction.date.format}")
+@LocalDate(dateField = "actualDisbursementDate", formatField = "dateFormat", localeField = "locale", message = "{collection.sheet.actual.disbursement.date.local.date}")
+@LocalDate(dateField = "transactionDate", formatField = "dateFormat", localeField = "locale", message = "{collection.sheet.transaction.date.local.date}")
+@DateRange(maxYearsAgo = 10, dateField = "actualDisbursementDate", formatField = "dateFormat", localeField = "locale", message = "{collection.sheet.actual.disbursement.date.format}")
+@DateRange(maxYearsAgo = 10, dateField = "transactionDate", formatField = "dateFormat", localeField = "locale", message = "{collection.sheet.transaction.date.format}")
 public class CollectionSheetRequest implements Serializable {
 
     @Serial
