@@ -53,7 +53,19 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/collectionsheet")
 @Component
-@Tag(name = "Collection Sheet", description = "")
+@Tag(name = "Collection Sheet", description = """
+        Provides APIs to generate and manage daily collection sheets for loan officers.
+        A Collection Sheet consolidates all scheduled loan and savings transactions
+        for a specific branch, office, or group on a given date. It enables bulk operations
+        such as `repayments`, `disbursals`, and `deposit collections` in the field.
+        This feature is typically used by banks
+        to streamline field operations, reduce manual data entry, and ensure accurate posting
+        of transactions into the core banking system. Endpoints in this tag allow clients
+        to fetch pre-filled collection data, submit collected payments in bulk, and reconcile
+        records for auditing and reporting purposes.
+        """
+
+)
 @RequiredArgsConstructor
 public class CollectionSheetApiResource {
 
