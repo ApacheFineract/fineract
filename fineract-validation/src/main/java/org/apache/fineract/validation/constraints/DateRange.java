@@ -22,23 +22,27 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = LocalDateValidator.class)
+@Constraint(validatedBy = DateRangeValidator.class)
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LocalDate {
+@Repeatable(DateRange.List.class)
+public @interface DateRange {
 
-    String message() default "{org.apache.fineract.validation.local-date}";
+    String message() default "{org.apache.fineract.validation.date-range}";
 
     String dateField();
 
     String formatField();
 
     String localeField();
+
+    int maxYearsAgo();
 
     Class<?>[] groups() default {};
 
@@ -49,6 +53,6 @@ public @interface LocalDate {
     @Documented
     @interface List {
 
-        LocalDate[] value();
+        DateRange[] value();
     }
 }
