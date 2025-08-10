@@ -19,6 +19,10 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.calendar.data.CalendarHistoryDataWrapper;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
@@ -26,86 +30,32 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleGeneratorFactory;
 
+@Getter
+@AllArgsConstructor
+@Builder
 public class ScheduleGeneratorDTO {
 
-    final LoanScheduleGeneratorFactory loanScheduleFactory;
-    final CurrencyData currency;
-    final LocalDate calculatedRepaymentsStartingFromDate;
-    final HolidayDetailDTO holidayDetailDTO;
-    final CalendarInstance calendarInstanceForInterestRecalculation;
-    final CalendarInstance compoundingCalendarInstance;
-    LocalDate recalculateFrom;
-    LocalDate recalculateTill;
-    final Long overdurPenaltyWaitPeriod;
-    final FloatingRateDTO floatingRateDTO;
-    final Calendar calendar;
-    final CalendarHistoryDataWrapper calendarHistoryDataWrapper;
-    final Boolean isInterestChargedFromDateAsDisbursementDateEnabled;
-    final Integer numberOfdays;
-    final boolean isSkipRepaymentOnFirstDayofMonth;
-    final Boolean isChangeEmiIfRepaymentDateSameAsDisbursementDateEnabled;
-    final boolean isFirstRepaymentDateAllowedOnHoliday;
-    final boolean isInterestToBeRecoveredFirstWhenGreaterThanEMI;
-    final boolean isPrincipalCompoundingDisabledForOverdueLoans;
+    private final LoanScheduleGeneratorFactory loanScheduleFactory;
+    private final CurrencyData currency;
+    private final LocalDate calculatedRepaymentsStartingFromDate;
+    private final HolidayDetailDTO holidayDetailDTO;
+    private final CalendarInstance calendarInstanceForInterestRecalculation;
+    private final CalendarInstance compoundingCalendarInstance;
 
-    public ScheduleGeneratorDTO(final LoanScheduleGeneratorFactory loanScheduleFactory, final CurrencyData currency,
-            final LocalDate calculatedRepaymentsStartingFromDate, final HolidayDetailDTO holidayDetailDTO,
-            final CalendarInstance calendarInstanceForInterestRecalculation, final CalendarInstance compoundingCalendarInstance,
-            final LocalDate recalculateFrom, final LocalDate recalculateTill, final Long overdurPenaltyWaitPeriod,
-            final FloatingRateDTO floatingRateDTO, final Calendar calendar, final CalendarHistoryDataWrapper calendarHistoryDataWrapper,
-            final Boolean isInterestChargedFromDateAsDisbursementDateEnabled, final Integer numberOfdays,
-            final boolean isSkipRepaymentOnFirstDayofMonth, final Boolean isChangeEmiIfRepaymentDateSameAsDisbursementDateEnabled,
-            final boolean isFirstRepaymentDateAllowedOnHoliday, final boolean isInterestToBeRecoveredFirstWhenGreaterThanEMI,
-            final boolean isPrincipalCompoundingDisabledForOverdueLoans) {
-
-        this.loanScheduleFactory = loanScheduleFactory;
-        this.currency = currency;
-        this.calculatedRepaymentsStartingFromDate = calculatedRepaymentsStartingFromDate;
-        this.calendarInstanceForInterestRecalculation = calendarInstanceForInterestRecalculation;
-        this.compoundingCalendarInstance = compoundingCalendarInstance;
-        this.recalculateFrom = recalculateFrom;
-        this.recalculateTill = recalculateTill;
-        this.overdurPenaltyWaitPeriod = overdurPenaltyWaitPeriod;
-        this.holidayDetailDTO = holidayDetailDTO;
-        this.floatingRateDTO = floatingRateDTO;
-        this.calendar = calendar;
-        this.calendarHistoryDataWrapper = calendarHistoryDataWrapper;
-        this.isInterestChargedFromDateAsDisbursementDateEnabled = isInterestChargedFromDateAsDisbursementDateEnabled;
-        this.numberOfdays = numberOfdays;
-        this.isSkipRepaymentOnFirstDayofMonth = isSkipRepaymentOnFirstDayofMonth;
-        this.isChangeEmiIfRepaymentDateSameAsDisbursementDateEnabled = isChangeEmiIfRepaymentDateSameAsDisbursementDateEnabled;
-        this.isFirstRepaymentDateAllowedOnHoliday = isFirstRepaymentDateAllowedOnHoliday;
-        this.isInterestToBeRecoveredFirstWhenGreaterThanEMI = isInterestToBeRecoveredFirstWhenGreaterThanEMI;
-        this.isPrincipalCompoundingDisabledForOverdueLoans = isPrincipalCompoundingDisabledForOverdueLoans;
-    }
-
-    public LoanScheduleGeneratorFactory getLoanScheduleFactory() {
-        return this.loanScheduleFactory;
-    }
-
-    public CurrencyData getCurrency() {
-        return this.currency;
-    }
-
-    public LocalDate getCalculatedRepaymentsStartingFromDate() {
-        return this.calculatedRepaymentsStartingFromDate;
-    }
-
-    public CalendarInstance getCalendarInstanceForInterestRecalculation() {
-        return this.calendarInstanceForInterestRecalculation;
-    }
-
-    public LocalDate getRecalculateFrom() {
-        return this.recalculateFrom;
-    }
-
-    public LocalDate getRecalculateTill() {
-        return this.recalculateTill;
-    }
-
-    public Long getOverdurPenaltyWaitPeriod() {
-        return this.overdurPenaltyWaitPeriod;
-    }
+    @Setter
+    private LocalDate recalculateFrom;
+    private LocalDate recalculateTill;
+    private final Long overdurPenaltyWaitPeriod;
+    private final FloatingRateDTO floatingRateDTO;
+    private final Calendar calendar;
+    private final CalendarHistoryDataWrapper calendarHistoryDataWrapper;
+    private final Boolean isInterestChargedFromDateAsDisbursementDateEnabled;
+    private final Integer numberOfdays;
+    private final Boolean isSkipRepaymentOnFirstDayofMonth;
+    private final Boolean isChangeEmiIfRepaymentDateSameAsDisbursementDateEnabled;
+    private final Boolean isFirstRepaymentDateAllowedOnHoliday;
+    private final Boolean isInterestToBeRecoveredFirstWhenGreaterThanEMI;
+    private final Boolean isPrincipalCompoundingDisabledForOverdueLoans;
 
     public int getPenaltyWaitPeriod() {
         int penaltyWaitPeriod = 0;
@@ -115,36 +65,8 @@ public class ScheduleGeneratorDTO {
         return penaltyWaitPeriod;
     }
 
-    public HolidayDetailDTO getHolidayDetailDTO() {
-        return this.holidayDetailDTO;
-    }
-
-    public void setRecalculateFrom(LocalDate recalculateFrom) {
-        this.recalculateFrom = recalculateFrom;
-    }
-
-    public CalendarInstance getCompoundingCalendarInstance() {
-        return this.compoundingCalendarInstance;
-    }
-
-    public FloatingRateDTO getFloatingRateDTO() {
-        return this.floatingRateDTO;
-    }
-
-    public Calendar getCalendar() {
-        return this.calendar;
-    }
-
-    public CalendarHistoryDataWrapper getCalendarHistoryDataWrapper() {
-        return this.calendarHistoryDataWrapper;
-    }
-
     public Boolean isInterestChargedFromDateAsDisbursementDateEnabled() {
         return this.isInterestChargedFromDateAsDisbursementDateEnabled;
-    }
-
-    public Integer getNumberOfdays() {
-        return numberOfdays;
     }
 
     public boolean isSkipRepaymentOnFirstDayofMonth() {

@@ -20,9 +20,12 @@ package org.apache.fineract.infrastructure.configuration.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import java.util.Optional;
 
 public interface GlobalConfigurationRepository
         extends JpaRepository<GlobalConfigurationProperty, Long>, JpaSpecificationExecutor<GlobalConfigurationProperty> {
 
     GlobalConfigurationProperty findOneByName(String name);
+
+    Optional<GlobalConfigurationProperty> findByName(String name);
 }

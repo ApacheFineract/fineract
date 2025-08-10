@@ -18,9 +18,9 @@
  */
 package org.apache.fineract.infrastructure.configuration.domain;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -32,22 +32,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalConfigurationRepositoryWrapper {
 
     private final GlobalConfigurationRepository repository;
 
-    @Autowired
-    public GlobalConfigurationRepositoryWrapper(final GlobalConfigurationRepository repository) {
-        this.repository = repository;
-    }
-
     @Cacheable(value = "configByName", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#propertyName)")
     public GlobalConfigurationProperty findOneByNameWithNotFoundDetection(final String propertyName) {
-        final GlobalConfigurationProperty property = this.repository.findOneByName(propertyName);
-        if (property == null) {
-            throw new GlobalConfigurationPropertyNotFoundException(propertyName);
-        }
-        return property;
+//        final GlobalConfigurationProperty property = this.repository.findOneByName(propertyName);
+//        if (property == null) {
+//            throw new GlobalConfigurationPropertyNotFoundException(propertyName);
+//        }
+//        return property;
+
+      if (propertyName == null) {
+        throw new IllegalArgumentException("Property name must not be null");
+      }
+
+      return this.repository.findByName(propertyName)
+              .orElseThrow(() -> new GlobalConfigurationPropertyNotFoundException(propertyName));
     }
 
     public GlobalConfigurationProperty findOneWithNotFoundDetection(final Long configId) {

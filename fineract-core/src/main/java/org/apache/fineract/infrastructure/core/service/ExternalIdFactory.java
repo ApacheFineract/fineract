@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.springframework.stereotype.Component;
 
 @Component

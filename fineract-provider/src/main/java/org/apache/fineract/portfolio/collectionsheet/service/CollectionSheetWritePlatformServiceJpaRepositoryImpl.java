@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -27,12 +26,9 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.Command;
@@ -181,14 +177,15 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         changes.put("locale", command.getPayload().getLocale());
         changes.put("dateFormat", command.getPayload().getDateFormat());
 
-        // final String noteText = command.stringValueOfParameterNamed("note");
-        // if (StringUtils.isNotBlank(noteText)) {
-        // changes.put("note", noteText);
-        // }
+        final String noteText = command.getPayload().getNote();
+        if (StringUtils.isNotBlank(noteText)) {
+          changes.put("note", noteText);
+        }
 
         changes.putAll(updateBulkRepayments(command));
 
-         changes.putAll(updateBulkDisbursals(command));
+        changes.putAll(updateBulkDisbursals(command));
+
         // changes.putAll(updateBulkMandatorySavingsDuePayments(command, paymentDetail));
 
         // final var result = new CommandProcessingResultBuilder()
@@ -226,7 +223,6 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                     bankNumber);
 
             final boolean isRecoveryRepayment = false;
-
 
             boolean isAccountTransfer = false;
             HolidayDetailDTO holidayDetailDTO = null;
@@ -310,128 +306,9 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         return changes;
     }
 
-  private Map<String, Object> updateBulkDisbursals(final Command<CollectionSheetRequest> command) {
-    final Map<String, Object> changes = new HashMap<>();
-//    List<SavingDueTransactionRequest> bulkSavingsDueTransactions =
-//            command.getPayload().getBulkDisbursementTransactions().getBulkSavingsDueTransactions();
-//    for (SavingDueTransactionRequest element : bulkSavingsDueTransactions) {
-//
-//      final AppUser currentUser = getAppUserIfPresent();
-//
-//      final SingleDisbursalCommand[] disbursalCommand = bulkDisbursalCommand.getDisburseTransactions();
-//
-//      final LocalDate nextPossibleRepaymentDate = null;
-//      final LocalDate rescheduledRepaymentDate = null;
-//
-//      for (final SingleDisbursalCommand singleLoanDisbursalCommand : disbursalCommand) {
-//        Loan loan = this.loanAssembler.assembleFrom(singleLoanDisbursalCommand.getLoanId());
-//        final LocalDate actualDisbursementDate = command.localDateValueOfParameterNamed("actualDisbursementDate");
-//
-//        // validate ActualDisbursement Date Against Expected Disbursement
-//        // Date
-//        LoanProduct loanProduct = loan.loanProduct();
-//        if (loanProduct.isSyncExpectedWithDisbursementDate()) {
-//          syncExpectedDateWithActualDisbursementDate(loan, actualDisbursementDate);
-//        }
-//        checkClientOrGroupActive(loan);
-//        businessEventNotifierService.notifyPreBusinessEvent(new LoanDisbursalBusinessEvent(loan));
-//
-//        final List<Long> existingTransactionIds = new ArrayList<>();
-//        final List<Long> existingReversedTransactionIds = new ArrayList<>();
-//
-//        final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
-//
-//        // Bulk disbursement should happen on meeting date (mostly from
-//        // collection sheet).
-//        // FIXME: AA - this should be first meeting date based on
-//        // disbursement date and next available meeting dates
-//        // assuming repayment schedule won't regenerate because expected
-//        // disbursement and actual disbursement happens on same date
-//        loanDownPaymentTransactionValidator.validateAccountStatus(loan, LoanEvent.LOAN_DISBURSED);
-//        updateLoanCounters(loan, actualDisbursementDate);
-//        if (canDisburse(loan)) {
-//          Money amountBeforeAdjust = loan.getPrincipal();
-//          Money disburseAmount = loanDisbursementService.adjustDisburseAmount(loan, command, actualDisbursementDate);
-//          boolean recalculateSchedule = amountBeforeAdjust.isNotEqualTo(loan.getPrincipal());
-//          final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, LoanApiConstants.externalIdParameterName);
-//          if (isAccountTransfer) {
-//            disburseLoanToSavings(loan, command, disburseAmount, paymentDetail);
-//            existingTransactionIds.addAll(loanTransactionRepository.findTransactionIdsByLoan(loan));
-//            existingReversedTransactionIds.addAll(loanTransactionRepository.findReversedTransactionIdsByLoan(loan));
-//
-//          } else {
-//            existingTransactionIds.addAll(loanTransactionRepository.findTransactionIdsByLoan(loan));
-//            existingReversedTransactionIds.addAll(loanTransactionRepository.findReversedTransactionIdsByLoan(loan));
-//            LoanTransaction disbursementTransaction = LoanTransaction.disbursement(loan, disburseAmount, paymentDetail,
-//                    actualDisbursementDate, txnExternalId, loan.getTotalOverpaidAsMoney());
-//            disbursementTransaction.updateLoan(loan);
-//            loan.addLoanTransaction(disbursementTransaction);
-//            businessEventNotifierService
-//                    .notifyPostBusinessEvent(new LoanDisbursalTransactionBusinessEvent(disbursementTransaction));
-//          }
-//          LocalDate recalculateFrom = null;
-//          final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom);
-//          regenerateScheduleOnDisbursement(command, loan, recalculateSchedule, scheduleGeneratorDTO, nextPossibleRepaymentDate,
-//                  rescheduledRepaymentDate);
-//          boolean downPaymentEnabled = loan.getLoanProductRelatedDetail().isEnableDownPayment();
-//          if (loan.isInterestBearingAndInterestRecalculationEnabled() || downPaymentEnabled) {
-//            createAndSaveLoanScheduleArchive(loan, scheduleGeneratorDTO);
-//          }
-//          disburseLoan(command, configurationDomainService.isPaymentTypeApplicableForDisbursementCharge(), paymentDetail, loan,
-//                  currentUser, changes, scheduleGeneratorDTO);
-//
-//          loanAccrualsProcessingService.reprocessExistingAccruals(loan);
-//
-//          LocalDate firstInstallmentDueDate = loan.fetchRepaymentScheduleInstallment(1).getDueDate();
-//          if (loan.isInterestBearingAndInterestRecalculationEnabled()
-//                  && (DateUtils.isBeforeBusinessDate(firstInstallmentDueDate) || loan.isDisbursementMissed())) {
-//            loanAccrualsProcessingService.processIncomePostingAndAccruals(loan);
-//          }
-//        }
-//        if (!changes.isEmpty()) {
-//          createNote(loan, command, changes);
-//          loan = saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
-//          journalEntryPoster.postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds);
-//          loanAccrualTransactionBusinessEventService.raiseBusinessEventForAccrualTransactions(loan, existingTransactionIds);
-//        }
-//        final Set<LoanCharge> loanCharges = loan.getActiveCharges();
-//        final Map<Long, BigDecimal> disBuLoanCharges = new HashMap<>();
-//        for (final LoanCharge loanCharge : loanCharges) {
-//          if (loanCharge.isDueAtDisbursement() && loanCharge.getChargePaymentMode().isPaymentModeAccountTransfer()
-//                  && loanCharge.isChargePending()) {
-//            disBuLoanCharges.put(loanCharge.getId(), loanCharge.amountOutstanding());
-//          }
-//        }
-//        final Locale locale = command.extractLocale();
-//        final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
-//        for (final Map.Entry<Long, BigDecimal> entrySet : disBuLoanCharges.entrySet()) {
-//          final PortfolioAccountData savingAccountData = this.accountAssociationsReadPlatformService
-//                  .retriveLoanLinkedAssociation(loan.getId());
-//          final SavingsAccount fromSavingsAccount = null;
-//          final boolean isRegularTransaction = true;
-//          final boolean isExceptionForBalanceCheck = false;
-//          final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(actualDisbursementDate, entrySet.getValue(),
-//                  PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, savingAccountData.getId(), loan.getId(),
-//                  "Loan Charge Payment", locale, fmt, null, null, LoanTransactionType.REPAYMENT_AT_DISBURSEMENT.getValue(),
-//                  entrySet.getKey(), null, AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, ExternalId.empty(), null, null,
-//                  fromSavingsAccount, isRegularTransaction, isExceptionForBalanceCheck);
-//          this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
-//        }
-//        updateRecurringCalendarDatesForInterestRecalculation(loan);
-//        loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan,
-//                loan.isInterestBearingAndInterestRecalculationEnabled(), true);
-//        loanAccountDomainService.setLoanDelinquencyTag(loan, DateUtils.getBusinessLocalDate());
-//        businessEventNotifierService.notifyPostBusinessEvent(new LoanDisbursalBusinessEvent(loan));
-//      }
-      return changes;
+    private Map<String, Object> updateBulkDisbursals(final Command<CollectionSheetRequest> command) {
+      return new HashMap<>(loanWritePlatformService.bulkLoanDisbursal(command.getPayload(), false));
     }
-
-
-
-
-//    changes.putAll(this.loanWritePlatformService.bulkLoanDisbursal(command, bulkDisbursalCommand, false));
-//    return changes;
-//  }
 
     private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();

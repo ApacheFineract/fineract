@@ -102,7 +102,9 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.rate.domain.Rate;
 import org.apache.fineract.portfolio.rate.service.RateAssembler;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class LoanAssemblerImpl implements LoanAssembler {
 

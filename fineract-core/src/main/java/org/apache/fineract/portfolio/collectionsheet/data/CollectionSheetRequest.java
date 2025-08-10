@@ -63,8 +63,8 @@ public class CollectionSheetRequest implements Serializable {
 
     private String actualDisbursementDate;
     private String transactionDate;
+    private String note;
 
     @Valid
     private DisbursementTransactionsRequest bulkDisbursementTransactions;
-
 }

@@ -86,18 +86,18 @@ public class CollectionSheetApiResource {
             return Response.ok(this.collectionSheetReadPlatformService.generateIndividualCollectionSheet(query)).build();
         } else if (CommandParameterUtil.is(commandParam, SAVE_COLLECTION_SHEET_COMMAND_VALUE)) {
 
-//             final CollectionSheetCommand command = new CollectionSheetCommand();
-//
-//             command.setId(UUID.randomUUID());
-//             command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-//             command.setPayload(collectionSheetRequest);
-//
-//             final Supplier<CollectionSheetResponse> response = commandPipeline.send(command);
-//
-//             return Response.ok(response.get()).build();
+             final CollectionSheetCommand command = new CollectionSheetCommand();
 
-            final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
-            return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
+             command.setId(UUID.randomUUID());
+             command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+             command.setPayload(collectionSheetRequest);
+
+             final Supplier<CollectionSheetResponse> response = commandPipeline.send(command);
+
+             return Response.ok(response.get()).build();
+
+//            final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
+//            return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
         }
         return Response.noContent().build();
     }
