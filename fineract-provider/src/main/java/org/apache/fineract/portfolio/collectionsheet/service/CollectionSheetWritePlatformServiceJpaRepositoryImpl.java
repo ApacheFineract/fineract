@@ -35,6 +35,7 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetResponse;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
+import org.apache.fineract.portfolio.collectionsheet.data.SavingDueTransactionRequest;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
@@ -45,6 +46,7 @@ import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePla
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
 
 @RequiredArgsConstructor
@@ -90,6 +92,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                 .with(changes).with(changes).build();
     }
 
+    @Deprecated
     @Override
     public CommandProcessingResult saveIndividualCollectionSheet(final JsonCommand command) {
 
@@ -136,13 +139,39 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
 
         changes.putAll(updateBulkDisbursals(request));
 
-        // changes.putAll(updateBulkMandatorySavingsDuePayments(command));
+        changes.putAll(updateBulkMandatorySavingsDuePayments(request));
 
-        return CollectionSheetResponse.builder().commandId(command.getId()).groupId(1L).entityId(1L).changes(new LinkedHashMap<>(changes))
+        return CollectionSheetResponse
+                .builder()
+                .commandId(command.getId())
+                .groupId(command.getPayload().getOfficeId())
+                .entityId(command.getPayload().getOfficeId())
+                .changes(new LinkedHashMap<>(changes))
                 .build();
     }
 
-    private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
+  private Map<String,?> updateBulkMandatorySavingsDuePayments(CollectionSheetRequest request) {
+    final Map<String, Object> changes = new HashMap<>();
+//    final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler
+//            .assembleBulkMandatorySavingsAccountTransactionDTOs(command, paymentDetail);
+
+    final List<SavingDueTransactionRequest> savingsTransactions = request.getBulkDisbursementTransactions().getBulkSavingsDueTransactions();
+
+    List<Long> depositTransactionIds = new ArrayList<>();
+    for (SavingDueTransactionRequest element : savingsTransactions) {
+      try {
+        SavingsAccountTransaction savingsAccountTransaction = accountWritePlatformService
+                .mandatorySavingsAccountDeposit(element, request);
+        depositTransactionIds.add(savingsAccountTransaction.getId());
+      } catch (Exception e) {
+        throw new SavingsAccountNotFoundException(element.getSavingsId());
+      }
+    }
+    changes.put("SavingsTransactions", depositTransactionIds);
+    return changes;
+  }
+
+  private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
@@ -167,6 +196,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
     return changes;
   }
 
+    @Deprecated
     private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler

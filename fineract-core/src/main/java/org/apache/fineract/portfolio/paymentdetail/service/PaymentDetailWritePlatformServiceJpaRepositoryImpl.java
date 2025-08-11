@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.RepaymentTransactionRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.SavingDueTransactionRequest;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailRepository;
@@ -67,6 +68,31 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
       return persistPaymentDetail(paymentDetail);
     }
     return paymentDetail;
+  }
+
+  @Transactional
+  @Override
+  public PaymentDetail createAndPersistPaymentDetail(SavingDueTransactionRequest element) {
+    final PaymentDetail paymentDetail = createPaymentDetail(element);
+    if (paymentDetail != null) {
+      return persistPaymentDetail(paymentDetail);
+    }
+    return paymentDetail;
+  }
+
+  private PaymentDetail createPaymentDetail(SavingDueTransactionRequest element) {
+    final Long paymentTypeId = element.getPaymentTypeId();
+    if (paymentTypeId == null) {
+      return null;
+    }
+    final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
+    return PaymentDetail.instance(paymentType,
+            element.getAccountNumber(),
+            element.getCheckNumber(),
+            element.getRoutingCode(),
+            element.getReceiptNumber(),
+            element.getBankNumber()
+    );
   }
 
   private PaymentDetail createPaymentDetail(final RepaymentTransactionRequest element,
