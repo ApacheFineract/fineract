@@ -38,7 +38,6 @@ public class SaveCollectionSheetCommandHandler implements CommandHandler<Collect
     @Transactional
     @Override
     public CollectionSheetResponse handle(Command<CollectionSheetRequest> command) {
-        // return this.collectionSheetWritePlatformService.saveIndividualCollectionSheet(command);
-        return null;
+        return this.collectionSheetWritePlatformService.saveIndividualCollectionSheet(command);
     }
 }

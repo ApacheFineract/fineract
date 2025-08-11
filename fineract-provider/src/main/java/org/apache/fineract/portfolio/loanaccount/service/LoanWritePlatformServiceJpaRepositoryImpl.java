@@ -34,6 +34,9 @@ import io.github.resilience4j.retry.annotation.Retry;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -148,6 +151,8 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.RepaymentTransactionRequest;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
@@ -219,6 +224,8 @@ import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecksRepository;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksAssembler;
@@ -227,9 +234,11 @@ import org.apache.fineract.portfolio.transfer.api.TransferApiConstants;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatformService {
 
@@ -292,6 +301,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final LoanTransactionProcessingService loanTransactionProcessingService;
     private final LoanBalanceService loanBalanceService;
     private final LoanTransactionService loanTransactionService;
+    private final PaymentTypeRepositoryWrapper paymentTyperepositoryWrapper;
 
     @Transactional
     @Override
@@ -3143,6 +3153,76 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 .build();
     }
 
+    @Override
+    public Map<String, Object> makeLoanBulkRepayment(CollectionSheetRequest request) {
+        // final SingleRepaymentCommand[] repaymentCommand = bulkRepaymentCommand.getLoanTransactions();
+        final Map<String, Object> changes = new LinkedHashMap<>();
+        final Boolean isRecoveryRepayment = false;
+
+        if (request == null) {
+            return changes;
+        }
+
+        List<Long> transactionIds = new ArrayList<>();
+        Boolean isAccountTransfer = false;
+        HolidayDetailDTO holidayDetailDTO = new HolidayDetailDTO();
+        Boolean isHolidayValidationDone = false;
+        final Boolean allowTransactionsOnHoliday = this.configurationDomainService.allowTransactionsOnHolidayEnabled();
+        // for (final SingleRepaymentCommand singleLoanRepaymentCommand : repaymentCommand) {
+        // if (singleLoanRepaymentCommand != null) {
+        LocalDate transactionDate = getDateInLocalDate(request.getTransactionDate(), request.getLocale(), request.getDateFormat());
+        Loan loan = loanRepositoryWrapper.findOneWithNotFoundDetection(
+                request.getBulkDisbursementTransactions().getBulkRepaymentTransactions().getFirst().getLoanId());
+        final List<Holiday> holidays = holidayRepository.findByOfficeIdAndGreaterThanDate(loan.getOfficeId(), transactionDate);
+        final WorkingDays workingDays = workingDaysRepository.findOne();
+        final Boolean allowTransactionsOnNonWorkingDay = this.configurationDomainService.allowTransactionsOnNonWorkingDayEnabled();
+        Boolean isHolidayEnabled = this.configurationDomainService.isRescheduleRepaymentsOnHolidaysEnabled();
+        holidayDetailDTO = new HolidayDetailDTO(isHolidayEnabled, holidays, workingDays, allowTransactionsOnHoliday,
+                allowTransactionsOnNonWorkingDay);
+        loanTransactionValidator.validateRepaymentDateIsOnHoliday(transactionDate, holidayDetailDTO.isAllowTransactionsOnHoliday(),
+                holidayDetailDTO.getHolidays());
+        loanTransactionValidator.validateRepaymentDateIsOnNonWorkingDay(transactionDate, holidayDetailDTO.getWorkingDays(),
+                holidayDetailDTO.isAllowTransactionsOnNonWorkingDay());
+        isHolidayValidationDone = true;
+        // break;
+        // }
+        // }
+        for (final RepaymentTransactionRequest element : request.getBulkDisbursementTransactions().getBulkRepaymentTransactions()) {
+            // if (singleLoanRepaymentCommand != null) {
+            final Loan loanVal = this.loanAssembler.assembleFrom(element.getLoanId());
+            // final PaymentDetail paymentDetail = element.getPaymentDetail();
+
+            final ExternalId externalId = StringUtils.isBlank(element.getExternalId())
+                    ? (configurationDomainService.isExternalIdAutoGenerationEnabled() ? ExternalId.generate() : null)
+                    : new ExternalId(element.getExternalId());
+
+            // if (externalId.isEmpty() && configurationDomainService.isExternalIdAutoGenerationEnabled()) {
+            // externalId = ExternalId.generate();
+            // }
+
+            final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(element.getPaymentTypeId());
+            final String accountNumber = element.getAccountNumber();
+            final String checkNumber = element.getCheckNumber();
+            final String routingCode = element.getRoutingCode();
+            final String receiptNumber = element.getReceiptNumber();
+            final String bankNumber = element.getBankNumber();
+
+            final PaymentDetail paymentDetail = PaymentDetail.instance(paymentType, accountNumber, checkNumber, routingCode, receiptNumber,
+                    bankNumber);
+
+            if (paymentDetail != null && paymentDetail.getId() == null) {
+                this.paymentDetailWritePlatformService.persistPaymentDetail(paymentDetail);
+            }
+            final String chargeRefundChargeType = null;
+            LoanTransaction loanTransaction = this.loanAccountDomainService.makeRepayment(LoanTransactionType.REPAYMENT, loanVal,
+                    transactionDate, element.getTransactionAmount(), paymentDetail, request.getNote(), externalId, isRecoveryRepayment,
+                    chargeRefundChargeType, isAccountTransfer, holidayDetailDTO, isHolidayValidationDone);
+            transactionIds.add(loanTransaction.getId());
+        }
+        changes.put("loanTransactions", transactionIds);
+        return changes;
+    }
+
     public void handleChargebackTransaction(final Loan loan, LoanTransaction chargebackTransaction) {
         loanTransactionValidator.validateIfTransactionIsChargeback(chargebackTransaction);
 
@@ -3755,6 +3835,19 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         }
         if (latestRepaymentDate != null) {
             loan.setExpectedMaturityDate(latestRepaymentDate);
+        }
+    }
+
+    private LocalDate getDateInLocalDate(String date, String locale, String dateFormat) {
+        try {
+            final DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive()
+                    .appendPattern(dateFormat.replace("y", "u")).parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0).parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                    .toFormatter(Locale.forLanguageTag(locale)).withResolverStyle(ResolverStyle.STRICT);
+
+            return LocalDate.parse(date, formatter);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid date format or value in transaction", e);
         }
     }
 }

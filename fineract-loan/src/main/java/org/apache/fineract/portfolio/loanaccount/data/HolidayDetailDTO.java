@@ -19,16 +19,22 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDays;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class HolidayDetailDTO {
 
-    final boolean isHolidayEnabled;
-    final List<Holiday> holidays;
-    final WorkingDays workingDays;
-    final boolean allowTransactionsOnHoliday;
-    final boolean allowTransactionsOnNonWorkingDay;
+    private boolean isHolidayEnabled;
+    private List<Holiday> holidays;
+    private WorkingDays workingDays;
+    private boolean allowTransactionsOnHoliday;
+    private boolean allowTransactionsOnNonWorkingDay;
 
     public HolidayDetailDTO(final boolean isHolidayEnabled, final List<Holiday> holidays, final WorkingDays workingDays) {
         this.isHolidayEnabled = isHolidayEnabled;
@@ -36,34 +42,5 @@ public class HolidayDetailDTO {
         this.workingDays = workingDays;
         this.allowTransactionsOnHoliday = false;
         this.allowTransactionsOnNonWorkingDay = false;
-    }
-
-    public HolidayDetailDTO(final boolean isHolidayEnabled, final List<Holiday> holidays, final WorkingDays workingDays,
-            final boolean allowTransactionsOnHoliday, final boolean allowTransactionsOnNonWorkingDay) {
-        this.isHolidayEnabled = isHolidayEnabled;
-        this.holidays = holidays;
-        this.workingDays = workingDays;
-        this.allowTransactionsOnHoliday = allowTransactionsOnHoliday;
-        this.allowTransactionsOnNonWorkingDay = allowTransactionsOnNonWorkingDay;
-    }
-
-    public boolean isHolidayEnabled() {
-        return this.isHolidayEnabled;
-    }
-
-    public List<Holiday> getHolidays() {
-        return this.holidays;
-    }
-
-    public WorkingDays getWorkingDays() {
-        return this.workingDays;
-    }
-
-    public boolean isAllowTransactionsOnHoliday() {
-        return this.allowTransactionsOnHoliday;
-    }
-
-    public boolean isAllowTransactionsOnNonWorkingDay() {
-        return this.allowTransactionsOnNonWorkingDay;
     }
 }

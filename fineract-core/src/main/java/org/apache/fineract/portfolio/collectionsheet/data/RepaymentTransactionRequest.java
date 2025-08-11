@@ -51,6 +51,7 @@ public class RepaymentTransactionRequest implements Serializable {
     @Digits(integer = 10, fraction = 0, message = "{collection.sheet.repayment.transactions.payment.type.id.digits}")
     private Long paymentTypeId;
 
+    private String externalId;
     private String accountNumber;
     private String checkNumber;
     private String routingCode;

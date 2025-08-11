@@ -21,15 +21,19 @@ package org.apache.fineract.portfolio.collectionsheet.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetResponse;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer;
@@ -115,12 +119,39 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                 .with(changes).with(changes).build();
     }
 
+    @Override
+    public CollectionSheetResponse saveIndividualCollectionSheet(Command<CollectionSheetRequest> command) {
+        final CollectionSheetRequest request = command.getPayload();
+
+        final Map<String, Object> changes = new HashMap<>();
+        changes.put("locale", request.getLocale());
+        changes.put("dateFormat", request.getDateFormat());
+
+        final String noteText = request.getNote();
+        if (StringUtils.isNotBlank(noteText)) {
+            changes.put("note", noteText);
+        }
+
+        changes.putAll(updateBulkRepayments(request));
+
+        // changes.putAll(updateBulkDisbursals(command));
+        //
+        // changes.putAll(updateBulkMandatorySavingsDuePayments(command));
+
+        return CollectionSheetResponse.builder().commandId(command.getId()).groupId(1L).entityId(1L).changes(new LinkedHashMap<>(changes))
+                .build();
+    }
+
     private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
         changes.putAll(this.loanWritePlatformService.makeLoanBulkRepayment(bulkRepaymentCommand));
         return changes;
+    }
+
+    private Map<String, Object> updateBulkRepayments(CollectionSheetRequest request) {
+        return new HashMap<>(loanWritePlatformService.makeLoanBulkRepayment(request));
     }
 
     private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {

@@ -24,12 +24,8 @@ import static org.apache.fineract.infrastructure.core.service.CommandParameterUt
 import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -37,17 +33,22 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import org.apache.fineract.commands.domain.CommandWrapper;
+import org.apache.fineract.command.core.CommandPipeline;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
+import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetResponse;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
 import org.springframework.stereotype.Component;
 
@@ -74,6 +75,7 @@ public class CollectionSheetApiResource {
     private final FromJsonHelper fromJsonHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final PlatformSecurityContext context;
+    private final CommandPipeline commandPipeline;
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -82,11 +84,8 @@ public class CollectionSheetApiResource {
             + "This Api retrieves repayment details of all individual loans under a office as on a specified meeting date.\n\n"
             + "Save Collection Sheet:\n\n"
             + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
-    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CollectionSheetRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollectionSheetApiResourceSwagger.PostCollectionSheetResponse.class))) })
     public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
+            @Parameter(hidden = true) @Valid CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
 
@@ -96,8 +95,18 @@ public class CollectionSheetApiResource {
             final JsonQuery query = JsonQuery.from(payload, parsedQuery, this.fromJsonHelper);
             return Response.ok(this.collectionSheetReadPlatformService.generateIndividualCollectionSheet(query)).build();
         } else if (CommandParameterUtil.is(commandParam, SAVE_COLLECTION_SHEET_COMMAND_VALUE)) {
-            final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
-            return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
+            // final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
+            // return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
+
+            final CollectionSheetCommand command = new CollectionSheetCommand();
+
+            command.setId(UUID.randomUUID());
+            command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+            command.setPayload(collectionSheetRequest);
+
+            final Supplier<CollectionSheetResponse> response = commandPipeline.send(command);
+
+            return Response.ok(response.get()).build();
         }
         return Response.ok().build();
     }
