@@ -21,13 +21,17 @@ package org.apache.fineract.portfolio.paymentdetail.service;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
+import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
+import org.apache.fineract.portfolio.collectionsheet.data.RepaymentTransactionRequest;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailRepository;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 @RequiredArgsConstructor
 public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements PaymentDetailWritePlatformService {
 
@@ -35,6 +39,7 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
     // private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
     private final PaymentTypeRepositoryWrapper paymentTyperepositoryWrapper;
 
+    @Deprecated
     @Override
     public PaymentDetail createPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
         final Long paymentTypeId = command.longValueOfParameterNamed(PaymentDetailConstants.paymentTypeParamName);
@@ -54,13 +59,34 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         return this.paymentDetailRepository.saveAndFlush(paymentDetail);
     }
 
-    @Override
-    @Transactional
-    public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
-        final PaymentDetail paymentDetail = createPaymentDetail(command, changes);
-        if (paymentDetail != null) {
-            return persistPaymentDetail(paymentDetail);
-        }
-        return paymentDetail;
+  @Transactional
+  @Override
+  public PaymentDetail createAndPersistPaymentDetail(RepaymentTransactionRequest element, Map<String, Object> changes) {
+    final PaymentDetail paymentDetail = createPaymentDetail(element, changes);
+    if (paymentDetail != null) {
+      return persistPaymentDetail(paymentDetail);
     }
+    return paymentDetail;
+  }
+
+  private PaymentDetail createPaymentDetail(final RepaymentTransactionRequest element,
+                                            final Map<String, Object> changes) {
+    final Long paymentTypeId = element.getPaymentTypeId();
+    if (paymentTypeId == null) {
+      return null;
+    }
+    final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
+    return PaymentDetail.generatePaymentDetail(paymentType, element, changes);
+  }
+
+  @Deprecated
+  @Override
+  @Transactional
+  public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+      final PaymentDetail paymentDetail = createPaymentDetail(command, changes);
+      if (paymentDetail != null) {
+          return persistPaymentDetail(paymentDetail);
+      }
+      return paymentDetail;
+  }
 }

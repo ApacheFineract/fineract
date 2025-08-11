@@ -28,6 +28,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.portfolio.collectionsheet.data.RepaymentTransactionRequest;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
@@ -59,6 +60,7 @@ public class PaymentDetail extends AbstractPersistableCustom<Long> {
 
     protected PaymentDetail() {}
 
+    @Deprecated
     public static PaymentDetail generatePaymentDetail(final PaymentType paymentType, final JsonCommand command,
             final Map<String, Object> changes) {
         final String accountNumber = command.stringValueOfParameterNamed(PaymentDetailConstants.accountNumberParamName);
@@ -101,7 +103,33 @@ public class PaymentDetail extends AbstractPersistableCustom<Long> {
         this.bankNumber = bankNumber;
     }
 
-    public PaymentDetailData toData() {
+  public static PaymentDetail generatePaymentDetail(PaymentType paymentType, RepaymentTransactionRequest element, Map<String, Object> changes) {
+    final String accountNumber = element.getAccountNumber();
+    final String checkNumber = element.getCheckNumber();
+    final String routingCode = element.getRoutingCode();
+    final String receiptNumber = element.getReceiptNumber();
+    final String bankNumber = element.getBankNumber();
+
+    if (StringUtils.isNotBlank(accountNumber)) {
+      changes.put(PaymentDetailConstants.accountNumberParamName, accountNumber);
+    }
+    if (StringUtils.isNotBlank(checkNumber)) {
+      changes.put(PaymentDetailConstants.checkNumberParamName, checkNumber);
+    }
+    if (StringUtils.isNotBlank(routingCode)) {
+      changes.put(PaymentDetailConstants.routingCodeParamName, routingCode);
+    }
+    if (StringUtils.isNotBlank(receiptNumber)) {
+      changes.put(PaymentDetailConstants.receiptNumberParamName, receiptNumber);
+    }
+    if (StringUtils.isNotBlank(bankNumber)) {
+      changes.put(PaymentDetailConstants.bankNumberParamName, bankNumber);
+    }
+    changes.put("paymentTypeId", paymentType.getId());
+    return new PaymentDetail(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
+  }
+
+  public PaymentDetailData toData() {
         final PaymentTypeData paymentTypeData = null; // this.paymentType.toData();
         return new PaymentDetailData(getId(), paymentTypeData, this.accountNumber, this.checkNumber, this.routingCode, this.receiptNumber,
                 this.bankNumber);

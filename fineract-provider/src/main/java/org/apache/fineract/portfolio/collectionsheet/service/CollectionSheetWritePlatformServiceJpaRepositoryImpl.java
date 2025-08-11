@@ -134,8 +134,8 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
 
         changes.putAll(updateBulkRepayments(request));
 
-        // changes.putAll(updateBulkDisbursals(command));
-        //
+        changes.putAll(updateBulkDisbursals(request));
+
         // changes.putAll(updateBulkMandatorySavingsDuePayments(command));
 
         return CollectionSheetResponse.builder().commandId(command.getId()).groupId(1L).entityId(1L).changes(new LinkedHashMap<>(changes))
@@ -150,17 +150,22 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
         return changes;
     }
 
-    private Map<String, Object> updateBulkRepayments(CollectionSheetRequest request) {
+    private Map<String, Object> updateBulkRepayments(final CollectionSheetRequest request) {
         return new HashMap<>(loanWritePlatformService.makeLoanBulkRepayment(request));
     }
 
-    private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
-        final Map<String, Object> changes = new HashMap<>();
-        final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand = this.bulkDisbursalCommandFromApiJsonDeserializer
-                .commandFromApiJson(command.json());
-        changes.putAll(this.loanWritePlatformService.bulkLoanDisbursal(command, bulkDisbursalCommand, false));
-        return changes;
+    private Map<String, Object> updateBulkDisbursals(final CollectionSheetRequest request) {
+      return new HashMap<>(this.loanWritePlatformService.bulkLoanDisbursal(request, false));
     }
+
+  @Deprecated
+  private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
+    final Map<String, Object> changes = new HashMap<>();
+    final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand = this.bulkDisbursalCommandFromApiJsonDeserializer
+            .commandFromApiJson(command.json());
+    changes.putAll(this.loanWritePlatformService.bulkLoanDisbursal(command, bulkDisbursalCommand, false));
+    return changes;
+  }
 
     private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();

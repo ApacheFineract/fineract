@@ -130,4 +130,6 @@ public interface LoanWritePlatformService {
     CommandProcessingResult makeManualInterestRefund(Long loanId, Long transactionId, JsonCommand command);
 
     Map<String, Object> makeLoanBulkRepayment(CollectionSheetRequest request);
+
+    Map<String, Object> bulkLoanDisbursal(CollectionSheetRequest request, boolean b);
 }

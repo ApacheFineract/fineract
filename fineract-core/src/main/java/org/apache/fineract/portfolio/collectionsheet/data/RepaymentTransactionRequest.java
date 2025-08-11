@@ -57,4 +57,5 @@ public class RepaymentTransactionRequest implements Serializable {
     private String routingCode;
     private String receiptNumber;
     private String bankNumber;
+    private BigDecimal fixedEmiAmount;
 }
