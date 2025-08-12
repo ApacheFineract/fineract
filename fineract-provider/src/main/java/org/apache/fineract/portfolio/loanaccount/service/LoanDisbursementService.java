@@ -372,55 +372,55 @@ public class LoanDisbursementService {
     }
 
     public Money adjustDisburseAmount(Loan loan, RepaymentTransactionRequest element, LocalDate actualDisbursementDate) {
-      Money disburseAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal().zero();
-      final BigDecimal principalDisbursed = element.getTransactionAmount();
-      if (loan.getActualDisbursementDate() == null || DateUtils.isBefore(actualDisbursementDate, loan.getActualDisbursementDate())) {
-        loan.setActualDisbursementDate(actualDisbursementDate);
-      }
-      BigDecimal diff = BigDecimal.ZERO;
-      final Collection<LoanDisbursementDetails> details = loan.fetchUndisbursedDetail();
-      if (principalDisbursed == null) {
-        disburseAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal();
-        if (!details.isEmpty()) {
-          disburseAmount = disburseAmount.zero();
-          for (LoanDisbursementDetails disbursementDetails : details) {
-            disbursementDetails.updateActualDisbursementDate(actualDisbursementDate);
-            disburseAmount = disburseAmount.plus(disbursementDetails.principal());
-          }
+        Money disburseAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal().zero();
+        final BigDecimal principalDisbursed = element.getTransactionAmount();
+        if (loan.getActualDisbursementDate() == null || DateUtils.isBefore(actualDisbursementDate, loan.getActualDisbursementDate())) {
+            loan.setActualDisbursementDate(actualDisbursementDate);
         }
-      } else {
-        if (loan.getLoanProduct().isMultiDisburseLoan()) {
-          disburseAmount = Money.of(loan.getCurrency(), principalDisbursed);
-        } else {
-          disburseAmount = disburseAmount.plus(principalDisbursed);
-        }
-
-        if (details.isEmpty()) {
-          diff = loan.getLoanRepaymentScheduleDetail().getPrincipal().minus(principalDisbursed).getAmount();
-        } else {
-          for (LoanDisbursementDetails disbursementDetails : details) {
-            disbursementDetails.updateActualDisbursementDate(actualDisbursementDate);
-            disbursementDetails.updatePrincipal(principalDisbursed);
-          }
-        }
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        if (loan.loanProduct().isMultiDisburseLoan()) {
-          Collection<LoanDisbursementDetails> loanDisburseDetails = loan.getDisbursementDetails();
-          BigDecimal setPrincipalAmount = BigDecimal.ZERO;
-          for (LoanDisbursementDetails disbursementDetails : loanDisburseDetails) {
-            if (disbursementDetails.actualDisbursementDate() != null) {
-              setPrincipalAmount = setPrincipalAmount.add(disbursementDetails.principal());
+        BigDecimal diff = BigDecimal.ZERO;
+        final Collection<LoanDisbursementDetails> details = loan.fetchUndisbursedDetail();
+        if (principalDisbursed == null) {
+            disburseAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal();
+            if (!details.isEmpty()) {
+                disburseAmount = disburseAmount.zero();
+                for (LoanDisbursementDetails disbursementDetails : details) {
+                    disbursementDetails.updateActualDisbursementDate(actualDisbursementDate);
+                    disburseAmount = disburseAmount.plus(disbursementDetails.principal());
+                }
             }
-            totalAmount = totalAmount.add(disbursementDetails.principal());
-          }
-          loan.getLoanRepaymentScheduleDetail().setPrincipal(setPrincipalAmount);
         } else {
-          loan.getLoanRepaymentScheduleDetail()
-                  .setPrincipal(loan.getLoanRepaymentScheduleDetail().getPrincipal().minus(diff).getAmount());
-          totalAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal().getAmount();
+            if (loan.getLoanProduct().isMultiDisburseLoan()) {
+                disburseAmount = Money.of(loan.getCurrency(), principalDisbursed);
+            } else {
+                disburseAmount = disburseAmount.plus(principalDisbursed);
+            }
+
+            if (details.isEmpty()) {
+                diff = loan.getLoanRepaymentScheduleDetail().getPrincipal().minus(principalDisbursed).getAmount();
+            } else {
+                for (LoanDisbursementDetails disbursementDetails : details) {
+                    disbursementDetails.updateActualDisbursementDate(actualDisbursementDate);
+                    disbursementDetails.updatePrincipal(principalDisbursed);
+                }
+            }
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            if (loan.loanProduct().isMultiDisburseLoan()) {
+                Collection<LoanDisbursementDetails> loanDisburseDetails = loan.getDisbursementDetails();
+                BigDecimal setPrincipalAmount = BigDecimal.ZERO;
+                for (LoanDisbursementDetails disbursementDetails : loanDisburseDetails) {
+                    if (disbursementDetails.actualDisbursementDate() != null) {
+                        setPrincipalAmount = setPrincipalAmount.add(disbursementDetails.principal());
+                    }
+                    totalAmount = totalAmount.add(disbursementDetails.principal());
+                }
+                loan.getLoanRepaymentScheduleDetail().setPrincipal(setPrincipalAmount);
+            } else {
+                loan.getLoanRepaymentScheduleDetail()
+                        .setPrincipal(loan.getLoanRepaymentScheduleDetail().getPrincipal().minus(diff).getAmount());
+                totalAmount = loan.getLoanRepaymentScheduleDetail().getPrincipal().getAmount();
+            }
+            loanDisbursementValidator.compareDisbursedToApprovedOrProposedPrincipal(loan, disburseAmount.getAmount(), totalAmount);
         }
-        loanDisbursementValidator.compareDisbursedToApprovedOrProposedPrincipal(loan, disburseAmount.getAmount(), totalAmount);
-      }
-      return disburseAmount;
+        return disburseAmount;
     }
 }

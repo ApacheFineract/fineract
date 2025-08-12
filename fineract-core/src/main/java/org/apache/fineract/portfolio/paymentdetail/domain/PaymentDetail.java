@@ -103,33 +103,34 @@ public class PaymentDetail extends AbstractPersistableCustom<Long> {
         this.bankNumber = bankNumber;
     }
 
-  public static PaymentDetail generatePaymentDetail(PaymentType paymentType, RepaymentTransactionRequest element, Map<String, Object> changes) {
-    final String accountNumber = element.getAccountNumber();
-    final String checkNumber = element.getCheckNumber();
-    final String routingCode = element.getRoutingCode();
-    final String receiptNumber = element.getReceiptNumber();
-    final String bankNumber = element.getBankNumber();
+    public static PaymentDetail generatePaymentDetail(PaymentType paymentType, RepaymentTransactionRequest element,
+            Map<String, Object> changes) {
+        final String accountNumber = element.getAccountNumber();
+        final String checkNumber = element.getCheckNumber();
+        final String routingCode = element.getRoutingCode();
+        final String receiptNumber = element.getReceiptNumber();
+        final String bankNumber = element.getBankNumber();
 
-    if (StringUtils.isNotBlank(accountNumber)) {
-      changes.put(PaymentDetailConstants.accountNumberParamName, accountNumber);
+        if (StringUtils.isNotBlank(accountNumber)) {
+            changes.put(PaymentDetailConstants.accountNumberParamName, accountNumber);
+        }
+        if (StringUtils.isNotBlank(checkNumber)) {
+            changes.put(PaymentDetailConstants.checkNumberParamName, checkNumber);
+        }
+        if (StringUtils.isNotBlank(routingCode)) {
+            changes.put(PaymentDetailConstants.routingCodeParamName, routingCode);
+        }
+        if (StringUtils.isNotBlank(receiptNumber)) {
+            changes.put(PaymentDetailConstants.receiptNumberParamName, receiptNumber);
+        }
+        if (StringUtils.isNotBlank(bankNumber)) {
+            changes.put(PaymentDetailConstants.bankNumberParamName, bankNumber);
+        }
+        changes.put("paymentTypeId", paymentType.getId());
+        return new PaymentDetail(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
     }
-    if (StringUtils.isNotBlank(checkNumber)) {
-      changes.put(PaymentDetailConstants.checkNumberParamName, checkNumber);
-    }
-    if (StringUtils.isNotBlank(routingCode)) {
-      changes.put(PaymentDetailConstants.routingCodeParamName, routingCode);
-    }
-    if (StringUtils.isNotBlank(receiptNumber)) {
-      changes.put(PaymentDetailConstants.receiptNumberParamName, receiptNumber);
-    }
-    if (StringUtils.isNotBlank(bankNumber)) {
-      changes.put(PaymentDetailConstants.bankNumberParamName, bankNumber);
-    }
-    changes.put("paymentTypeId", paymentType.getId());
-    return new PaymentDetail(paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
-  }
 
-  public PaymentDetailData toData() {
+    public PaymentDetailData toData() {
         final PaymentTypeData paymentTypeData = null; // this.paymentType.toData();
         return new PaymentDetailData(getId(), paymentTypeData, this.accountNumber, this.checkNumber, this.routingCode, this.receiptNumber,
                 this.bankNumber);

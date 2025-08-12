@@ -37,7 +37,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
-//import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
@@ -96,8 +95,8 @@ public class CollectionSheetApiResource {
             final JsonQuery query = JsonQuery.from(payload, parsedQuery, this.fromJsonHelper);
             return Response.ok(this.collectionSheetReadPlatformService.generateIndividualCollectionSheet(query)).build();
         } else if (CommandParameterUtil.is(commandParam, SAVE_COLLECTION_SHEET_COMMAND_VALUE)) {
-//             final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
-//             return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
+            // final CommandWrapper commandRequest = builder.saveIndividualCollectionSheet().build();
+            // return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
 
             final CollectionSheetCommand command = new CollectionSheetCommand();
 

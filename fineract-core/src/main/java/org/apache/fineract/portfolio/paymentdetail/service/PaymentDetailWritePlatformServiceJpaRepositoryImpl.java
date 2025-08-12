@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.paymentdetail.service;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.RepaymentTransactionRequest;
 import org.apache.fineract.portfolio.collectionsheet.data.SavingDueTransactionRequest;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
@@ -60,59 +59,53 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         return this.paymentDetailRepository.saveAndFlush(paymentDetail);
     }
 
-  @Transactional
-  @Override
-  public PaymentDetail createAndPersistPaymentDetail(RepaymentTransactionRequest element, Map<String, Object> changes) {
-    final PaymentDetail paymentDetail = createPaymentDetail(element, changes);
-    if (paymentDetail != null) {
-      return persistPaymentDetail(paymentDetail);
+    @Transactional
+    @Override
+    public PaymentDetail createAndPersistPaymentDetail(RepaymentTransactionRequest element, Map<String, Object> changes) {
+        final PaymentDetail paymentDetail = createPaymentDetail(element, changes);
+        if (paymentDetail != null) {
+            return persistPaymentDetail(paymentDetail);
+        }
+        return paymentDetail;
     }
-    return paymentDetail;
-  }
 
-  @Transactional
-  @Override
-  public PaymentDetail createAndPersistPaymentDetail(SavingDueTransactionRequest element) {
-    final PaymentDetail paymentDetail = createPaymentDetail(element);
-    if (paymentDetail != null) {
-      return persistPaymentDetail(paymentDetail);
+    @Transactional
+    @Override
+    public PaymentDetail createAndPersistPaymentDetail(SavingDueTransactionRequest element) {
+        final PaymentDetail paymentDetail = createPaymentDetail(element);
+        if (paymentDetail != null) {
+            return persistPaymentDetail(paymentDetail);
+        }
+        return paymentDetail;
     }
-    return paymentDetail;
-  }
 
-  private PaymentDetail createPaymentDetail(SavingDueTransactionRequest element) {
-    final Long paymentTypeId = element.getPaymentTypeId();
-    if (paymentTypeId == null) {
-      return null;
+    private PaymentDetail createPaymentDetail(SavingDueTransactionRequest element) {
+        final Long paymentTypeId = element.getPaymentTypeId();
+        if (paymentTypeId == null) {
+            return null;
+        }
+        final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
+        return PaymentDetail.instance(paymentType, element.getAccountNumber(), element.getCheckNumber(), element.getRoutingCode(),
+                element.getReceiptNumber(), element.getBankNumber());
     }
-    final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
-    return PaymentDetail.instance(paymentType,
-            element.getAccountNumber(),
-            element.getCheckNumber(),
-            element.getRoutingCode(),
-            element.getReceiptNumber(),
-            element.getBankNumber()
-    );
-  }
 
-  private PaymentDetail createPaymentDetail(final RepaymentTransactionRequest element,
-                                            final Map<String, Object> changes) {
-    final Long paymentTypeId = element.getPaymentTypeId();
-    if (paymentTypeId == null) {
-      return null;
+    private PaymentDetail createPaymentDetail(final RepaymentTransactionRequest element, final Map<String, Object> changes) {
+        final Long paymentTypeId = element.getPaymentTypeId();
+        if (paymentTypeId == null) {
+            return null;
+        }
+        final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
+        return PaymentDetail.generatePaymentDetail(paymentType, element, changes);
     }
-    final PaymentType paymentType = paymentTyperepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
-    return PaymentDetail.generatePaymentDetail(paymentType, element, changes);
-  }
 
-  @Deprecated
-  @Override
-  @Transactional
-  public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
-      final PaymentDetail paymentDetail = createPaymentDetail(command, changes);
-      if (paymentDetail != null) {
-          return persistPaymentDetail(paymentDetail);
-      }
-      return paymentDetail;
-  }
+    @Deprecated
+    @Override
+    @Transactional
+    public PaymentDetail createAndPersistPaymentDetail(final JsonCommand command, final Map<String, Object> changes) {
+        final PaymentDetail paymentDetail = createPaymentDetail(command, changes);
+        if (paymentDetail != null) {
+            return persistPaymentDetail(paymentDetail);
+        }
+        return paymentDetail;
+    }
 }

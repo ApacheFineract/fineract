@@ -141,37 +141,33 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
 
         changes.putAll(updateBulkMandatorySavingsDuePayments(request));
 
-        return CollectionSheetResponse
-                .builder()
-                .commandId(command.getId())
-                .groupId(command.getPayload().getOfficeId())
-                .entityId(command.getPayload().getOfficeId())
-                .changes(new LinkedHashMap<>(changes))
-                .build();
+        return CollectionSheetResponse.builder().commandId(command.getId()).groupId(command.getPayload().getOfficeId())
+                .entityId(command.getPayload().getOfficeId()).changes(new LinkedHashMap<>(changes)).build();
     }
 
-  private Map<String,?> updateBulkMandatorySavingsDuePayments(CollectionSheetRequest request) {
-    final Map<String, Object> changes = new HashMap<>();
-//    final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler
-//            .assembleBulkMandatorySavingsAccountTransactionDTOs(command, paymentDetail);
+    private Map<String, ?> updateBulkMandatorySavingsDuePayments(CollectionSheetRequest request) {
+        final Map<String, Object> changes = new HashMap<>();
+        // final Collection<SavingsAccountTransactionDTO> savingsTransactions = this.accountAssembler
+        // .assembleBulkMandatorySavingsAccountTransactionDTOs(command, paymentDetail);
 
-    final List<SavingDueTransactionRequest> savingsTransactions = request.getBulkDisbursementTransactions().getBulkSavingsDueTransactions();
+        final List<SavingDueTransactionRequest> savingsTransactions = request.getBulkDisbursementTransactions()
+                .getBulkSavingsDueTransactions();
 
-    List<Long> depositTransactionIds = new ArrayList<>();
-    for (SavingDueTransactionRequest element : savingsTransactions) {
-      try {
-        SavingsAccountTransaction savingsAccountTransaction = accountWritePlatformService
-                .mandatorySavingsAccountDeposit(element, request);
-        depositTransactionIds.add(savingsAccountTransaction.getId());
-      } catch (Exception e) {
-        throw new SavingsAccountNotFoundException(element.getSavingsId());
-      }
+        List<Long> depositTransactionIds = new ArrayList<>();
+        for (SavingDueTransactionRequest element : savingsTransactions) {
+            try {
+                SavingsAccountTransaction savingsAccountTransaction = accountWritePlatformService.mandatorySavingsAccountDeposit(element,
+                        request);
+                depositTransactionIds.add(savingsAccountTransaction.getId());
+            } catch (Exception e) {
+                throw new SavingsAccountNotFoundException(element.getSavingsId(), e);
+            }
+        }
+        changes.put("SavingsTransactions", depositTransactionIds);
+        return changes;
     }
-    changes.put("SavingsTransactions", depositTransactionIds);
-    return changes;
-  }
 
-  private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
+    private Map<String, Object> updateBulkRepayments(final JsonCommand command, final PaymentDetail paymentDetail) {
         final Map<String, Object> changes = new HashMap<>();
         final CollectionSheetBulkRepaymentCommand bulkRepaymentCommand = this.bulkRepaymentCommandFromApiJsonDeserializer
                 .commandFromApiJson(command.json(), paymentDetail);
@@ -184,17 +180,17 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
     }
 
     private Map<String, Object> updateBulkDisbursals(final CollectionSheetRequest request) {
-      return new HashMap<>(this.loanWritePlatformService.bulkLoanDisbursal(request, false));
+        return new HashMap<>(this.loanWritePlatformService.bulkLoanDisbursal(request, false));
     }
 
-  @Deprecated
-  private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
-    final Map<String, Object> changes = new HashMap<>();
-    final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand = this.bulkDisbursalCommandFromApiJsonDeserializer
-            .commandFromApiJson(command.json());
-    changes.putAll(this.loanWritePlatformService.bulkLoanDisbursal(command, bulkDisbursalCommand, false));
-    return changes;
-  }
+    @Deprecated
+    private Map<String, Object> updateBulkDisbursals(final JsonCommand command) {
+        final Map<String, Object> changes = new HashMap<>();
+        final CollectionSheetBulkDisbursalCommand bulkDisbursalCommand = this.bulkDisbursalCommandFromApiJsonDeserializer
+                .commandFromApiJson(command.json());
+        changes.putAll(this.loanWritePlatformService.bulkLoanDisbursal(command, bulkDisbursalCommand, false));
+        return changes;
+    }
 
     @Deprecated
     private Map<String, Object> updateBulkMandatorySavingsDuePayments(final JsonCommand command, final PaymentDetail paymentDetail) {

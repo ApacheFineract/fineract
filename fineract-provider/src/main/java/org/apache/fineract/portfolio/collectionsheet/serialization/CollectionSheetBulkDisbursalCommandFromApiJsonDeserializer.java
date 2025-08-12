@@ -63,51 +63,51 @@ public final class CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer
 
         SingleDisbursalCommand[] loanDisbursementTransactions = null;
 
-//        if (element.isJsonObject()) {
-//            if (topLevelJsonElement.has("bulkDisbursementTransactions")
-//                    && topLevelJsonElement.get("bulkDisbursementTransactions").isJsonArray()) {
-//                final JsonArray array = topLevelJsonElement.get("bulkDisbursementTransactions").getAsJsonArray();
-//                loanDisbursementTransactions = new SingleDisbursalCommand[array.size()];
-//                for (int i = 0; i < array.size(); i++) {
-//                    final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
-//
-//                    final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
-//                    final BigDecimal disbursementAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
-//                            loanTransactionElement, locale);
-//                    loanDisbursementTransactions[i] = new SingleDisbursalCommand(loanId, disbursementAmount, transactionDate);
-//                }
-//            }
-//        }
+        // if (element.isJsonObject()) {
+        // if (topLevelJsonElement.has("bulkDisbursementTransactions")
+        // && topLevelJsonElement.get("bulkDisbursementTransactions").isJsonArray()) {
+        // final JsonArray array = topLevelJsonElement.get("bulkDisbursementTransactions").getAsJsonArray();
+        // loanDisbursementTransactions = new SingleDisbursalCommand[array.size()];
+        // for (int i = 0; i < array.size(); i++) {
+        // final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
+        //
+        // final Long loanId = this.fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
+        // final BigDecimal disbursementAmount = this.fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
+        // loanTransactionElement, locale);
+        // loanDisbursementTransactions[i] = new SingleDisbursalCommand(loanId, disbursementAmount, transactionDate);
+        // }
+        // }
+        // }
 
-      if (topLevelJsonElement != null && topLevelJsonElement.isJsonObject()) {
-        JsonObject root = topLevelJsonElement.getAsJsonObject();
+        if (topLevelJsonElement != null && topLevelJsonElement.isJsonObject()) {
+            JsonObject root = topLevelJsonElement.getAsJsonObject();
 
-        if (root.has("bulkDisbursementTransactions")) {
-          JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
+            if (root.has("bulkDisbursementTransactions")) {
+                JsonElement disbursementElement = root.get("bulkDisbursementTransactions");
 
-          if (disbursementElement != null && disbursementElement.isJsonObject()) {
-            JsonObject disbursementObj = disbursementElement.getAsJsonObject();
+                if (disbursementElement != null && disbursementElement.isJsonObject()) {
+                    JsonObject disbursementObj = disbursementElement.getAsJsonObject();
 
-            if (disbursementObj.has("bulkRepaymentTransactions")) {
-              JsonElement savingsElement = disbursementObj.get("bulkRepaymentTransactions");
+                    if (disbursementObj.has("bulkRepaymentTransactions")) {
+                        JsonElement savingsElement = disbursementObj.get("bulkRepaymentTransactions");
 
-              if (savingsElement != null && savingsElement.isJsonArray()) {
-                JsonArray array = savingsElement.getAsJsonArray();
+                        if (savingsElement != null && savingsElement.isJsonArray()) {
+                            JsonArray array = savingsElement.getAsJsonArray();
 
-                loanDisbursementTransactions = new SingleDisbursalCommand[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                  final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
+                            loanDisbursementTransactions = new SingleDisbursalCommand[array.size()];
+                            for (int i = 0; i < array.size(); i++) {
+                                final JsonObject loanTransactionElement = array.get(i).getAsJsonObject();
 
-                  final Long loanId = fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
-                  final BigDecimal disbursementAmount = fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
-                          loanTransactionElement, locale);
-                  loanDisbursementTransactions[i] = new SingleDisbursalCommand(loanId, disbursementAmount, transactionDate);
+                                final Long loanId = fromApiJsonHelper.extractLongNamed("loanId", loanTransactionElement);
+                                final BigDecimal disbursementAmount = fromApiJsonHelper.extractBigDecimalNamed("transactionAmount",
+                                        loanTransactionElement, locale);
+                                loanDisbursementTransactions[i] = new SingleDisbursalCommand(loanId, disbursementAmount, transactionDate);
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
         return new CollectionSheetBulkDisbursalCommand(note, transactionDate, loanDisbursementTransactions);
     }
 }

@@ -37,60 +37,53 @@ import org.springframework.validation.Validator;
 @ContextConfiguration(classes = { ValidationConfig.class })
 class DateRangeValidationTest {
 
-  @Autowired
-  private Validator validator;
+    @Autowired
+    private Validator validator;
 
-  @Test
-  void validAllBlank() {
-    final var request =
-            DateRangeModel.builder().format("").date("  ").locale(null).build();
-    final var errors = validator.validateObject(request);
-    assertThat(errors.getAllErrors()).hasSize(0);
-  }
+    @Test
+    void validAllBlank() {
+        final var request = DateRangeModel.builder().format("").date("  ").locale(null).build();
+        final var errors = validator.validateObject(request);
+        assertThat(errors.getAllErrors()).hasSize(0);
+    }
 
-  @Test
-  void invalidLocaleFormat() {
-    final var request =
-            DateRangeModel.builder().format("dd MMMM yyyy").date("01 January 2025").locale("").build();
-    final var errors = validator.validateObject(request);
-    assertThat(errors.getAllErrors()).isEmpty();
-  }
+    @Test
+    void invalidLocaleFormat() {
+        final var request = DateRangeModel.builder().format("dd MMMM yyyy").date("01 January 2025").locale("").build();
+        final var errors = validator.validateObject(request);
+        assertThat(errors.getAllErrors()).isEmpty();
+    }
 
-  @Test
-  void invalidDateFormat() {
-    final var request = DateRangeModel.builder().format("dd/MM/yyyy").date("12-05" +
-            "-2025").locale("en").build();
-    final var errors = validator.validateObject(request);
-    assertThat(errors.getAllErrors()).hasSize(1);
-  }
+    @Test
+    void invalidDateFormat() {
+        final var request = DateRangeModel.builder().format("dd/MM/yyyy").date("12-05" + "-2025").locale("en").build();
+        final var errors = validator.validateObject(request);
+        assertThat(errors.getAllErrors()).hasSize(1);
+    }
 
-  @Test
-  void invalidDateRangeFormat() {
-    final var request =
-            DateRangeModel.builder().format("dd MMMM yyyy").date("01 January 2000").locale("en").build();
-    final var errors = validator.validateObject(request);
-    assertThat(errors.getAllErrors()).hasSize(1);
-  }
+    @Test
+    void invalidDateRangeFormat() {
+        final var request = DateRangeModel.builder().format("dd MMMM yyyy").date("01 January 2000").locale("en").build();
+        final var errors = validator.validateObject(request);
+        assertThat(errors.getAllErrors()).hasSize(1);
+    }
 
-  @Test
-  void valid() {
-    final var request =
-            DateRangeModel.builder().format("dd MMMM yyyy").date("01 January " +
-                    "2025").locale("en").build();
-    final var errors = validator.validateObject(request);
-    assertThat(errors.getAllErrors()).isEmpty();
-  }
+    @Test
+    void valid() {
+        final var request = DateRangeModel.builder().format("dd MMMM yyyy").date("01 January " + "2025").locale("en").build();
+        final var errors = validator.validateObject(request);
+        assertThat(errors.getAllErrors()).isEmpty();
+    }
 
-  @Builder
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DateRange(maxYearsAgo = 10, dateField = "date", formatField = "format", localeField =
-          "locale", message = "{org.apache.fineract.validation.date-range}")
-  static class DateRangeModel {
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @DateRange(maxYearsAgo = 10, dateField = "date", formatField = "format", localeField = "locale", message = "{org.apache.fineract.validation.date-range}")
+    static class DateRangeModel {
 
-    private String date;
-    private String format;
-    private String locale;
-  }
+        private String date;
+        private String format;
+        private String locale;
+    }
 }
