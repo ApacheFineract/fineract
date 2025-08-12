@@ -3166,7 +3166,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         List<Long> transactionIds = new ArrayList<>();
         boolean isAccountTransfer = false;
-        HolidayDetailDTO holidayDetailDTO = new HolidayDetailDTO();
+        HolidayDetailDTO holidayDetailDTO = null;
         boolean isHolidayValidationDone = false;
         final boolean allowTransactionsOnHoliday = configurationDomainService.allowTransactionsOnHolidayEnabled();
         // for (final SingleRepaymentCommand singleLoanRepaymentCommand : repaymentCommand) {

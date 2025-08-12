@@ -37,7 +37,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -88,7 +87,7 @@ public class CollectionSheetApiResource {
     public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) @Valid CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
-        final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
+        // final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
 
         if (CommandParameterUtil.is(commandParam, GENERATE_COLLECTION_SHEET_COMMAND_VALUE)) {
             this.context.authenticatedUser().validateHasReadPermission(CollectionSheetConstants.COLLECTIONSHEET_RESOURCE_NAME);
