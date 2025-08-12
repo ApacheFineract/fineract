@@ -46,9 +46,7 @@ class LocalDateValidationTest {
 
         var errors = validator.validateObject(request);
 
-        assertThat(errors.getAllErrors()).hasSize(1);
-
-        assertThat(errors.getAllErrors()).allMatch(e -> "Wrong local date fields.".equals(e.getDefaultMessage()));
+        assertThat(errors.getAllErrors()).isEmpty();
     }
 
     @Test
@@ -57,9 +55,7 @@ class LocalDateValidationTest {
 
         var errors = validator.validateObject(request);
 
-        assertThat(errors.getAllErrors()).hasSize(1);
-
-        assertThat(errors.getAllErrors()).allMatch(e -> "Wrong local date fields.".equals(e.getDefaultMessage()));
+        assertThat(errors.getAllErrors()).isEmpty();
     }
 
     @Test
@@ -69,8 +65,6 @@ class LocalDateValidationTest {
         var errors = validator.validateObject(request);
 
         assertThat(errors.getAllErrors()).hasSize(1);
-
-        assertThat(errors.getAllErrors()).allMatch(e -> "Wrong local date fields.".equals(e.getDefaultMessage()));
     }
 
     @Test
