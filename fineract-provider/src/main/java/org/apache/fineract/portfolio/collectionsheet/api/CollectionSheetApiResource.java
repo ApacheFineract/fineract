@@ -64,9 +64,7 @@ import org.springframework.stereotype.Component;
         of transactions into the core banking system. Endpoints in this tag allow clients
         to fetch pre-filled collection data, submit collected payments in bulk, and reconcile
         records for auditing and reporting purposes.
-        """
-
-)
+        """)
 @RequiredArgsConstructor
 public class CollectionSheetApiResource {
 
@@ -80,10 +78,13 @@ public class CollectionSheetApiResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Generate Individual Collection Sheet | Save Collection Sheet", description = "Generate Individual Collection Sheet:\n\n"
-            + "This Api retrieves repayment details of all individual loans under a office as on a specified meeting date.\n\n"
-            + "Save Collection Sheet:\n\n"
-            + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
+    @Operation(summary = "Generate Individual Collection Sheet | Save Collection Sheet", description = """
+            **Generate Individual Collection Sheet:**
+            This API `retrieves` repayment details of all individual `loans` under an office as on a specified meeting date.
+
+            **Save Collection Sheet:**
+            This API allows the loan officer to `perform` bulk repayments of individual `loans` and deposit of mandatory `savings` on a given meeting date.
+            """)
     public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) @Valid CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);

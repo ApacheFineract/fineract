@@ -22,6 +22,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
@@ -62,7 +63,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, Object
                     .withResolverStyle(ResolverStyle.STRICT);
 
             final LocalDate parsedDate = LocalDate.parse(dateFieldVal, formatter);
-            final LocalDate today = LocalDate.now();
+            final LocalDate today = LocalDate.now(ZoneId.systemDefault());
 
             // Date must not be in future and must be at most {specified} years old
             return !parsedDate.isAfter(today) && !parsedDate.isBefore(today.minusYears(maxYearsAgo));
