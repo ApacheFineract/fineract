@@ -43,7 +43,6 @@ import jakarta.ws.rs.core.UriInfo;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandPipeline;
@@ -58,7 +57,6 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountDTO;
@@ -70,12 +68,12 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.command.DeleteGuarant
 import org.apache.fineract.portfolio.loanaccount.guarantor.command.UpdateGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.CreateGuarantorsResponse;
-import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.DeleteGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.UpdateGuarantorsResponse;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
+import org.apache.fineract.portfolio.loanaccount.guarantor.mapper.GuarantorCommandMapper;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
@@ -89,6 +87,8 @@ import org.springframework.stereotype.Component;
         Guarantors are individuals or entities that commit to repaying a loan if the primary borrower defaults. In the banking domain, they serve as an additional layer of security for lenders, helping to mitigate credit risk and improve loan eligibility for borrowers. This feature is especially important in microfinance and inclusive banking, where borrowers may lack traditional forms of collateral.
 
         `The Apache Fineract` supports the full lifecycle management of guarantors, including creation, validation, and association with loan accounts, enabling financial institutions to manage credit guarantees transparently and effectively.""")
+@Consumes({ MediaType.APPLICATION_JSON })
+@Produces({ MediaType.APPLICATION_JSON })
 @RequiredArgsConstructor
 public class GuarantorsApiResource {
 
@@ -105,11 +105,10 @@ public class GuarantorsApiResource {
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final CommandPipeline commandPipeline;
+    private final GuarantorCommandMapper mapper;
 
     @GET
     @Path("template")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve Guarantor Account Linking Template", description = """
             Retrieves a JSON template with metadata required to link a guarantor’s savings account to a loan.
             Accepts `loanId` as a path parameter to associate the template contextually.
@@ -128,8 +127,6 @@ public class GuarantorsApiResource {
     }
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve Guarantor Details", description = """
             Retrieves a guarantor details from the database.
             This API is part of The Apache Fineract platform's guarantor management module.""")
@@ -142,8 +139,6 @@ public class GuarantorsApiResource {
 
     @GET
     @Path("{guarantorId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve Guarantor Details with Optional Template Metadata", description = """
             Fetches details of a specific guarantor associated with a given loan using the `loanId` and `guarantorId` path parameters.
             If the request includes the `template=true` query parameter, the response is enriched with metadata such as `guarantorType` options,
@@ -170,8 +165,6 @@ public class GuarantorsApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Add a Guarantor to a Loan Account", description = """
             Creates and attaches a new guarantor to the specified loan account.
             The guarantor can be either an existing client or an external individual.
@@ -180,16 +173,17 @@ public class GuarantorsApiResource {
     public CreateGuarantorsResponse createGuarantor(
             @PathParam("loanId") @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.notNull}") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.digits}") final Long loanId,
             @Valid final CreateGuarantorsRequest request) {
-        final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
+        // final CreateGuarantorsCommand command = new CreateGuarantorsCommand();
+        //
+        // if (request.getLoanId() == null) {
+        // request.setLoanId(loanId);
+        // }
+        //
+        // command.setId(UUID.randomUUID());
+        // command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        // command.setPayload(request);
 
-        if (request.getLoanId() == null) {
-            request.setLoanId(loanId);
-        }
-
-        command.setId(UUID.randomUUID());
-        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-        command.setPayload(request);
-
+        final CreateGuarantorsCommand command = mapper.toCommand(loanId, request);
         final Supplier<CreateGuarantorsResponse> response = commandPipeline.send(command);
 
         return response.get();
@@ -197,8 +191,6 @@ public class GuarantorsApiResource {
 
     @PUT
     @Path("{guarantorId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Update an Existing Guarantor details on a Loan Account", description = """
             Updates the details of an existing guarantor associated with a specified loan account.
             The guarantor may be an existing client or an external person.
@@ -207,22 +199,21 @@ public class GuarantorsApiResource {
             This API is part of The Apache Fineract platform's guarantor management capabilities.""")
     public UpdateGuarantorsResponse updateGuarantor(
             @PathParam("loanId") @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.notNull}") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.digits}") final Long loanId,
-
             @PathParam("guarantorId") @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.digits}") final Long guarantorId,
             @Valid final UpdateGuarantorsRequest request) {
-        final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
-
-        if (request.getLoanId() == null) {
-            request.setLoanId(loanId);
-        }
-        if (request.getGuarantorId() == null) {
-            request.setGuarantorId(guarantorId);
-        }
-
-        command.setId(UUID.randomUUID());
-        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-        command.setPayload(request);
-
+        // final UpdateGuarantorsCommand command = new UpdateGuarantorsCommand();
+        //
+        // if (request.getLoanId() == null) {
+        // request.setLoanId(loanId);
+        // }
+        // if (request.getGuarantorId() == null) {
+        // request.setGuarantorId(guarantorId);
+        // }
+        //
+        // command.setId(UUID.randomUUID());
+        // command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        // command.setPayload(request);
+        final UpdateGuarantorsCommand command = mapper.toCommand(loanId, guarantorId, request);
         final Supplier<UpdateGuarantorsResponse> response = commandPipeline.send(command);
 
         return response.get();
@@ -230,8 +221,6 @@ public class GuarantorsApiResource {
 
     @DELETE
     @Path("{guarantorId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Delete a Guarantor from a Loan Account", description = """
             Removes an existing guarantor associated with the specified loan account.
             You can delete either the entire guarantor record or a specific guarantor funding detail by passing the optional `guarantorFundingId` query parameter.
@@ -243,15 +232,16 @@ public class GuarantorsApiResource {
             @PathParam("loanId") @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.notNull}") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.digits}") final Long loanId,
             @PathParam("guarantorId") @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.notNull}") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.digits}") final Long guarantorId,
             @QueryParam("guarantorFundingId") @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorFundingId.positiveOrZero}") @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorFundingId.digits}") final Long guarantorFundingId) {
-        final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
-
-        final DeleteGuarantorsRequest request = DeleteGuarantorsRequest.builder().loanId(loanId).guarantorId(guarantorId)
-                .guarantorFundingId(guarantorFundingId).build();
-
-        command.setId(UUID.randomUUID());
-        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-        command.setPayload(request);
-
+        // final DeleteGuarantorsCommand command = new DeleteGuarantorsCommand();
+        //
+        // final DeleteGuarantorsRequest request =
+        // DeleteGuarantorsRequest.builder().loanId(loanId).guarantorId(guarantorId)
+        // .guarantorFundingId(guarantorFundingId).build();
+        //
+        // command.setId(UUID.randomUUID());
+        // command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        // command.setPayload(request);
+        final DeleteGuarantorsCommand command = mapper.toCommand(loanId, guarantorId, guarantorFundingId);
         final Supplier<DeleteGuarantorsResponse> response = commandPipeline.send(command);
 
         return response.get();
@@ -259,8 +249,6 @@ public class GuarantorsApiResource {
 
     @GET
     @Path("accounts/template")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Retrieve Guarantor Account Linking Options Template", description = """
             Provides a template containing available savings accounts for a client that can be linked as guarantor funding sources for a loan.
             Requires both `clientId` and `loanId` parameters.
