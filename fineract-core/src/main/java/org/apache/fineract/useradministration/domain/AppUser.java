@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -57,6 +58,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+@ToString
 @Entity
 @Table(name = "m_appuser", uniqueConstraints = @UniqueConstraint(columnNames = { "username" }, name = "username_org"))
 public class AppUser extends AbstractPersistableCustom<Long> implements PlatformUser {
@@ -728,10 +730,5 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
             }
         }
         return newAppUserClientMappings;
-    }
-
-    @Override
-    public String toString() {
-        return "AppUser [username=" + this.username + ", getId()=" + this.getId() + "]";
     }
 }

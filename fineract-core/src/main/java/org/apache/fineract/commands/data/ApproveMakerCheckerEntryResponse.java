@@ -16,15 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.organisation.monetary.command;
+package org.apache.fineract.commands.data;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.apache.fineract.command.core.Command;
-import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
+import lombok.NoArgsConstructor;
 
+@Builder
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class CurrencyUpdateCommand extends Command<CurrencyUpdateRequest> {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ApproveMakerCheckerEntryResponse implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private UUID commandId;
+    private Long officeId;
+    private Long clientId;
+    private Long resourceId;
 }

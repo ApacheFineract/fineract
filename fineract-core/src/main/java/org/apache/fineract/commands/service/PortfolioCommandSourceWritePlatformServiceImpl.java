@@ -22,6 +22,9 @@ import com.google.gson.JsonElement;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryRequest;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryResponse;
 import org.apache.fineract.commands.domain.CommandSource;
 import org.apache.fineract.commands.domain.CommandSourceRepository;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -112,6 +115,18 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
         this.commandSourceRepository.deleteById(makerCheckerId);
 
         return makerCheckerId;
+    }
+
+    @Transactional
+    @Override
+    public ApproveMakerCheckerEntryResponse approveEntry(Command<ApproveMakerCheckerEntryRequest> command) {
+        return null;
+    }
+
+    @Transactional
+    @Override
+    public ApproveMakerCheckerEntryResponse rejectEntry(Command<ApproveMakerCheckerEntryRequest> command) {
+        return null;
     }
 
     private CommandSource validateMakerCheckerTransaction(final Long makerCheckerId) {

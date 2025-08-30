@@ -20,10 +20,6 @@ package org.apache.fineract.commands.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
@@ -40,6 +36,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.CommandPipeline;
 import org.apache.fineract.commands.data.AuditData;
 import org.apache.fineract.commands.data.AuditSearchData;
 import org.apache.fineract.commands.data.request.MakerCheckerRequest;
@@ -55,6 +52,8 @@ import org.springframework.stereotype.Component;
 @Path("/v1/makercheckers")
 @Component
 @Tag(name = "Maker Checker (or 4-eye) functionality")
+@Consumes({ MediaType.APPLICATION_JSON })
+@Produces({ MediaType.APPLICATION_JSON })
 @RequiredArgsConstructor
 public class MakercheckersApiResource {
 
@@ -64,10 +63,9 @@ public class MakercheckersApiResource {
     private final AuditReadPlatformService readPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService writePlatformService;
+    private final CommandPipeline commandPipeline;
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "List Maker Checker Entries", description = "Get a list of entries that can be checked by the requestor that match the criteria supplied.\n"
             + "\n" + "Example Requests:\n" + "\n" + "makercheckers\n" + "\n" + "makercheckers?fields=madeOnDate,maker,processingResult\n"
             + "\n" + "makercheckers?makerDateTimeFrom=2013-03-25 08:00:00&makerDateTimeTo=2013-04-04 18:00:00\n" + "\n"
@@ -77,13 +75,10 @@ public class MakercheckersApiResource {
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return readPlatformService.retrieveAllEntriesToBeChecked(extraCriteria, settings.isIncludeJson());
-
     }
 
     @GET
     @Path("/searchtemplate")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Maker Checker Search Template", description = "This is a convenience resource. It can be useful when building a Checker Inbox UI. \"appUsers\" are data scoped to the office/branch the requestor is associated with. \"actionNames\" and \"entityNames\" returned are those that the requestor has Checker approval permissions for.\n"
             + "\n" + "Example Requests:\n" + "\n" + "makercheckers/searchtemplate\n" + "makercheckers/searchtemplate?fields=entityNames")
     public AuditSearchData retrieveAuditSearchTemplate() {
@@ -92,11 +87,7 @@ public class MakercheckersApiResource {
 
     @POST
     @Path("{auditId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MakercheckersApiResourceSwagger.PostMakerCheckersResponse.class))) })
     public CommandProcessingResult approveMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam) {
 
@@ -112,17 +103,38 @@ public class MakercheckersApiResource {
         return result;
     }
 
+    // @POST
+    // @Path("{auditId}")
+    // @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
+    // public ApproveMakerCheckerEntryResponse approveMakerCheckerEntry(
+    // @PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
+    // @QueryParam("command") @Parameter(description = "command")
+    // @EnumValue(enumClass = MakerCheckerStatus.class, message = "{org.apache.fineract.commands.invalid}")
+    // final String commandParam) {
+    //
+    // ApproveMakerCheckerEntryCommand command = new ApproveMakerCheckerEntryCommand();
+    //
+    // ApproveMakerCheckerEntryRequest request = ApproveMakerCheckerEntryRequest.builder()
+    // .auditId(auditId)
+    // .commandParam(commandParam)
+    // .build();
+    //
+    // command.setId(UUID.randomUUID());
+    // command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+    // command.setPayload(request);
+    //
+    // final Supplier<ApproveMakerCheckerEntryResponse> response = commandPipeline.send(command);
+    //
+    // return response.get();
+    // }
+
     private boolean is(final String commandParam, final String commandValue) {
         return StringUtils.isNotBlank(commandParam) && commandParam.trim().equalsIgnoreCase(commandValue);
     }
 
     @DELETE
     @Path("{auditId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Delete Maker Checker Entry")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MakercheckersApiResourceSwagger.PostMakerCheckersResponse.class))) })
     public CommandProcessingResult deleteMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId) {
         final Long id = writePlatformService.deleteEntry(auditId);
         return CommandProcessingResult.commandOnlyResult(id);

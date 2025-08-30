@@ -89,3 +89,6 @@ file("${rootDir}/custom").eachDir { companyDir ->
         }
     }
 }
+
+
+include 'fineract-maker-checker'

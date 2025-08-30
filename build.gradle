@@ -32,6 +32,7 @@ buildscript {
                 'fineract-command',
                 'fineract-accounting',
                 'fineract-provider',
+                'fineract-maker-checker',
                 'fineract-branch',
                 'fineract-document',
                 'fineract-investor',

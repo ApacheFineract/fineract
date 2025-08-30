@@ -20,9 +20,11 @@ package org.apache.fineract.commands.domain;
 
 import java.util.Set;
 import lombok.Getter;
+import lombok.ToString;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.useradministration.api.PasswordPreferencesApiConstants;
 
+@ToString
 @Getter
 public class CommandWrapper {
 

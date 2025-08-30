@@ -23,9 +23,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.ToString;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
 
+@ToString
 @Entity
 @Table(name = "m_selfservice_user_client_mapping")
 public class AppUserClientMapping extends AbstractPersistableCustom<Long> {

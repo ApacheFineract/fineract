@@ -98,6 +98,7 @@ class LocaleValidationTest {
     @NoArgsConstructor
     @AllArgsConstructor
     static class LocaleModel {
+
         @Locale
         private String locale;
     }

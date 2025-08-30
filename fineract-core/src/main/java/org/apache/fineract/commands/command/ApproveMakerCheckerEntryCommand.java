@@ -16,25 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.commands.service;
+package org.apache.fineract.commands.command;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.commands.data.ApproveMakerCheckerEntryRequest;
-import org.apache.fineract.commands.data.ApproveMakerCheckerEntryResponse;
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
-public interface PortfolioCommandSourceWritePlatformService {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class ApproveMakerCheckerEntryCommand extends Command<ApproveMakerCheckerEntryRequest> {
 
-    CommandProcessingResult logCommandSource(CommandWrapper commandRequest);
-
-    CommandProcessingResult approveEntry(Long id);
-
-    Long rejectEntry(Long id);
-
-    Long deleteEntry(Long makerCheckerId);
-
-    ApproveMakerCheckerEntryResponse approveEntry(Command<ApproveMakerCheckerEntryRequest> command);
-
-    ApproveMakerCheckerEntryResponse rejectEntry(Command<ApproveMakerCheckerEntryRequest> command);
 }

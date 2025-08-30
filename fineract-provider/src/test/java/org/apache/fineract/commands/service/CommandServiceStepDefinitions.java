@@ -28,7 +28,10 @@ import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.retry.event.RetryEvent;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.fineract.command.core.Command;
 import org.apache.fineract.commands.configuration.RetryConfigurationAssembler;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryRequest;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryResponse;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.exception.RollbackTransactionNotApprovedException;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -147,6 +150,16 @@ public class CommandServiceStepDefinitions implements En {
 
         @Override
         public Long deleteEntry(Long makerCheckerId) {
+            return null;
+        }
+
+        @Override
+        public ApproveMakerCheckerEntryResponse approveEntry(Command<ApproveMakerCheckerEntryRequest> command) {
+            return null;
+        }
+
+        @Override
+        public ApproveMakerCheckerEntryResponse rejectEntry(Command<ApproveMakerCheckerEntryRequest> command) {
             return null;
         }
     }

@@ -16,28 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.commands.api;
+package org.apache.fineract.commands.data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * Created by sanyam on 27/7/17.
- */
-final class MakercheckersApiResourceSwagger {
-
-    private MakercheckersApiResourceSwagger() {
-        // only to initialize swagger documentation
-    }
-
-    @Schema(description = "PostMakerCheckersResponse")
-    public static final class PostMakerCheckersResponse {
-
-        private PostMakerCheckersResponse() {
-
-        }
-
-        @Schema(example = "1")
-        public Long auditId;
-
-    }
+public enum MakerCheckerStatus {
+    APPROVE, REJECT
 }

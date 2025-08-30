@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -54,6 +55,7 @@ import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.useradministration.domain.AppUser;
 
+@ToString
 @Entity
 @Getter
 @Setter
