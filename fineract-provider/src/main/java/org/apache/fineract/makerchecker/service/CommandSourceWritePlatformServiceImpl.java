@@ -18,30 +18,21 @@
  */
 package org.apache.fineract.makerchecker.service;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.commands.domain.CommandSourceRepository;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandProcessingService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.hooks.event.HookEvent;
 import org.apache.fineract.infrastructure.jobs.service.SchedulerJobRunnerReadService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.organisation.office.domain.Office;
-import org.apache.fineract.organisation.staff.domain.Staff;
-import org.apache.fineract.portfolio.client.domain.Client;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
-import org.apache.fineract.useradministration.domain.Role;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,11 +57,10 @@ public class CommandSourceWritePlatformServiceImpl {
 
         String commandId = fineractRequestContextHolder.getAttribute("commandId").toString();
 
-//        List<AppUser> usersList = repository.findAll();
-//        for (AppUser element : usersList) {
-//            log.info("Element: {}", element);
-//        }
-
+        // List<AppUser> usersList = repository.findAll();
+        // for (AppUser element : usersList) {
+        // log.info("Element: {}", element);
+        // }
         // boolean isApprovedByChecker = false;
         //
         // // check if is update of own account details
@@ -100,5 +90,10 @@ public class CommandSourceWritePlatformServiceImpl {
 
     private void validateIsUpdateAllowed() {
         this.schedulerJobRunnerReadService.isUpdatesAllowed();
+    }
+
+    @EventListener
+    private void consumeEvent(HookEvent event) {
+        log.info("Received Hook Event: {}", event);
     }
 }

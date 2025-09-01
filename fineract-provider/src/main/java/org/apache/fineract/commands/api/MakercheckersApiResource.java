@@ -34,11 +34,18 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.CommandPipeline;
+import org.apache.fineract.commands.command.ApproveMakerCheckerEntryCommand;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryRequest;
+import org.apache.fineract.commands.data.ApproveMakerCheckerEntryResponse;
 import org.apache.fineract.commands.data.AuditData;
 import org.apache.fineract.commands.data.AuditSearchData;
+import org.apache.fineract.commands.data.MakerCheckerStatus;
 import org.apache.fineract.commands.data.request.MakerCheckerRequest;
 import org.apache.fineract.commands.service.AuditReadPlatformService;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -46,7 +53,9 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.utils.SQLBuilder;
+import org.apache.fineract.validation.constraints.EnumValue;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/makercheckers")
@@ -85,48 +94,48 @@ public class MakercheckersApiResource {
         return readPlatformService.retrieveSearchTemplate("makerchecker");
     }
 
-    @POST
-    @Path("{auditId}")
-    @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
-    public CommandProcessingResult approveMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
-            @QueryParam("command") @Parameter(description = "command") final String commandParam) {
+//    @POST
+//    @Path("{auditId}")
+//    @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
+//    public CommandProcessingResult approveMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
+//            @QueryParam("command") @Parameter(description = "command") final String commandParam) {
+//
+//        CommandProcessingResult result = null;
+//        if (is(commandParam, COMMAND_APPROVE)) {
+//            result = writePlatformService.approveEntry(auditId);
+//        } else if (is(commandParam, COMMAND_REJECT)) {
+//            final Long id = writePlatformService.rejectEntry(auditId);
+//            result = CommandProcessingResult.commandOnlyResult(id);
+//        } else {
+//            throw new UnrecognizedQueryParamException("command", commandParam);
+//        }
+//        return result;
+//    }
 
-        CommandProcessingResult result = null;
-        if (is(commandParam, COMMAND_APPROVE)) {
-            result = writePlatformService.approveEntry(auditId);
-        } else if (is(commandParam, COMMAND_REJECT)) {
-            final Long id = writePlatformService.rejectEntry(auditId);
-            result = CommandProcessingResult.commandOnlyResult(id);
-        } else {
-            throw new UnrecognizedQueryParamException("command", commandParam);
-        }
-        return result;
-    }
+     @POST
+     @Path("{auditId}")
+     @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
+     public ApproveMakerCheckerEntryResponse approveMakerCheckerEntry(
+     @PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
+     @QueryParam("command") @Parameter(description = "command")
+     @EnumValue(enumClass = MakerCheckerStatus.class, message = "{org.apache.fineract.commands.invalid}")
+     final String commandParam) {
 
-    // @POST
-    // @Path("{auditId}")
-    // @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
-    // public ApproveMakerCheckerEntryResponse approveMakerCheckerEntry(
-    // @PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
-    // @QueryParam("command") @Parameter(description = "command")
-    // @EnumValue(enumClass = MakerCheckerStatus.class, message = "{org.apache.fineract.commands.invalid}")
-    // final String commandParam) {
-    //
-    // ApproveMakerCheckerEntryCommand command = new ApproveMakerCheckerEntryCommand();
-    //
-    // ApproveMakerCheckerEntryRequest request = ApproveMakerCheckerEntryRequest.builder()
-    // .auditId(auditId)
-    // .commandParam(commandParam)
-    // .build();
-    //
-    // command.setId(UUID.randomUUID());
-    // command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
-    // command.setPayload(request);
-    //
-    // final Supplier<ApproveMakerCheckerEntryResponse> response = commandPipeline.send(command);
-    //
-    // return response.get();
-    // }
+     ApproveMakerCheckerEntryCommand command = new ApproveMakerCheckerEntryCommand();
+
+     ApproveMakerCheckerEntryRequest request = ApproveMakerCheckerEntryRequest.builder()
+     .auditId(auditId)
+     .commandParam(commandParam)
+     .build();
+
+     command.setId(UUID.randomUUID());
+     command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+     command.setPayload(request);
+
+     final Supplier<ApproveMakerCheckerEntryResponse> response = commandPipeline.send(command);
+
+     return response.get();
+     }
 
     private boolean is(final String commandParam, final String commandValue) {
         return StringUtils.isNotBlank(commandParam) && commandParam.trim().equalsIgnoreCase(commandValue);

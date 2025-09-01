@@ -23,14 +23,12 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.makerchecker.service.CommandSourceWritePlatformServiceImpl;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Path("/v1/makerchecker")
 @Component
@@ -46,9 +44,10 @@ public class MakerCheckerApiResource {
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createClient().withJson(apiRequestBodyAsJson).build();
 
-        final List<String> result =
-                commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final List<String> result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return result;
     }
+
+
 }

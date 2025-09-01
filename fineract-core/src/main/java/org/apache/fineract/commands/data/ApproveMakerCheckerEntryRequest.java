@@ -20,10 +20,12 @@ package org.apache.fineract.commands.data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.fineract.commands.service.CommandPermission;
 
 @Builder
 @Data
@@ -36,4 +38,8 @@ public class ApproveMakerCheckerEntryRequest implements Serializable {
 
     private Long auditId;
     private String commandParam;
+
+    @Builder.Default
+    @JsonIgnore
+    private CommandPermission commandData = CommandPermission.CREATE_CLIENT;
 }

@@ -16,25 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.hooks.event;
+package org.apache.fineract.api;
 
-import lombok.Getter;
-import lombok.ToString;
-import org.apache.fineract.infrastructure.core.domain.FineractContext;
-import org.apache.fineract.infrastructure.core.domain.FineractEvent;
-import org.apache.fineract.useradministration.domain.AppUser;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
-@ToString
-@Getter
-public class HookEvent extends FineractEvent {
+@Path("/v1/helloworld")
+@Component
+@Produces({ "application/json" })
+@RequiredArgsConstructor
+public class HelloWorldApiResource {
 
-    private final String payload;
+  @GET
+  public Response getHelloWorld(@Context UriInfo uriInfo) {
 
-    private final AppUser appUser;
-
-    public HookEvent(final HookEventSource source, final String payload, final AppUser appUser, FineractContext fineractContext) {
-        super(source, fineractContext);
-        this.payload = payload;
-        this.appUser = appUser;
-    }
+    String url = uriInfo.getRequestUri().toString();
+    return Response.ok("Fineract-Maker-Checker: " + url).build();
+  }
 }
