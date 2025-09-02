@@ -25,1145 +25,1085 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CommandPermission {
 
-  UPDATE_CREDIT_BUREAU(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
-  UPDATE_CREDIT_BUREAU_LOANPRODUCT_MAPPING(Action.UPDATE, Entity.CREDIT_BUREAU_LOANPRODUCT_MAPPING,
-          "/creditBureauConfiguration/template"),
-  ADD_ORGANISATION_CREDIT_BUREAU(Action.CREATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/organizationCreditBureau/template"),
+    UPDATE_CREDIT_BUREAU(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
+            "/creditBureauConfiguration/template"), UPDATE_CREDIT_BUREAU_LOANPRODUCT_MAPPING(Action.UPDATE,
+                    Entity.CREDIT_BUREAU_LOANPRODUCT_MAPPING,
+                    "/creditBureauConfiguration/template"), ADD_ORGANISATION_CREDIT_BUREAU(Action.CREATE, Entity.ORGANISATION_CREDIT_BUREAU,
+                            "/creditBureauConfiguration/organizationCreditBureau/template"),
 
-  GET_CREDIT_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    GET_CREDIT_REPORT(Action.GET, Entity.CREDIT_REPORT, "/getCreditReport/template"),
 
-  SAVE_CREDIT_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVE_CREDIT_REPORT(Action.SAVE, Entity.CREDIT_REPORT, "/saveCreditReport/"),
 
-  DELETE_CREDIT_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CREDIT_REPORT(Action.DELETE, Entity.CREDIT_REPORT, "/deleteCreditReport/"),
 
-  CREATE_CREDIT_BUREAU_LOAN_PRODUCT_MAPPING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CREDIT_BUREAU_LOAN_PRODUCT_MAPPING(Action.CREATE, Entity.CREDIT_BUREAU_LOANPRODUCT_MAPPING,
+            "/creditBureauConfiguration/template"),
 
-  ADD_CREDIT_BUREAU_CONFIGURATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_CREDIT_BUREAU_CONFIGURATION(Action.CREATE, Entity.CREDIT_BUREAU_CONFIGURATION, "/addCreditBureauConfigurationData/"),
 
-  UPDATE_CREDIT_BUREAU_CONFIGURATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CREDIT_BUREAU_CONFIGURATION(Action.UPDATE, Entity.CREDIT_BUREAU_CONFIGURATION, "/updateCreditBureauConfigurationData/"),
 
-  ADD_CLIENT_ADDRESS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_CLIENT_ADDRESS(Action.CREATE, Entity.ADDRESS, "/clients/"),
 
-  UPDATE_CLIENT_ADDRESS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CLIENT_ADDRESS(Action.UPDATE, Entity.ADDRESS, "/clients/"),
 
-  ADD_FAMILY_MEMBERS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_FAMILY_MEMBERS(Action.CREATE, Entity.FAMILY_MEMBERS, "/clients/"),
 
-  UPDATE_FAMILY_MEMBERS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_FAMILY_MEMBERS(Action.UPDATE, Entity.FAMILY_MEMBERS, "/clients/"),
 
-  DELETE_FAMILY_MEMBERS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_FAMILY_MEMBERS(Action.DELETE, Entity.FAMILY_MEMBERS, "/clients/"),
 
-  UPDATE_GLOBAL_CONFIGURATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_GLOBAL_CONFIGURATION(Action.UPDATE, Entity.CONFIGURATION, "/configurations/"),
 
-  UPDATE_PERMISSIONS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PERMISSIONS(Action.UPDATE, Entity.PERMISSION, "/permissions"),
 
-  CREATE_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ROLE(Action.CREATE, Entity.ROLE, "/roles/template"),
 
-  UPDATE_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ROLE(Action.UPDATE, Entity.ROLE, "/roles/"),
 
-  UPDATE_ROLE_PERMISSIONS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ROLE_PERMISSIONS(Action.PERMISSIONS, Entity.ROLE, "/roles/"),
 
-  CREATE_USER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_USER(Action.CREATE, Entity.USER, "/users/template"),
 
-  CHANGE_USER_PASSWORD(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CHANGE_USER_PASSWORD(Action.CHANGEPWD, Entity.USER, "/users/"),
 
-  UPDATE_USER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_USER(Action.UPDATE, Entity.USER, "/users/"),
 
-  DELETE_USER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_USER(Action.DELETE, Entity.USER, "/users/"),
 
-  CREATE_OFFICE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_OFFICE(Action.CREATE, Entity.OFFICE, "/offices/template"),
 
-  UPDATE_OFFICE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_OFFICE(Action.UPDATE, Entity.OFFICE, "/offices/"),
 
-  CREATE_OFFICE_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_OFFICE_TRANSACTION(Action.CREATE, Entity.OFFICE_TRANSACTION, "/officetransactions/template"),
 
-  DELETE_OFFICE_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_OFFICE_TRANSACTION(Action.DELETE, Entity.OFFICE_TRANSACTION, "/officetransactions/"),
 
-  CREATE_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_STAFF(Action.CREATE, Entity.STAFF, "/staff/template"),
 
-  UPDATE_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_STAFF(Action.UPDATE, Entity.STAFF, "/staff/"),
 
+    CREATE_GUARANTOR(Action.CREATE, Entity.GUARANTOR, "/loans/"),
 
-  CREATE_GUARANTOR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECOVER_FROM_GUARANTOR(Action.RECOVERGUARANTEES, Entity.LOAN, "/loans/"),
 
-  RECOVER_FROM_GUARANTOR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_GUARANTOR(Action.UPDATE, Entity.GUARANTOR, "/loans/"),
 
-  UPDATE_GUARANTOR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_GUARANTOR(Action.DELETE, Entity.GUARANTOR, "/loans/"),
 
-  DELETE_GUARANTOR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_FUND(Action.CREATE, Entity.FUND, "/funds/template"),
 
-  CREATE_FUND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_FUND(Action.UPDATE, Entity.FUND, "/funds/"),
 
-  UPDATE_FUND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_REPORT(Action.CREATE, Entity.REPORT, "/reports/template"),
 
-  CREATE_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_REPORT(Action.UPDATE, Entity.REPORT, "/reports/"),
 
-  UPDATE_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_REPORT(Action.DELETE, Entity.REPORT, "/reports/"),
 
-  DELETE_REPORT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CURRENCIES(Action.UPDATE, Entity.CURRENCY, "/currencies"),
 
-  UPDATE_CURRENCIES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_SMS(Action.CREATE, Entity.SMS, "/sms/template"),
 
-  CREATE_SMS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_SMS(Action.UPDATE, Entity.SMS, "/sms/"),
 
-  UPDATE_SMS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SMS(Action.DELETE, Entity.SMS, "/sms/"),
 
-  DELETE_SMS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CODE(Action.CREATE, Entity.CODE, "/codes/template"),
 
-  CREATE_CODE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CODE(Action.UPDATE, Entity.CODE, "/codes/"),
 
-  UPDATE_CODE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CODE(Action.DELETE, Entity.CODE, "/codes/"),
 
-  DELETE_CODE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_HOOK(Action.CREATE, Entity.HOOK, "/hooks/template"),
 
-  CREATE_HOOK(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_HOOK(Action.UPDATE, Entity.HOOK, "/hooks/"),
 
-  UPDATE_HOOK(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_HOOK(Action.DELETE, Entity.HOOK, "/hooks/"),
 
-  DELETE_HOOK(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CHARGE(Action.CREATE, Entity.CHARGE, "/charges/template"),
 
-  CREATE_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_COLLATERAL(Action.CREATE, Entity.COLLATERAL_PRODUCT, "/collateral-product"),
 
-  CREATE_COLLATERAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CHARGE(Action.UPDATE, Entity.CHARGE, "/charges/"),
 
-  UPDATE_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CHARGE(Action.DELETE, Entity.CHARGE, "/charges/"),
 
-  DELETE_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_LOAN_PRODUCT(Action.CREATE, Entity.LOAN_PRODUCT, "/loanproducts/template"),
 
-  CREATE_LOAN_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LOAN_PRODUCT(Action.UPDATE, Entity.LOAN_PRODUCT, "/loanproducts/"),
 
-  UPDATE_LOAN_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CLIENT_IDENTIFIER(Action.CREATE, Entity.CLIENT_IDENTIFIER, "/clients/"),
 
-  CREATE_CLIENT_IDENTIFIER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CLIENT_IDENTIFIER(Action.UPDATE, Entity.CLIENT_IDENTIFIER, "/clients/"),
 
-  UPDATE_CLIENT_IDENTIFIER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CLIENT_IDENTIFIER(Action.DELETE, Entity.CLIENT_IDENTIFIER, "/clients/"),
 
-  DELETE_CLIENT_IDENTIFIER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CLIENT(Action.CREATE, Entity.CLIENT, "/clients/template"),
 
-  CREATE_CLIENT(Action.CREATE, Entity.CLIENT, "/clients/template"),
+    ACTIVATE_CLIENT(Action.ACTIVATE, Entity.CLIENT, "/clients/"),
 
-  ACTIVATE_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_CLIENT(Action.CLOSE, Entity.CLIENT, "/clients/"),
 
-  CLOSE_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_CLIENT(Action.REJECT, Entity.CLIENT, "/clients/"),
 
-  REJECT_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_CLIENT(Action.WITHDRAW, Entity.CLIENT, "/clients/"),
 
-  WITHDRAW_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REACTIVATE_CLIENT(Action.REACTIVATE, Entity.CLIENT, "/clients/"),
 
-  REACTIVATE_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PROPOSE_CLIENT_TRANSFER(Action.PROPOSETRANSFER, Entity.CLIENT, "/clientId/"),
 
-  PROPOSE_CLIENT_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PROPOSE_AND_ACCEPT_CLIENT_TRANSFER(Action.PROPOSEANDACCEPTTRANSFER, Entity.CLIENT, "/clientId/"),
 
-  PROPOSE_AND_ACCEPT_CLIENT_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_CLIENT_TRANSFER_REQUEST(Action.WITHDRAWTRANSFER, Entity.CLIENT, "/clientId/"),
 
-  WITHDRAW_CLIENT_TRANSFER_REQUEST(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACCEPT_CLIENT_TRANSFER(Action.ACCEPTTRANSFER, Entity.CLIENT, "/clientId/"),
 
-  ACCEPT_CLIENT_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_CLIENT_TRANSFER(Action.REJECTTRANSFER, Entity.CLIENT, "/clientId/"),
 
-  REJECT_CLIENT_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CLIENT(Action.UPDATE, Entity.CLIENT, "/clients/"),
 
-  UPDATE_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CLIENT(Action.DELETE, Entity.CLIENT, "/clients/"),
 
-  DELETE_CLIENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATED_BDATATABLE(Action.CREATE, Entity.DATATABLE, "/datatables/"),
 
-  CREATE_DB_DATATABLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATED_BDATATABLE(Action.UPDATE, Entity.DATATABLE, "/datatables/"),
 
-  UPDATE_DB_DATATABLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETED_BDATATABLE(Action.DELETE, Entity.DATATABLE, "/datatables/"),
 
-  DELETE_DB_DATATABLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_REJECTION(Action.UNDOREJECT, Entity.CLIENT, "/clients/"),
 
-  UNDO_REJECTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_WITHDRAWAL(Action.UNDOWITHDRAWAL, Entity.CLIENT, "/clients/"),
 
-  UNDO_WITHDRAWAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_LOAN_CHARGE(Action.CREATE, Entity.LOANCHARGE, "/loans/"),
 
-  CREATE_DATATABLE_ENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LOAN_CHARGE(Action.UPDATE, Entity.LOANCHARGE, "/loans/"),
 
-  UPDATE_DATATABLE_ENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WAIVE_LOAN_CHARGE(Action.WAIVE, Entity.LOANCHARGE, "/loans/"),
 
-  DELETE_DATATABLE_ENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PAY_LOAN_CHARGE(Action.PAY, Entity.LOANCHARGE, "/loans/"),
 
-  CREATE_LOAN_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADJUSTMENT_FOR_LOAN_CHARGE(Action.ADJUSTMENT, Entity.LOANCHARGE, "/loans/"),
 
-  UPDATE_LOAN_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DEACTIVATE_OVERDUE_LOAN_CHARGES(Action.DEACTIVATEOVERDUE, Entity.LOANCHARGE, "/loans/"),
 
-  WAIVE_LOANCHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration" +
-          "/template"),
+    DELETE_LOAN_CHARGE(Action.DELETE, Entity.LOANCHARGE, "/loans/"),
 
-  PAY_LOANCHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration" +
-          "/template"),
+    LOAN_REPAYMENT_TRANSACTION(Action.REPAYMENT, Entity.LOAN, "/loans/"),
 
-  ADJUSTMENT_FOR_LOAN_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_MERCHANT_ISSUED_REFUND_TRANSACTION(Action.MERCHANTISSUEDREFUND, Entity.LOAN, "/loans/"),
 
-  DEACTIVATE_OVERDUE_LOAN_CHARGES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_PAYOUT_REFUND_TRANSACTION(Action.PAYOUTREFUND, Entity.LOAN, "/loans/"),
 
-  DELETE_LOAN_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_GOODWILL_CREDIT_TRANSACTION(Action.GOODWILLCREDIT, Entity.LOAN, "/loans/"),
 
-  LOAN_REPAYMENT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_INTEREST_PAYMENT_WAIVER_TRANSACTION(Action.INTERESTPAYMENTWAIVER, Entity.LOAN, "/loans/"),
 
-  LOAN_MERCHANT_ISSUED_REFUND_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REFUND_LOAN_CHARGE(Action.CHARGEREFUND, Entity.LOAN, "/loans/"),
 
-  LOAN_PAYOUT_REFUND_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_RECOVERY_PAYMENT_TRANSACTION(Action.RECOVERYPAYMENT, Entity.LOAN, "/loans/"),
 
-  LOAN_GOODWILL_CREDIT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WAIVE_INTEREST_PORTION_TRANSACTION(Action.WAIVEINTERESTPORTION, Entity.LOAN, "/loans/"),
 
-  LOAN_INTEREST_PAYMENT_WAIVER_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WRITE_OFF_LOAN_TRANSACTION(Action.WRITEOFF, Entity.LOAN, "/loans/"),
 
-  REFUND_LOAN_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_WRITE_OFF_LOAN_TRANSACTION(Action.UNDOWRITEOFF, Entity.LOAN, "/loans/"),
 
-  LOAN_RECOVERY_PAYMENT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_LOAN_AS_RESCHEDULED_TRANSACTION(Action.CLOSEASRESCHEDULED, Entity.LOAN, "/loans/"),
 
-  WAIVE_INTEREST_PORTION_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_LOAN_TRANSACTION(Action.CLOSE, Entity.LOAN, "/loans/"),
 
-  WRITEOFF_LOAN_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADJUST_TRANSACTION(Action.ADJUST, Entity.LOAN, "/loans/"),
 
-  UNDO_WRITEOFF_LOAN_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REFUND_LOAN_TRANSACTION_BY_CASH(Action.REFUNDBYCASH, Entity.LOAN, "/loans/"),
 
-  CLOSE_LOAN_AS_RESCHEDULED_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CHARGE_BACK_TRANSACTION(Action.CHARGEBACK, Entity.LOAN, "/loans/"),
 
-  CLOSE_LOAN_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LOAN_FORECLOSURE(Action.FORECLOSURE, Entity.LOAN, "/loans/"),
 
-  ADJUST_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREDIT_BALANCE_REFUND(Action.CREDITBALANCEREFUND, Entity.LOAN, "/loans/"),
 
-  REFUND_LOAN_TRANSACTION_BY_CASH(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_WAIVE_CHARGE_TRANSACTION(Action.UNDO, Entity.WAIVECHARGE, "/loans/"),
 
-  CHARGE_BACK_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_LOAN_APPLICATION(Action.CREATE, Entity.LOAN, "/loans"),
 
-  LOAN_FORECLOSURE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_POST_DATED_CHEQUE(Action.UPDATE, Entity.REPAYMENT_WITH_POSTDATEDCHECKS, "/loans/"),
 
-  CREDIT_BALANCE_REFUND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BOUNCED_CHEQUE(Action.BOUNCE, Entity.REPAYMENT_WITH_POSTDATEDCHECKS, "/loans/"),
 
-  UNDO_WAIVE_CHARGE_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_POST_DATED_CHEQUE(Action.DELETE, Entity.REPAYMENT_WITH_POSTDATEDCHECKS, "/loans/"),
 
-  CREATE_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LOAN_APPLICATION(Action.UPDATE, Entity.LOAN, "/loans/"),
 
-  UPDATE_POST_DATED_CHEQUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    MARK_AS_FRAUD(Action.SETFRAUD, Entity.LOAN, "/loans/"),
 
-  BOUNCED_CHEQUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_DISBUSEMENT_DATE(Action.UPDATE, Entity.DISBURSEMENT_DETAIL, "/loans/"),
 
-  DELETE_POSTDATED_CHEQUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_AND_DELETE_DISBURSEMENT_DETAILS(Action.UPDATE, Entity.DISBURSEMENT_DETAIL, "/loans/"),
 
-  UPDATE_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_LOAN_APPLICATION(Action.DELETE, Entity.LOAN, "/loans/"),
 
-  MARK_AS_FRAUD(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_LOAN_APPLICATION(Action.REJECT, Entity.LOAN, "/loans/"),
 
-  UPDATE_DISBURSEMENT_DATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    REJECT_GLIM_APPLICATION(Action.REJECT, Entity.GLIM_LOAN, "/loans/"),
 
-  ADD_AND_DELETE_DISBURSEMENT_DETAILS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_LOAN_APPLICATION(Action.WITHDRAW, Entity.LOAN, "/loans/"),
 
-  DELETE_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_LOAN_APPLICATION(Action.APPROVE, Entity.LOAN, "/loans/"),
 
-  REJECT_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_GLIM_LOAN_APPLICATION(Action.APPROVE, Entity.GLIM_LOAN, "/loans/"),
 
-  REJECT_GLIM_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISBURSE_GLIM_LOAN_APPLICATION(Action.DISBURSE, Entity.GLIM_LOAN, "/loans/"),
 
-  WITHDRAW_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REPAYMENT_GLIM_LOAN_APPLICATION(Action.REPAYMENT, Entity.GLIM_LOAN, "/loans/"),
 
-  APPROVE_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_GLIM_LOAN_DISBURSAL(Action.UNDODISBURSAL, Entity.GLIM_LOAN, "/loans/"),
 
-  APPROVE_GLIM_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_GLIM_LOAN_APPROVAL(Action.UNDOAPPROVAL, Entity.GLIM_LOAN, "/loans/"),
 
-  DISBURSE_GLIM_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISBURSE_LOAN_APPLICATION(Action.DISBURSE, Entity.LOAN, "/loans/"),
 
-  REPAYMENT_GLIM_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISBURSE_LOAN_TO_SAVINGS_APPLICATION(Action.DISBURSETOSAVINGS, Entity.LOAN, "/loans/"),
 
-  UNDO_GLIM_LOAN_DISBURSAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISBURSE_WITHOUT_AUTO_DOWNPAYMENT(Action.DISBURSEWITHOUTAUTODOWNPAYMENT, Entity.LOAN, "/loans/"),
 
-  UNDO_GLIM_LOAN_APPROVAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_LOAN_APPLICATION_APPROVAL(Action.APPROVALUNDO, Entity.LOAN, "/loans/"),
 
-  DISBURSE_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_LOAN_APPLICATION_DISBURSAL(Action.DISBURSALUNDO, Entity.LOAN, "/loans/"),
 
-  DISBURSE_LOAN_TO_SAVINGS_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_LAST_DISBURSAL_LOAN_APPLICATION(Action.DISBURSALLASTUNDO, Entity.LOAN, "/loans/"),
 
-  DISBURSE_WITHOUT_AUTO_DOWNPAYMENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_LOAN_OFFICER(Action.UPDATELOANOFFICER, Entity.LOAN, "/loans/"),
 
-  UNDO_LOAN_APPLICATION_APPROVAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNASSIGN_LOAN_OFFICER(Action.REMOVELOANOFFICER, Entity.LOAN, "/loans/"),
 
-  UNDO_LOAN_APPLICATION_DISBURSAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_LOAN_OFFICERS_IN_BULK(Action.BULKREASSIGN, Entity.LOAN, "/loans/loanreassignment"),
 
-  UNDO_LAST_DISBURSAL_LOAN_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_DELINQUENCY(Action.UPDATEDELINQUENCY, Entity.LOAN, "/loans/"),
 
-  ASSIGN_LOAN_OFFICER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CODE_VALUE(Action.CREATE, Entity.CODE_VALUE, "/codes/"),
 
-  UNASSIGN_LOAN_OFFICER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CODE_VALUE(Action.UPDATE, Entity.CODE_VALUE, "/codes/"),
 
-  ASSIGN_LOAN_OFFICERS_IN_BULK(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CODE_VALUE(Action.DELETE, Entity.CODE_VALUE, "/codes/"),
 
-  ASSIGN_DELINQUENCY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_GL_CLOSURE(Action.CREATE, Entity.GL_CLOSURE, "/glclosures/template"),
 
-  CREATE_CODEVALUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_GL_CLOSURE(Action.UPDATE, Entity.GL_CLOSURE, "/glclosures/"),
 
-  UPDATE_CODEVALUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_GL_CLOSURE(Action.DELETE, Entity.GL_CLOSURE, "/glclosures/"),
 
-  DELETE_CODEVALUE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    EXCUTE_ACCRUAL_ACCOUNTING(Action.EXECUTE, Entity.PERIODIC_ACCRUAL_ACCOUNTING, "/accrualaccounting"),
 
-  CREATE_GLCLOSURE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_GL_ACCOUNT(Action.CREATE, Entity.GL_ACCOUNT, "/glaccounts/template"),
 
-  UPDATE_GLCLOSURE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_GL_ACCOUNT(Action.UPDATE, Entity.GL_ACCOUNT, "/glaccounts/"),
 
-  DELETE_GLCLOSURE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_GL_ACCOUNT(Action.DELETE, Entity.GL_ACCOUNT, "/glaccounts/"),
 
-  EXECUTE_ACCRUAL_ACCOUNTING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    CREATE_JOURNAL_ENTRY(Action.CREATE, Entity.JOURNAL_ENTRY, "/journalentries/template"),
 
-  CREATE_GL_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REVERSE_JOURNAL_ENTRY(Action.REVERSE, Entity.JOURNAL_ENTRY, "/journalentries/"),
 
-  UPDATE_GL_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_RUNNING_BALANCE_FOR_JOURNAL_ENTRY(Action.UPDATERUNNINGBALANCE, Entity.JOURNAL_ENTRY, "/journalentries/update"),
 
-  DELETE_GL_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DEFINE_OPENING_BALANCE_FOR_JOURNAL_ENTRY(Action.DEFINEOPENINGBALANCE, Entity.JOURNAL_ENTRY, "/journalentries/update"),
 
-  CREATE_JOURNAL_ENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    UPDATE_OPENING_BALANCE_FOR_JOURNAL_ENTRY(Action.UPDATEOPENINGBALANCE, Entity.JOURNAL_ENTRY, "/journalentries/update"),
 
-  REVERSE_JOURNAL_ENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    CREATE_SAVING_PRODUCT(Action.CREATE, Entity.SAVINGS_PRODUCT, "/savingsproducts/template"),
 
-  UPDATE_RUNNING_BALANCE_FOR_JOURNALENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_SAVING_PRODUCT(Action.UPDATE, Entity.SAVINGS_PRODUCT, "/savingsproducts/"),
 
-  DEFINE_OPENING_BALANCE_FOR_JOURNALENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SAVING_PRODUCT(Action.DELETE, Entity.SAVINGS_PRODUCT, "/savingsproducts/"),
 
-  UPDATE_OPENING_BALANCE_FOR_JOURNALENTRY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_SAVINGS_ACCOUNT(Action.CREATE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/template"),
 
-  CREATE_SAVING_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    CREATE_GSIM_ACCOUNT(Action.CREATE, Entity.GSIM_ACCOUNT, "/gsimaccounts/template"),
 
-  UPDATE_SAVING_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    UPDATE_SAVINGS_ACCOUNT(Action.UPDATE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  DELETE_SAVING_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    UPDATE_GSIM_ACCOUNT(Action.UPDATE, Entity.GSIM_ACCOUNT, "/gsimaccounts/"),
 
-  CREATE_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SAVINGS_ACCOUNT(Action.DELETE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CREATE_GSIM_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_SAVINGS_ACCOUNT_APPLICATION(Action.REJECT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  UPDATE_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_GSIM_ACCOUNT_APPLICATION(Action.REJECT, Entity.GSIM_ACCOUNT, "/savingsaccounts/"),
 
-  UPDATE_GSIM_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_SAVINGS_ACCOUNT_APPLICATION(Action.WITHDRAW, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  DELETE_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_SAVINGS_ACCOUNT_APPLICATION(Action.APPROVE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  REJECT_SAVINGSACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_GSIM_ACCOUNT_APPLICATION(Action.APPROVE, Entity.GSIM_ACCOUNT, "/gsimsaccounts/"),
 
-  REJECT_GSIM_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_SAVINGS_ACCOUNT_APPLICATION(Action.APPROVALUNDO, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  WITHDRAW_SAVINGS_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_GSIM_APPLICATION_APPROVAL(Action.APPROVALUNDO, Entity.GSIM_ACCOUNT, "/savingsaccounts/"),
 
-  APPROVE_SAVINGS_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_ACTIVATION(Action.ACTIVATE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  APPROVE_GSIM_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    GSIM_ACCOUNT_ACTIVATION(Action.ACTIVATE, Entity.GSIM_ACCOUNT, "/savingsaccounts/"),
 
-  UNDO_SAVINGS_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_SAVINGS_ACCOUNT_APPLICATION(Action.CLOSE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  UNDO_GSIM_APPLICATION_APPROVAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_GSIM_APPLICATION(Action.CLOSE, Entity.GSIM_ACCOUNT, "/savingsaccounts/"),
 
-  SAVINGS_ACCOUNT_ACTIVATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ACCOUNT_TRANSFER(Action.CREATE, Entity.ACCOUNT_TRANSFER, "/accounttransfers"),
 
-  GSIM_ACCOUNT_ACTIVATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_STANDING_INSTRUCTION(Action.CREATE, Entity.STANDING_INSTRUCTION, "/standinginstructions"),
 
-  CLOSE_SAVINGSACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_STANDING_INSTRUCTION(Action.UPDATE, Entity.STANDING_INSTRUCTION, "/standinginstructions"),
 
-  CLOSE_GSIM_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_STANDING_INSTRUCTION(Action.DELETE, Entity.STANDING_INSTRUCTION, "/standinginstructions"),
 
-  CREATE_ACCOUNT_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_DEPOSIT(Action.DEPOSIT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CREATE_STANDING_INSTRUCTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    GSIM_SAVINGS_ACCOUNT_DEPOSIT(Action.DEPOSIT, Entity.GSIM_ACCOUNT, "/savingsaccounts/"),
 
-  UPDATE_STANDING_INSTRUCTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_WITHDRAWAL(Action.WITHDRAWAL, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  DELETE_STANDING_INSTRUCTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_SAVINGS_ACCOUNT_TRANSACTION(Action.UNDOTRANSACTION, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  SAVINGSACCOUNT_DEPOSIT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REVERSE_SAVINGS_ACCOUNT_TRANSACTION(Action.REVERSETRANSACTION, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  GSIM_SAVINGSACCOUNT_DEPOSIT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADJUST_SAVINGS_ACCOUNT_TRANSACTION(Action.ADJUSTTRANSACTION, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  SAVINGSACCOUNT_WITHDRAWAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_INTEREST_CALCULATION(Action.CALCULATEINTEREST, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  UNDO_SAVINGSACCOUNT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_INTEREST_POSTING(Action.POSTINTEREST, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  REVERSE_SAVINGSACCOUNT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_ACCOUNT_APPLY_ANNUAL_FEES(Action.APPLYANNUALFEE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  ADJUST_SAVINGSACCOUNT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_SAVINGS_ACCOUNT_CHARGE(Action.CREATE, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  SAVINGSACCOUNT_INTEREST_CALCULATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_SAVINGS_ACCOUNT_CHARGE(Action.UPDATE, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  SAVINGSACCOUNT_INTEREST_POSTING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WAIVE_SAVINGS_ACCOUNT_CHARGE(Action.WAIVE, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  SAVINGSACCOUNT_APPLY_ANNUAL_FEES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PAY_SAVINGS_ACCOUNT_CHARGE(Action.PAY, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  CREATE_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    INACTIVATE_SAVINGS_ACCOUNT_CHARGE(Action.INACTIVATE, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  UPDATE_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SAVINGS_ACCOUNT_CHARGE(Action.DELETE, Entity.SAVINGS_ACCOUNT_CHARGE, "/savingsaccounts/"),
 
-  WAIVE_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_FIXED_DEPOSIT_PRODUCT(Action.CREATE, Entity.FIXED_DEPOSIT_PRODUCT, "/fixeddepositproducts/template"),
 
-  PAY_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_FIXED_DEPOSIT_PRODUCT(Action.UPDATE, Entity.FIXED_DEPOSIT_PRODUCT, "/fixeddepositproducts/"),
 
-  INACTIVATE_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_FIXED_DEPOSIT_PRODUCT(Action.DELETE, Entity.FIXED_DEPOSIT_PRODUCT, "/fixeddepositproducts/"),
 
-  DELETE_SAVINGSACCOUNT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_RECURRING_DEPOSIT_PRODUCT(Action.CREATE, Entity.RECURRING_DEPOSIT_PRODUCT, "/recurringdepositproducts/template"),
 
-  CREATE_FIXED_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_RECURRING_DEPOSIT_PRODUCT(Action.UPDATE, Entity.RECURRING_DEPOSIT_PRODUCT, "/recurringdepositproducts/"),
 
-  UPDATE_FIXED_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_RECURRING_DEPOSIT_PRODUCT(Action.DELETE, Entity.RECURRING_DEPOSIT_PRODUCT, "/recurringdepositproducts/"),
 
-  DELETE_FIXED_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_INTEREST_RATE_CHART(Action.CREATE, Entity.INTEREST_RATE_CHART, "/interestratechart/template"),
 
-  CREATE_RECURRING_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_INTEREST_RATE_CHART(Action.UPDATE, Entity.INTEREST_RATE_CHART, "/interestratechart/"),
 
-  UPDATE_RECURRING_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_INTEREST_RATE_CHART(Action.DELETE, Entity.INTEREST_RATE_CHART, "/interestratechart/"),
 
-  DELETE_RECURRING_DEPOSIT_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_INTEREST_RATE_CHARTS_LAB(Action.CREATE, Entity.CHARTSLAB, "/interestratechart/"),
 
-  CREATE_INTEREST_RATE_CHART(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_INTEREST_RATE_CHARTS_LAB(Action.UPDATE, Entity.CHARTSLAB, "/interestratechart/"),
 
-  UPDATE_INTEREST_RATE_CHART(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_INTEREST_RATE_CHARTS_LAB(Action.DELETE, Entity.CHARTSLAB, "/interestratechart/"),
 
-  DELETE_INTEREST_RATE_CHART(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CALENDAR(Action.CREATE, Entity.CALENDAR, "/"),
 
-  CREATE_INTEREST_RATE_CHARTS_LAB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CALENDAR(Action.UPDATE, Entity.CALENDAR, "/"),
 
-  UPDATE_INTEREST_RATE_CHARTS_LAB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CALENDAR(Action.DELETE, Entity.CALENDAR, "/"),
 
-  DELETE_INTEREST_RATE_CHARTS_LAB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_NOTE(Action.CREATE, Entity.LOAN, "/"),
 
-  CREATE_CALENDAR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_NOTE(Action.UPDATE, Entity.LOAN, "/"),
 
-  UPDATE_CALENDAR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_NOTE(Action.DELETE, Entity.LOAN, "/"),
 
-  DELETE_CALENDAR(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_GROUP(Action.CREATE, Entity.GROUP, "/groups/template"),
 
-  CREATE_NOTE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_GROUP(Action.UPDATE, Entity.GROUP, "/groups/"),
 
-  UPDATE_NOTE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACTIVATE_GROUP(Action.ACTIVATE, Entity.GROUP, "/groups/"),
 
-  DELETE_NOTE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVE_GROUP_COLLECTION_SHEET(Action.SAVECOLLECTIONSHEET, Entity.GROUP, "/groups/"),
 
-  CREATE_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVE_INDIVIDUAL_COLLECTION_SHEET(Action.SAVE, Entity.COLLECTIONSHEET, "/collectionsheet?command=saveCollectionSheet"),
 
-  UPDATE_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_GROUP(Action.DELETE, Entity.GROUP, "/groups/"),
 
-  ACTIVATE_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSOCIATE_CLIENTS_TO_GROUP(Action.ASSOCIATECLIENTS, Entity.GROUP, "/groups/"),
 
-  SAVE_GROUP_COLLECTIONSHEET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISASSOCIATE_CLIENTS_FROM_GROUP(Action.DISASSOCIATECLIENTS, Entity.GROUP, "/groups/"),
 
-  SAVE_INDIVIDUAL_COLLECTIONSHEET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    TRANSFER_CLIENTS_BETWEEN_GROUPS(Action.TRANSFERCLIENTS, Entity.GROUP, "/groups/"),
 
-  DELETE_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNASSIGN_GROUP_STAFF(Action.UNASSIGNSTAFF, Entity.GROUP, "/groups/"),
 
-  ASSOCIATE_CLIENT_TO_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_GROUP_STAFF(Action.ASSIGNSTAFF, Entity.GROUP, "/groups/"),
 
-  DISASSOCIATE_CLIENT_FROM_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_GROUP(Action.CLOSE, Entity.GROUP, "/groups/"),
 
-  TRANSFER_CLIENT_BETWEEN_GROUPS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_COLLATERAL(Action.UPDATE, Entity.COLLATERAL, "/loans/"),
 
-  UNASSIGN_GROUP_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_COLLATERAL_PRODUCT(Action.UPDATE, Entity.COLLATERAL_PRODUCT, "/collateral-management/"),
 
-  ASSIGN_GROUP_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CLIENT_COLLATERAL_PRODUCT(Action.UPDATE, Entity.CLIENT_COLLATERAL_PRODUCT, "/clients/"),
 
-  CLOSE_GROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_LOAN_COLLATERAL(Action.DELETE, Entity.LOAN_COLLATERAL_PRODUCT, "/loans/"),
 
-  UPDATE_COLLATERAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_COLLATERAL(Action.DELETE, Entity.COLLATERAL, "/loans/"),
 
-  UPDATE_COLLATERAL_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_COLLATERAL_PRODUCT(Action.DELETE, Entity.COLLATERAL_PRODUCT, "/collateral-management/"),
 
-  UPDATE_CLIENT_COLLATERAL_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CLIENT_COLLATERAL_PRODUCT(Action.DELETE, Entity.CLIENT_COLLATERAL_PRODUCT, "/clients/"),
 
-  DELETE_LOAN_COLLATERAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_CLIENT_COLLATERAL_PRODUCT(Action.CREATE, Entity.CLIENT_COLLATERAL_PRODUCT, "/clients/"),
 
-  DELETE_COLLATERAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_COLLECTIONSHEET(Action.UPDATE, Entity.COLLECTIONSHEET, "/groups/"),
 
-  DELETE_COLLATERAL_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CENTER(Action.CREATE, Entity.CENTER, "/centers/template"),
 
-  DELETE_CLIENT_COLLATERAL_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CENTER(Action.UPDATE, Entity.CENTER, "/centers/"),
 
-  ADD_CLIENT_COLLATERAL_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CENTER(Action.DELETE, Entity.CENTER, "/centers/"),
 
-  UPDATE_COLLECTIONSHEET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACTIVATE_CENTER(Action.ACTIVATE, Entity.CENTER, "/centers/"),
 
-  CREATE_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVE_CENTER_COLLECTIONSHEET(Action.SAVECOLLECTIONSHEET, Entity.CENTER, "/centers/"),
 
-  UPDATE_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_CENTER(Action.CLOSE, Entity.CENTER, "/centers/"),
 
-  DELETE_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSOCIATE_GROUPS_TO_CENTER(Action.ASSOCIATEGROUPS, Entity.CENTER, "/groups/"),
 
-  ACTIVATE_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISASSOCIATE_GROUPS_FROM_CENTER(Action.DISASSOCIATEGROUPS, Entity.CENTER, "/groups/"),
 
-  SAVE_CENTER_COLLECTIONSHEET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ACCOUNTING_RULE(Action.CREATE, Entity.ACCOUNTING_RULE, "/accountingrules/template"),
 
-  CLOSE_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ACCOUNTING_RULE(Action.UPDATE, Entity.ACCOUNTING_RULE, "/accountingrules/"),
 
-  ASSOCIATE_GROUPS_TO_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ACCOUNTING_RULE(Action.DELETE, Entity.ACCOUNTING_RULE, "/accountingrules/"),
 
-  DISASSOCIATE_GROUPS_FROM_CENTER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_TAXONOMY_MAPPING(Action.UPDATE, Entity.XBRLMAPPING, "/xbrlmapping"),
 
-  CREATE_ACCOUNTING_RULE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_HOLIDAY(Action.CREATE, Entity.HOLIDAY, "/holidays/template"),
 
-  UPDATE_ACCOUNTING_RULE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACTIVATE_HOLIDAY(Action.ACTIVATE, Entity.HOLIDAY, "/holidays/"),
 
-  DELETE_ACCOUNTING_RULE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_HOLIDAY(Action.UPDATE, Entity.HOLIDAY, "/holidays/"),
 
-  UPDATE_TAXONOMY_MAPPING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_HOLIDAY(Action.DELETE, Entity.HOLIDAY, "/holidays/"),
 
-  CREATE_HOLIDAY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_ROLE(Action.ASSIGNROLE, Entity.GROUP, "/groups/"),
 
-  ACTIVATE_HOLIDAY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNASSIGN_ROLE(Action.UNASSIGNROLE, Entity.GROUP, "/groups/"),
 
-  UPDATE_HOLIDAY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNASSIGN_CLIENT_STAFF(Action.UNASSIGNSTAFF, Entity.CLIENT, "/clients/"),
 
-  DELETE_HOLIDAY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_TEMPLATE(Action.CREATE, Entity.TEMPLATE, "/templates"),
 
-  ASSIGN_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_TEMPLATE(Action.UPDATE, Entity.TEMPLATE, "/templates/"),
 
-  UNASSIGN_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_TEMPLATE(Action.DELETE, Entity.TEMPLATE, "/templates/"),
 
-  UNASSIGN_CLIENT_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_CLIENT_STAFF(Action.ASSIGNSTAFF, Entity.CLIENT, "/clients/"),
 
-  CREATE_TEMPLATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_CLIENT_SAVINGS_ACCOUNT(Action.UPDATESAVINGSACCOUNT, Entity.CLIENT, "/clients/"),
 
-  UPDATE_TEMPLATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PRODUCTMIX(Action.CREATE, Entity.PRODUCTMIX, "/loanproducts/"),
 
-  DELETE_TEMPLATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PRODUCT_MIX(Action.UPDATE, Entity.PRODUCTMIX, "/loanproducts/"),
 
-  ASSIGN_CLIENT_STAFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_PRODUCT_MIX(Action.DELETE, Entity.PRODUCTMIX, "/loanproducts/"),
 
-  UPDATE_CLIENT_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_JOBDETAIL(Action.UPDATE, Entity.SCHEDULER, "/updateJobDetail/"),
 
-  CREATE_PRODUCT_MIX(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_MEETING(Action.CREATE, Entity.MEETING, "/"),
 
-  UPDATE_PRODUCT_MIX(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_MEETING(Action.UPDATE, Entity.MEETING, "/"),
 
-  DELETE_PRODUCT_MIX(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_MEETING(Action.DELETE, Entity.MEETING, "/"),
 
-  WITH_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration" +
+    SAVE_OR_UPDATE_ATTENDANCE(Action.SAVEORUPDATEATTENDANCE, Entity.MEETING, "/"),
 
-          "/template"),
+    UPDATE_CACHE(Action.UPDATE, Entity.CACHE, "/cache"),
 
-  UPDATE_JOB_DETAIL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_FIXED_DEPOSIT_ACCOUNT(Action.CREATE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/template"),
 
-  CREATE_MEETING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  UPDATE_MEETING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_FIXED_DEPOSIT_ACCOUNT(Action.DELETE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  DELETE_MEETING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.REJECT, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  SAVE_OR_UPDATE_ATTENDANCE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.WITHDRAW, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  UPDATE_CACHE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.APPROVE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  CREATE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.APPROVALUNDO, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  UPDATE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FIXED_DEPOSIT_ACCOUNT_ACTIVATION(Action.ACTIVATE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  DELETE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_FIXED_DEPOSIT_ACCOUNT(Action.CLOSE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  REJECT_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PREMATURE_CLOSE_FIXED_DEPOSIT_ACCOUNT(Action.PREMATURECLOSE, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  WITHDRAW_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FIXED_DEPOSIT_ACCOUNT_INTEREST_CALCULATION(Action.CALCULATEINTEREST, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  APPROVE_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FIXED_DEPOSIT_ACCOUNT_INTEREST_POSTING(Action.POSTINTEREST, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  UNDO_FIXED_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FIXED_DEPOSIT_ACCOUNT_DEPOSIT(Action.DEPOSIT, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  FIXED_DEPOSIT_ACCOUNT_ACTIVATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FIXED_DEPOSIT_ACCOUNT_WITHDRAWAL(Action.WITHDRAWAL, Entity.FIXEDDEPOSIT_ACCOUNT, "/fixeddepositaccounts/"),
 
-  CLOSE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_RECURRING_DEPOSIT_ACCOUNT(Action.CREATE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/template"),
 
-  PREMATURE_CLOSE_FIXED_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_RECURRING_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  FIXED_DEPOSITACCOUNT_INTEREST_CALCULATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECURRING_ACCOUNT_DEPOSIT(Action.DEPOSIT, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  FIXED_DEPOSITACCOUNT_INTEREST_POSTING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECURRING_ACCOUNT_WITHDRAWAL(Action.WITHDRAWAL, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  FIXED_DEPOSITACCOUNT_DEPOSIT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADJUST_RECURRING_ACCOUNT_TRANSACTION(Action.ADJUSTTRANSACTION, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  FIXED_DEPOSITACCOUNT_WITHDRAWAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_RECURRING_ACCOUNT_TRANSACTION(Action.UNDOTRANSACTION, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  CREATE_RECURRING_DEPOSITACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_RECURRING_DEPOSIT_ACCOUNT(Action.DELETE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  UPDATE_RECURRING_DEPOSITACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.REJECT, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  RECURRING_ACCOUNT_DEPOSIT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WITHDRAW_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.WITHDRAW, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  RECURRING_ACCOUNT_WITHDRAWAL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.APPROVE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  ADJUST_RECURRING_ACCOUNT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.APPROVALUNDO, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  UNDO_RECURRING_ACCOUNT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECURRING_DEPOSIT_ACCOUNT_ACTIVATION(Action.ACTIVATE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  DELETE_RECURRING_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_RECURRING_DEPOSIT_ACCOUNT(Action.CLOSE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  REJECT_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_DEPOSIT_AMOUNT_FOR_RECURRING_DEPOSIT_ACCOUNT(Action.CREATE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  WITHDRAW_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PREMATURE_CLOSE_RECURRING_DEPOSIT_ACCOUNT(Action.PREMATURECLOSE, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  APPROVE_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECURRING_DEPOSIT_ACCOUNT_INTEREST_CALCULATION(Action.CALCULATEINTEREST, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  UNDO_RECURRING_DEPOSIT_ACCOUNT_APPLICATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECURRING_DEPOSIT_ACCOUNT_INTEREST_POSTING(Action.POSTINTEREST, Entity.RECURRINGDEPOSIT_ACCOUNT, "/recurringdepositaccounts/"),
 
-  RECURRING_DEPOSIT_ACCOUNT_ACTIVATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.CREATE, Entity.FINANCIALACTIVITY_ACCOUNT, "/organizationglaccounts/template"),
 
-  CLOSE_RECURRING_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.UPDATE, Entity.FINANCIALACTIVITY_ACCOUNT, "/organizationglaccounts/"),
 
-  UPDATE_DEPOSIT_AMOUNT_FOR_RECURRING_DEPOSIT_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.DELETE, Entity.FINANCIALACTIVITY_ACCOUNT, "/organizationglaccounts/"),
 
-  PREMATURE_CLOSE_RECURRING_DEPOSITACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REGISTER_DB_DATATABLE(Action.REGISTER, Entity.DATATABLE, "/datatables/register/"),
 
-  RECURRING_DEPOSIT_ACCOUNT_INTEREST_CALCULATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REGISTER_SURVEY(Action.REGISTER, Entity.SURVEY, "/survey/register/"),
 
-  RECURRING_DEPOSIT_ACCOUNT_INTEREST_POSTING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    FULLFIL_SURVEY(Action.CREATE, Entity.SURVEY, "/survey/"),
 
-  CREATE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LIKELIHOOD(Action.UPDATE, Entity.LIKELIHOOD, "/likelihood/"),
 
-  UPDATE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ASSIGN_SAVINGS_OFFICER(Action.UPDATESAVINGSOFFICER, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  DELETE_OFFICE_TO_GL_ACCOUNT_MAPPING(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNASSIGN_SAVINGS_OFFICER(Action.REMOVESAVINGSOFFICER, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  REGISTER_DB_DATATABLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SAVINGS_INTEREST_POSTING_AS_ON_DATE(Action.POSTINTERESTASONDATE, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  REGISTER_SURVEY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_LOAN_RESCHEDULE_REQUEST(Action.CREATE, Entity.LOAN, "/rescheduleloans"),
 
-  FULFILL_SURVEY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration" +
-          "/template"),
+    APPROVE_LOAN_RESCHEDULE_REQUEST(Action.APPROVE, Entity.LOAN, "/rescheduleloans/"),
 
-  UPDATE_LIKELIHOOD(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REJECT_LOAN_RESCHEDULE_REQUEST(Action.REJECT, Entity.LOAN, "/rescheduleloans/"),
 
-  ASSIGN_SAVINGS_OFFICER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ACCOUNT_NUMBER_FORMAT(Action.UPDATE, Entity.LOAN, "/"),
 
-  UNASSIGN_SAVINGS_OFFICER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ACCOUNT_NUMBER_FORMAT(Action.DELETE, Entity.LOAN, "/"),
 
-  SAVINGS_INTEREST_POSTING_AS_ON_DATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REFUND_BY_TRANSFER(Action.REFUNDBYTRANSFER, Entity.ACCOUNT_TRANSFER, "/refundByTransfer"),
 
-  CREATE_LOAN_RESCHEDULE_REQUEST(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_TELLER(Action.CREATE, Entity.TELLER, "/tellers/templates"),
 
-  APPROVE_LOAN_RESCHEDULE_REQUEST(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+    UPDATE_TELLER(Action.UPDATE, Entity.TELLER, "/tellers/"),
 
-  REJECT_LOAN_RESCHEDULE_REQUEST(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_TELLER(Action.DELETE, Entity.TELLER, "/tellers/"),
 
-  CREATE_ACCOUNT_NUMBER_FORMAT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ALLOCATE_TELLER(Action.ALLOCATECASHIER, Entity.TELLER, "/tellers/"),
 
-  UPDATE_ACCOUNT_NUMBER_FORMAT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ALLOCATION_TELLER(Action.UPDATECASHIERALLOCATION, Entity.TELLER, "/tellers/"),
 
-  DELETE_ACCOUNT_NUMBER_FORMAT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ALLOCATION_TELLER(Action.DELETECASHIERALLOCATION, Entity.TELLER, "/tellers/"),
 
-  REFUND_BY_TRANSFER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ALLOCATE_CASH_TO_CASHIER(Action.ALLOCATECASHTOCASHIER, Entity.TELLER, "/tellers/"),
 
-  CREATE_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SETTLE_CASH_FROM_CASHIER(Action.SETTLECASHFROMCASHIER, Entity.TELLER, "/tellers/"),
 
-  UPDATE_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ROLE(Action.DELETE, Entity.ROLE, "/roles/"),
 
-  DELETE_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISABLE_ROLE(Action.DISABLE, Entity.ROLE, "/roles/"),
 
-  ALLOCATE_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ENABLE_ROLE(Action.ENABLE, Entity.ROLE, "/roles/"),
 
-  UPDATE_ALLOCATION_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_MAP(Action.CREATE, Entity.ENTITY_MAPPING, "/entitytoentitymapping/"),
 
-  DELETE_ALLOCATION_TELLER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_MAP(Action.UPDATE, Entity.ENTITY_MAPPING, "/entitytoentitymapping"),
 
-  ALLOCATE_CASH_TO_CASHIER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_MAP(Action.DELETE, Entity.ENTITY_MAPPING, "/entitytoentitymapping/"),
 
-  SETTLE_CASH_FROM_CASHIER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_WORKING_DAYS(Action.UPDATE, Entity.WORKINGDAYS, "/workingdays/"),
 
-  DELETE_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PASSWORD_PREFERENCES(Action.UPDATE, Entity.WORKINGDAYS, "/"),
 
-  DISABLE_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PAYMENT_TYPE(Action.CREATE, Entity.WORKINGDAYS, "/"),
 
-  ENABLE_ROLE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PAYMENT_TYPE(Action.UPDATE, Entity.WORKINGDAYS, "/"),
 
-  CREATE_MAP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_PAYMENT_TYPE(Action.DELETE, Entity.PAYMENT_TYPE, "/"),
 
-  UPDATE_MAP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EXTERNAL_SERVICE_PROPERTIES(Action.UPDATE, Entity.EXTERNAL_SERVICES, "/externalservices/"),
 
-  DELETE_MAP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_CLIENT_CHARGE(Action.UPDATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  UPDATE_WORKING_DAYS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_CLIENT_CHARGE(Action.UPDATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  UPDATE_PASSWORD_PREFERENCES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    WAIVE_CLIENT_CHARGE(Action.UPDATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  CREATE_PAYMENT_TYPE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    PAY_CLIENT_CHARGE(Action.UPDATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  UPDATE_PAYMENT_TYPE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    INACTIVATE_CLIENT_CHARGE(Action.INACTIVATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  DELETE_PAYMENT_TYPE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_CLIENT_TRANSACTION(Action.INACTIVATE, Entity.EXTERNAL_SERVICES, "/clients/"),
 
-  UPDATE_EXTERNAL_SERVICE_PROPERTIES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PROVISIONING_CATEGORY(Action.CREATE, Entity.PROVISION_CATEGORY, "/provisioningcategory"),
 
-  CREATE_CLIENT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PROVISIONING_CATEGORY(Action.UPDATE, Entity.PROVISION_CATEGORY, "/provisioningcategory/"),
 
-  DELETE_CLIENT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_PROVISIONING_CATEGORY(Action.DELETE, Entity.PROVISION_CATEGORY, "/provisioningcategory/"),
 
-  WAIVE_CLIENT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PROVISIONING_CRITERIA(Action.CREATE, Entity.PROVISION_CRITERIA, "/provisioningcriteria"),
 
-  PAY_CLIENT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PROVISIONING_CRITERIA(Action.UPDATE, Entity.PROVISION_CRITERIA, "/provisioningcriteria/"),
 
-  INACTIVATE_CLIENT_CHARGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_PROVISIONING_CRITERIA(Action.DELETE, Entity.PROVISION_CRITERIA, "/provisioningcriteria/"),
 
-  UNDO_CLIENT_TRANSACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PROVISIONING_ENTRIES(Action.CREATE, Entity.PROVISION_ENTRIES, "/provisioningentries"),
 
-  CREATE_PROVISIONING_CATEGORY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PROVISIONING_JOURNAL_ENTRIES(Action.CREATE, Entity.PROVISION_JOURNAL_ENTRIES, "/provisioningentries/"),
 
-  UPDATE_PROVISIONING_CATEGORY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RECREATE_PROVISIONING_ENTRIES(Action.RECREATE, Entity.PROVISION_ENTRIES, "/provisioningentries/"),
 
-  DELETE_PROVISIONING_CATEGORY(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_FLOATING_RATE(Action.CREATE, Entity.FLOATING_RATE, "/floatingrates"),
 
-  CREATE_PROVISIONING_CRITERIA(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_FLOATING_RATE(Action.UPDATE, Entity.FLOATING_RATE, "/floatingrates/"),
 
-  UPDATE_PROVISIONING_CRITERIA(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_SCHEDULE_EXCEPTIONS(Action.CREATESCHEDULEEXCEPTIONS, Entity.LOAN, "/loans/"),
 
-  DELETE_PROVISIONING_CRITERIA(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SCHEDULE_EXCEPTIONS(Action.DELETESCHEDULEEXCEPTIONS, Entity.LOAN, "/loans/"),
 
-  CREATE_PROVISIONING_ENTRIES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_PRODUCT(Action.CREATE, Entity.LOAN, "/products/"),
 
-  CREATE_PROVISIONING_JOURNAL_ENTRIES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_PRODUCT(Action.UPDATE, Entity.LOAN, "/products/"),
 
-  RECREATE_PROVISIONING_ENTRIES(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ACCOUNT(Action.CREATE, Entity.LOAN, "/accounts/"),
 
-  CREATE_FLOATING_RATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ACCOUNT(Action.UPDATE, Entity.LOAN, "/accounts/"),
 
-  UPDATE_FLOATING_RATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPROVE_SHARE_PRODUCT_DIVIDEND_PAYOUT_COMMAND(Action.APPROVE_DIVIDEND, Entity.SHARE_PRODUCT, "/shareproduct/"),
 
-  CREATE_SCHEDULE_EXCEPTIONS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SHARE_PRODUCT_DIVIDEND_PAYOUT_COMMAND(Action.DELETE_DIVIDEND, Entity.SHARE_PRODUCT, "/shareproduct/"),
 
-  DELETE_SCHEDULE_EXCEPTIONS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_TAX_COMPONENT(Action.CREATE, Entity.TAX_COMPONENT, "/taxes/component"),
 
-  CREATE_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_TAX_COMPONENT(Action.UPDATE, Entity.TAX_COMPONENT, "/taxes/component/"),
 
-  UPDATE_PRODUCT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_TAX_GROUP(Action.CREATE, Entity.TAXGROUP, "/taxes/group"),
 
-  CREATE_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_TAX_GROUP(Action.UPDATE, Entity.TAXGROUP, "/taxes/group/"),
 
-  UPDATE_ACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_WITHHOLD_TAX(Action.UPDATEWITHHOLDTAX, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CREATE_PRODUCT_COMMAND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ENTITY_DATATABLE_CHECKS(Action.CREATE, Entity.ENTITY_DATATABLE_CHECK, "/entityDatatableChecks/"),
 
-  CREATE_SHARE_PRODUCT_DIVIDEND_PAYOUT_COMMAND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ENTITY_DATA_TABLE_CHECKS(Action.DELETE, Entity.ENTITY_DATATABLE_CHECK, "/entityDatatableChecks/"),
 
-  APPROVE_SHARE_PRODUCT_DIVIDEND_PAYOUT_COMMAND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_SELF_SERVICE_BENEFICIARY_TPT(Action.CREATE, Entity.SS_BENEFICIARY_TPT, "/self/beneficiaries/tpt"),
 
-  DELETE_SHARE_PRODUCT_DIVIDEND_PAYOUT_COMMAND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_SELF_SERVICE_BENEFICIARY_TPT(Action.UPDATE, Entity.SS_BENEFICIARY_TPT, "/self/beneficiaries/tpt/"),
 
-  CREATE_ACCOUNT_COMMAND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SELF_SERVICE_BENEFICIARY_TPT(Action.DELETE, Entity.SS_BENEFICIARY_TPT, "/self/beneficiaries/tpt/"),
 
-  CREATE_TAX_COMPONENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_REPORT_MAILING_JOB(Action.CREATE, Entity.SS_BENEFICIARY_TPT, "/reportmailingjobs"),
 
-  UPDATE_TAX_COMPONENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_REPORT_MAILING_JOB(Action.UPDATE, Entity.SS_BENEFICIARY_TPT, "/reportmailingjobs/"),
 
-  CREATE_TAXGROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_REPORT_MAILING_JOB(Action.DELETE, Entity.SS_BENEFICIARY_TPT, "/reportmailingjobs/"),
 
-  UPDATE_TAXGROUP(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_SMS_CAMPAIGN(Action.CREATE, Entity.SMS_CAMPAIGN, "/smscampaigns"),
 
-  UPDATE_WITHHOLD_TAX(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration" +
-          "/template"),
+    UPDATE_SMS_CAMPAIGN(Action.UPDATE, Entity.SMS_CAMPAIGN, "/smscampaigns/"),
 
-  CREATE_ENTITY_DATATABLE_CHECKS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACTIVATE_SMS_CAMPAIGN(Action.ACTIVATE, Entity.SMS_CAMPAIGN, "/smscampaigns/"),
 
-  DELETE_ENTITY_DATATABLE_CHECKS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_SMS_CAMPAIGN(Action.CLOSE, Entity.SMS_CAMPAIGN, "/smscampaigns/"),
 
-  ADD_SELF_SERVICE_BENEFICIARY_TPT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REACTIVATE_SMS_CAMPAIGN(Action.REACTIVATE, Entity.SMS_CAMPAIGN, "/smscampaigns/"),
 
-  UPDATE_SELF_SERVICE_BENEFICIARY_TPT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_SMS_CAMPAIGN(Action.DELETE, Entity.SMS_CAMPAIGN, "/smscampaigns/"),
 
-  DELETE_SELF_SERVICE_BENEFICIARY_TPT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    HOLD_AMOUNT(Action.HOLDAMOUNT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CREATE_REPORT_MAILING_JOB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    RELEASE_AMOUNT(Action.RELEASEAMOUNT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  UPDATE_REPORT_MAILING_JOB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BLOCK_DEBITS_FROM_SAVINGS_ACCOUNT(Action.BLOCKDEBIT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  DELETE_REPORT_MAILING_JOB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNBLOCK_DEBITS_FROM_SAVINGS_ACCOUNT(Action.UNBLOCKDEBIT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CREATE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BLOCK_CREDITS_TO_SAVINGS_ACCOUNT(Action.BLOCKCREDIT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  UPDATE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNBLOCK_CREDITS_TO_SAVINGS_ACCOUNT(Action.UNBLOCKCREDIT, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  ACTIVATE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BLOCK_SAVINGS_ACCOUNT(Action.BLOCK, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  CLOSE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNBLOCK_SAVINGS_ACCOUNT(Action.UNBLOCK, Entity.SAVINGS_ACCOUNT, "/savingsaccounts/"),
 
-  REACTIVATE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DISABLE_ADHOC(Action.DISABLE, Entity.ADHOC, "/adhoc/"),
 
-  DELETE_SMS_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ENABLE_ADHOC(Action.ENABLE, Entity.ADHOC, "/adhoc/"),
 
-  HOLD_AMOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_ADHOC(Action.CREATE, Entity.ADHOC, "/adhocquery/template"),
 
-  RELEASE_AMOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_ADHOC(Action.UPDATE, Entity.ADHOC, "/adhocquery/"),
 
-  BLOCK_DEBITS_FROM_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_ADHOC(Action.DELETE, Entity.ADHOC, "/adhocquery/"),
 
-  UNBLOCK_DEBITS_FROM_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_EMAIL(Action.CREATE, Entity.EMAIL, "/emailcampaigns/template"),
 
-  BLOCK_CREDIT_TO_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EMAIL(Action.UPDATE, Entity.EMAIL, "/emailcampaigns/"),
 
-  UNBLOCK_CREDIT_TO_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_EMAIL(Action.DELETE, Entity.EMAIL, "/emailcampaigns/"),
 
-  BLOCK_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_EMAIL_CAMPAIGN(Action.CREATE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/campaign"),
 
-  UNBLOCK_SAVINGSACCOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/"),
 
-  DISABLE_ADHOC(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_EMAIL_CAMPAIGN(Action.DELETE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/"),
 
-  ENABLE_ADHOC(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ACTIVATE_EMAIL_CAMPAIGN(Action.ACTIVATE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/"),
 
-  CREATE_ADHOC(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CLOSE_EMAIL_CAMPAIGN(Action.CLOSE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/"),
 
-  UPDATE_ADHOC(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REACTIVATE_EMAIL_CAMPAIGN(Action.REACTIVATE, Entity.EMAIL_CAMPAIGN, "/emailcampaigns/"),
 
-  DELETE_ADHOC(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EMAIL_CONFIGURATION(Action.UPDATE, Entity.EMAIL_CONFIGURATION, "/emailcampaigns/configuration/"),
 
-  CREATE_EMAIL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    INVALIDATE_TWO_FACTOR_ACCESS_TOKEN(Action.INVALIDATE, Entity.TWOFACTOR_ACCESSTOKEN, "/twofactor/invalidate"),
 
-  UPDATE_EMAIL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_TWO_FACTOR_CONFIGURATION(Action.UPDATE, Entity.TWOFACTOR_CONFIGURATION, "/twofactor/configure"),
 
-  DELETE_EMAIL(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    LINK_ACCOUNTS_TO_POCKET(Action.UPDATE, Entity.TWOFACTOR_CONFIGURATION, "/self/pocket?command="),
 
-  CREATE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELINK_ACCOUNTS_FROM_POCKET(Action.UPDATE, Entity.TWOFACTOR_CONFIGURATION, "/self/pocket?command="),
 
-  UPDATE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_RATE(Action.CREATE, Entity.RATE, "/rates/template"),
 
-  DELETE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_RATE(Action.UPDATE, Entity.RATE, "/rates/"),
 
-  ACTIVATE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_BUSINESS_DATE(Action.UPDATE, Entity.BUSINESS_DATE, "/businessdate"),
 
-  CLOSE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_DELINQUENCY_RANGE(Action.CREATE, Entity.DELINQUENCY_RANGE, "/delinquency/range"),
 
-  REACTIVATE_EMAIL_CAMPAIGN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_DELINQUENCY_RANGE(Action.UPDATE, Entity.DELINQUENCY_RANGE, "/delinquency/range"),
 
-  UPDATE_EMAIL_CONFIGURATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_DELINQUENCY_RANGE(Action.DELETE, Entity.DELINQUENCY_RANGE, "/delinquency/range"),
 
-  INVALIDATE_TWOFACTOR_ACCESS_TOKEN(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_DELINQUENCY_BUCKET(Action.CREATE, Entity.DELINQUENCY_BUCKET, "/delinquency/bucket"),
 
-  UPDATE_TWOFACTOR_CONFIGURATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_DELINQUENCY_BUCKET(Action.UPDATE, Entity.DELINQUENCY_BUCKET, "/delinquency/bucket"),
 
-  LINK_ACCOUNTS_TO_POCKET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_DELINQUENCY_BUCKET(Action.DELETE, Entity.DELINQUENCY_BUCKET, "/delinquency/bucket"),
 
-  DELINK_ACCOUNTS_FROM_POCKET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_BUSINESS_STEP_CONFIG(Action.UPDATE, Entity.BATCH_BUSINESS_STEP, "/jobs/"),
 
-  CREATE_RATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    EXECUTE_INLINE_JOB(Action.EXECUTE, Entity.INLINE_JOB, "/jobs/"),
 
-  UPDATE_RATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EXTERNAL_EVENT_CONFIGURATIONS(Action.UPDATE, Entity.EXTERNAL_EVENT_CONFIGURATION, "/externaleventconfiguration"),
 
-  UPDATE_BUSINESSDATE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CHARGEOFF(Action.CHARGEOFF, Entity.LOAN, "/loans/"),
 
-  CREATE_DELINQUENCY_RANGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_CHARGEOFF(Action.UNDOCHARGEOFF, Entity.LOAN, "/loans/"),
 
-  UPDATE_DELINQUENCY_RANGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE(Action.CREATE, Entity.EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE,
+            "/external-asset-owners/loan-product/"),
 
-  DELETE_DELINQUENCY_RANGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE(Action.UPDATE, Entity.EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE,
+            "/external-asset-owners/loan-product/"),
 
-  CREATE_DELINQUENCY_BUCKET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    INTERMEDIARY_SALE_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.INTERMEDIARYSALE, Entity.LOAN, "/external-asset-owners/transfers/loans/"),
 
-  UPDATE_DELINQUENCY_BUCKET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    SALE_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.SALE, Entity.LOAN, "/external-asset-owners/transfers/loans/"),
 
-  DELETE_DELINQUENCY_BUCKET(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BUYBACK_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.BUYBACK, Entity.LOAN, "/external-asset-owners/transfers/loans/"),
 
-  UPDATE_BUSINESS_STEP_CONFIG(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CANCEL_TRANSACTION_BY_ID_TO_EXTERNAL_ASSET_OWNER(Action.CANCEL, Entity.ASSET_OWNER_TRANSACTION, "/external-asset-owners/transfers/"),
 
-  EXECUTE_IN_LINE_JOB(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DOWN_PAYMENT(Action.DOWNPAYMENT, Entity.LOAN, "/loans/"),
 
-  UPDATE_EXTERNAL_EVENT_CONFIGURATIONS(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REAGE(Action.REAGE, Entity.LOAN, "/loans/"),
 
-  CHARGEOFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_REAGE(Action.UNDO_REAGE, Entity.LOAN, "/loans/"),
 
-  UNDO_CHARGEOFF(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    REAMORTIZE(Action.REAMORTIZE, Entity.LOAN, "/loans/"),
 
-  CREATE_EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_REAMORTIZE(Action.UNDO_REAMORTIZE, Entity.LOAN, "/loans/"),
 
-  UPDATE_EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_DELINQUENCY_ACTION(Action.CREATE, Entity.DELINQUENCY_ACTION, "/loans/"),
 
-  INTERMEDIARY_SALE_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_INTEREST_PAUSE(Action.CREATE, Entity.INTEREST_PAUSE, "/v1/loans/"),
 
-  SALE_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CREATE_INTEREST_PAUSE_BY_EXTERNAL_ID(Action.CREATE, Entity.INTEREST_PAUSE, "/v1/loans/external-id/"),
 
-  BUY_BACK_LOAN_TO_EXTERNAL_ASSET_OWNER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    DELETE_INTEREST_PAUSE(Action.DELETE, Entity.INTEREST_PAUSE, "/v1/loans/"),
 
-  CANCEL_TRANSACTION_BY_ID_TO_EXTERNAL_ASSET_OWNER(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_INTEREST_PAUSE(Action.UPDATE, Entity.INTEREST_PAUSE, "/v1/loans/"),
 
-  DOWNPAYMENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ADD_CAPITALIZED_INCOME(Action.CAPITALIZEDINCOME, Entity.LOAN, "/loans/"),
 
-  REAGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    CAPITALIZED_INCOME_ADJUSTMENT(Action.CAPITALIZEDINCOMEADJUSTMENT, Entity.LOAN, "/loans/"),
 
-  UNDO_REAGE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    BUYDOWN_FEE_ADJUSTMENT(Action.BUYDOWNFEEADJUSTMENT, Entity.LOAN, "/loans/"),
 
-  REAMORTIZE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    APPLY_CONTRACT_TERMINATION(Action.CONTRACT_TERMINATION, Entity.LOAN, "/loans/"),
 
-  UNDO_REAMORTIZE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UNDO_CONTRACT_TERMINATION(Action.CONTRACT_TERMINATION_UNDO, Entity.LOAN, "/loans/"),
 
-  CREATE_DELINQUENCY_ACTION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    MAKE_LOAN_BUYDOWN_FEE(Action.BUYDOWNFEE, Entity.LOAN, "/loans/"),
 
-  CREATE_INTEREST_PAUSE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LOAN_APPROVED_AMOUNT(Action.UPDATE_APPROVED_AMOUNT, Entity.LOAN, "/loans/"),
 
-  CREATE_INTEREST_PAUSE_BY_EXTERNAL_ID(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    MANUAL_INTEREST_REFUND(Action.MANUAL_INTEREST_REFUND_TRANSACTION, Entity.LOAN, "/loans/"),
 
-  DELETE_INTEREST_PAUSE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    UPDATE_LOAN_AVAILABLE_DISBURSEMENT_AMOUNT(Action.UPDATE, Entity.LOAN_AVAILABLE_DISBURSEMENT_AMOUNT, "/loans/");
 
-  UPDATE_INTEREST_PAUSE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    ;
 
-  ADD_CAPITALIZED_INCOME(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    private final Action actionName;
+    private final Entity entityName;
+    private final String href;
 
-  CAPITALIZED_INCOME_ADJUSTMENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    @RequiredArgsConstructor
+    private enum Action {
 
-  BUY_DOWN_FEE_ADJUSTMENT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+        CREATE("CREATE"), UPDATE("UPDATE"), DELETE("DELETE"), GET("GET"), SAVE("SAVE"), PERMISSIONS("PERMISSIONS"), CHANGEPWD(
+                "CHANGEPWD"), RECOVERGUARANTEES("RECOVERGUARANTEES"), ACTIVATE("ACTIVATE"), CLOSE("CLOSE"), REJECT("REJECT"), WITHDRAW(
+                        "WITHDRAW"), REACTIVATE("REACTIVATE"), PROPOSETRANSFER("PROPOSETRANSFER"), PROPOSEANDACCEPTTRANSFER(
+                                "PROPOSEANDACCEPTTRANSFER"), WITHDRAWTRANSFER("WITHDRAWTRANSFER"), ACCEPTTRANSFER(
+                                        "ACCEPTTRANSFER"), REJECTTRANSFER("REJECTTRANSFER"), UNDOREJECT("UNDOREJECT"), UNDOWITHDRAWAL(
+                                                "UNDOWITHDRAWAL"), WAIVE("WAIVE"), PAY("PAY"), ADJUSTMENT("ADJUSTMENT"), DEACTIVATEOVERDUE(
+                                                        "DEACTIVATEOVERDUE"), REPAYMENT("REPAYMENT"), MERCHANTISSUEDREFUND(
+                                                                "MERCHANTISSUEDREFUND"), PAYOUTREFUND("PAYOUTREFUND"), GOODWILLCREDIT(
+                                                                        "GOODWILLCREDIT"), INTERESTPAYMENTWAIVER(
+                                                                                "INTERESTPAYMENTWAIVER"), CHARGEREFUND(
+                                                                                        "CHARGEREFUND"), RECOVERYPAYMENT(
+                                                                                                "RECOVERYPAYMENT"), WAIVEINTERESTPORTION(
+                                                                                                        "WAIVEINTERESTPORTION"), WRITEOFF(
+                                                                                                                "WRITEOFF"), UNDOWRITEOFF(
+                                                                                                                        "UNDOWRITEOFF"), CLOSEASRESCHEDULED(
+                                                                                                                                "CLOSEASRESCHEDULED"), ADJUST(
+                                                                                                                                        "ADJUST"), REFUNDBYCASH(
+                                                                                                                                                "REFUNDBYCASH"), CHARGEBACK(
+                                                                                                                                                        "CHARGEBACK"), FORECLOSURE(
+                                                                                                                                                                "FORECLOSURE"), CREDITBALANCEREFUND(
+                                                                                                                                                                        "CREDITBALANCEREFUND"), UNDO(
+                                                                                                                                                                                "UNDO"), BOUNCE(
+                                                                                                                                                                                        "BOUNCE"), SETFRAUD(
+                                                                                                                                                                                                "SETFRAUD"), APPROVE(
+                                                                                                                                                                                                        "APPROVE"), DISBURSE(
+                                                                                                                                                                                                                "DISBURSE"), UNDODISBURSAL(
+                                                                                                                                                                                                                        "UNDODISBURSAL"), UNDOAPPROVAL(
+                                                                                                                                                                                                                                "UNDOAPPROVAL"), DISBURSETOSAVINGS(
+                                                                                                                                                                                                                                        "DISBURSETOSAVINGS"), DISBURSEWITHOUTAUTODOWNPAYMENT(
+                                                                                                                                                                                                                                                "DISBURSEWITHOUTAUTODOWNPAYMENT"), APPROVALUNDO(
+                                                                                                                                                                                                                                                        "APPROVALUNDO"), DISBURSALUNDO(
+                                                                                                                                                                                                                                                                "DISBURSALUNDO"), DISBURSALLASTUNDO(
+                                                                                                                                                                                                                                                                        "DISBURSALLASTUNDO"), UPDATELOANOFFICER(
+                                                                                                                                                                                                                                                                                "UPDATELOANOFFICER"), REMOVELOANOFFICER(
+                                                                                                                                                                                                                                                                                        "REMOVELOANOFFICER"), BULKREASSIGN(
+                                                                                                                                                                                                                                                                                                "BULKREASSIGN"), UPDATEDELINQUENCY(
+                                                                                                                                                                                                                                                                                                        "UPDATEDELINQUENCY"), EXECUTE(
+                                                                                                                                                                                                                                                                                                                "EXECUTE"), REVERSE(
+                                                                                                                                                                                                                                                                                                                        "REVERSE"), UPDATERUNNINGBALANCE(
+                                                                                                                                                                                                                                                                                                                                "UPDATERUNNINGBALANCE"), DEFINEOPENINGBALANCE(
+                                                                                                                                                                                                                                                                                                                                        "DEFINEOPENINGBALANCE"), UPDATEOPENINGBALANCE(
+                                                                                                                                                                                                                                                                                                                                                "UPDATEOPENINGBALANCE"), DEPOSIT(
+                                                                                                                                                                                                                                                                                                                                                        "DEPOSIT"), WITHDRAWAL(
+                                                                                                                                                                                                                                                                                                                                                                "WITHDRAWAL"), UNDOTRANSACTION(
+                                                                                                                                                                                                                                                                                                                                                                        "UNDOTRANSACTION"), REVERSETRANSACTION(
+                                                                                                                                                                                                                                                                                                                                                                                "REVERSETRANSACTION"), ADJUSTTRANSACTION(
+                                                                                                                                                                                                                                                                                                                                                                                        "ADJUSTTRANSACTION"), CALCULATEINTEREST(
+                                                                                                                                                                                                                                                                                                                                                                                                "CALCULATEINTEREST"), POSTINTEREST(
+                                                                                                                                                                                                                                                                                                                                                                                                        "POSTINTEREST"), APPLYANNUALFEE(
+                                                                                                                                                                                                                                                                                                                                                                                                                "APPLYANNUALFEE"), INACTIVATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                        "INACTIVATE"), SAVECOLLECTIONSHEET(
+                                                                                                                                                                                                                                                                                                                                                                                                                                "SAVECOLLECTIONSHEET"), ASSOCIATECLIENTS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                        "ASSOCIATECLIENTS"), DISASSOCIATECLIENTS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                "DISASSOCIATECLIENTS"), TRANSFERCLIENTS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        "TRANSFERCLIENTS"), UNASSIGNSTAFF(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UNASSIGNSTAFF"), ASSIGNSTAFF(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ASSIGNSTAFF"), ASSOCIATEGROUPS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "ASSOCIATEGROUPS"), DISASSOCIATEGROUPS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DISASSOCIATEGROUPS"), ASSIGNROLE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "ASSIGNROLE"), UNASSIGNROLE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UNASSIGNROLE"), UPDATEROLE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UPDATEROLE"), UPDATESAVINGSACCOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UPDATESAVINGSACCOUNT"), SAVEORUPDATEATTENDANCE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "SAVEORUPDATEATTENDANCE"), PREMATURECLOSE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "PREMATURECLOSE"), RECURRINGDEPOSITACCOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "RECURRINGDEPOSITACCOUNT"), REGISTER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "REGISTER"), UPDATESAVINGSOFFICER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UPDATESAVINGSOFFICER"), REMOVESAVINGSOFFICER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "REMOVESAVINGSOFFICER"), POSTINTERESTASONDATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "POSTINTERESTASONDATE"), REFUNDBYTRANSFER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "REFUNDBYTRANSFER"), ALLOCATECASHIER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "ALLOCATECASHIER"), UPDATECASHIERALLOCATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UPDATECASHIERALLOCATION"), DELETECASHIERALLOCATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "DELETECASHIERALLOCATION"), ALLOCATECASHTOCASHIER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ALLOCATECASHTOCASHIER"), SETTLECASHFROMCASHIER(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "SETTLECASHFROMCASHIER"), ENABLE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ENABLE"), RECREATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "RECREATE"), CREATESCHEDULEEXCEPTIONS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "CREATESCHEDULEEXCEPTIONS"), DELETESCHEDULEEXCEPTIONS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "DELETESCHEDULEEXCEPTIONS"), SHAREPRODUCT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "SHAREPRODUCT"), UPDATEWITHHOLDTAX(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UPDATEWITHHOLDTAX"), HOLDAMOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "HOLDAMOUNT"), RELEASEAMOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "RELEASEAMOUNT"), BLOCKDEBIT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BLOCKDEBIT"), UNBLOCKDEBIT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UNBLOCKDEBIT"), BLOCKCREDIT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BLOCKCREDIT"), UNBLOCKCREDIT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UNBLOCKCREDIT"), BLOCK(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BLOCK"), UNBLOCK(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UNBLOCK"), DISABLE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DISABLE"), INVALIDATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "INVALIDATE"), CHARGEOFF(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "CHARGEOFF"), UNDOCHARGEOFF(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UNDOCHARGEOFF"), INTERMEDIARYSALE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "INTERMEDIARYSALE"), SALE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "SALE"), BUYBACK(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BUYBACK"), CANCEL(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "CANCEL"), DOWNPAYMENT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DOWNPAYMENT"), REAGE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "REAGE"), UNDO_REAGE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UNDO_REAGE"), REAMORTIZE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "REAMORTIZE"), UNDO_REAMORTIZE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UNDO_REAMORTIZE"), CAPITALIZEDINCOME(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "CAPITALIZEDINCOME"), CAPITALIZEDINCOMEADJUSTMENT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "CAPITALIZEDINCOMEADJUSTMENT"), BUYDOWNFEEADJUSTMENT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "BUYDOWNFEEADJUSTMENT"), CONTRACT_TERMINATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "CONTRACT_TERMINATION"), CONTRACT_TERMINATION_UNDO(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "CONTRACT_TERMINATION_UNDO"), BUYDOWNFEE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BUYDOWNFEE"), UPDATE_APPROVED_AMOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "UPDATE_APPROVED_AMOUNT"), MANUAL_INTEREST_REFUND_TRANSACTION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "MANUAL_INTEREST_REFUND_TRANSACTION"), APPROVE_DIVIDEND(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "APPROVE_DIVIDEND"), DELETE_DIVIDEND(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DELETE_DIVIDEND");
 
-  APPLY_CONTRACT_TERMINATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+        @Getter
+        private final String value;
+    }
 
-  UNDO_CONTRACT_TERMINATION(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
+    @RequiredArgsConstructor
+    private enum Entity {
 
-  MAKE_LOAN_BUY_DOWN_FEE(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-          "/creditBureauConfiguration/template"),
+        ORGANISATION_CREDIT_BUREAU("ORGANISATIONCREDITBUREAU"), CREDIT_BUREAU_LOANPRODUCT_MAPPING(
+                "CREDITBUREAU_LOANPRODUCT_MAPPING"), CREDIT_REPORT("CREDITREPORT"), CREDIT_BUREAU_CONFIGURATION(
+                        "CREDITBUREAU_CONFIGURATION"), ADDRESS("ADDRESS"), FAMILY_MEMBERS("FAMILYMEMBERS"), CONFIGURATION(
+                                "CONFIGURATION"), PERMISSION("PERMISSION"), ROLE("ROLE"), USER(
+                                        "USER"), OFFICE("OFFICE"), OFFICE_TRANSACTION("OFFICETRANSACTION"), STAFF("STAFF"), GUARANTOR(
+                                                "GUARANTOR"), LOAN("LOAN"), FUND("FUND"), REPORT("REPORT"), CURRENCY("CURRENCY"), SMS(
+                                                        "SMS"), CODE("CODE"), HOOK("HOOK"), CHARGE("CHARGE"), COLLATERAL_PRODUCT(
+                                                                "COLLATERAL_PRODUCT"), LOAN_PRODUCT("LOANPRODUCT"), CLIENT_IDENTIFIER(
+                                                                        "CLIENTIDENTIFIER"), CLIENT("CLIENT"), DATATABLE(
+                                                                                "DATATABLE"), LOANCHARGE("LOANCHARGE"), WAIVECHARGE(
+                                                                                        "WAIVECHARGE"), REPAYMENT_WITH_POSTDATEDCHECKS(
+                                                                                                "REPAYMENT_WITH_POSTDATEDCHECKS"), DISBURSEMENT_DETAIL(
+                                                                                                        "DISBURSEMENTDETAIL"), GLIM_LOAN(
+                                                                                                                "GLIMLOAN"), CODE_VALUE(
+                                                                                                                        "CODEVALUE"), GL_CLOSURE(
+                                                                                                                                "GLCLOSURE"), PERIODIC_ACCRUAL_ACCOUNTING(
+                                                                                                                                        "PERIODICACCRUALACCOUNTING"), GL_ACCOUNT(
+                                                                                                                                                "GLACCOUNT"), JOURNAL_ENTRY(
+                                                                                                                                                        "JOURNALENTRY"), SAVINGS_PRODUCT(
+                                                                                                                                                                "SAVINGSPRODUCT"), SAVINGS_ACCOUNT(
+                                                                                                                                                                        "SAVINGSACCOUNT"), GSIM_ACCOUNT(
+                                                                                                                                                                                "GSIMACCOUNT"), ACCOUNT_TRANSFER(
+                                                                                                                                                                                        "ACCOUNTTRANSFER"), STANDING_INSTRUCTION(
+                                                                                                                                                                                                "STANDINGINSTRUCTION"), SAVINGS_ACCOUNT_CHARGE(
+                                                                                                                                                                                                        "SAVINGSACCOUNTCHARGE"), FIXED_DEPOSIT_PRODUCT(
+                                                                                                                                                                                                                "FIXEDDEPOSITPRODUCT"), RECURRING_DEPOSIT_PRODUCT(
+                                                                                                                                                                                                                        "RECURRINGDEPOSITPRODUCT"), INTEREST_RATE_CHART(
+                                                                                                                                                                                                                                "INTERESTRATECHART"), CHARTSLAB(
+                                                                                                                                                                                                                                        "CHARTSLAB"), CALENDAR(
+                                                                                                                                                                                                                                                "CALENDAR"), GROUP(
+                                                                                                                                                                                                                                                        "GROUP"), COLLECTIONSHEET(
+                                                                                                                                                                                                                                                                "COLLECTIONSHEET"), COLLATERAL(
+                                                                                                                                                                                                                                                                        "COLLATERAL"), CLIENT_COLLATERAL_PRODUCT(
+                                                                                                                                                                                                                                                                                "CLIENT_COLLATERAL_PRODUCT"), LOAN_COLLATERAL_PRODUCT(
+                                                                                                                                                                                                                                                                                        "LOAN_COLLATERAL_PRODUCT"), CENTER(
+                                                                                                                                                                                                                                                                                                "CENTER"), ACCOUNTING_RULE(
+                                                                                                                                                                                                                                                                                                        "ACCOUNTINGRULE"), XBRLMAPPING(
+                                                                                                                                                                                                                                                                                                                "XBRLMAPPING"), HOLIDAY(
+                                                                                                                                                                                                                                                                                                                        "HOLIDAY"), TEMPLATE(
+                                                                                                                                                                                                                                                                                                                                "TEMPLATE"), PRODUCTMIX(
+                                                                                                                                                                                                                                                                                                                                        "PRODUCTMIX"), SCHEDULER(
+                                                                                                                                                                                                                                                                                                                                                "SCHEDULER"), MEETING(
+                                                                                                                                                                                                                                                                                                                                                        "MEETING"), CACHE(
+                                                                                                                                                                                                                                                                                                                                                                "CACHE"), FIXEDDEPOSIT_ACCOUNT(
+                                                                                                                                                                                                                                                                                                                                                                        "FIXEDDEPOSITACCOUNT"), RECURRINGDEPOSIT_ACCOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                "RECURRINGDEPOSITACCOUNT"), FINANCIALACTIVITY_ACCOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                        "FINANCIALACTIVITYACCOUNT"), SURVEY(
+                                                                                                                                                                                                                                                                                                                                                                                                "SURVEY"), LIKELIHOOD(
+                                                                                                                                                                                                                                                                                                                                                                                                        "LIKELIHOOD"), TELLER(
+                                                                                                                                                                                                                                                                                                                                                                                                                "TELLER"), ENTITY_MAPPING(
+                                                                                                                                                                                                                                                                                                                                                                                                                        "ENTITYMAPPING"), WORKINGDAYS(
+                                                                                                                                                                                                                                                                                                                                                                                                                                "WORKINGDAYS"), PAYMENT_TYPE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                        "PAYMENTTYPE"), EXTERNAL_SERVICES(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                "EXTERNALSERVICES"), PROVISION_CATEGORY(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        "PROVISIONCATEGORY"), PROVISION_CRITERIA(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                "PROVISIONCRITERIA"), PROVISION_ENTRIES(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "PROVISIONENTRIES"), PROVISION_JOURNAL_ENTRIES(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "PROVISIONJOURNALENTRIES"), FLOATING_RATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "FLOATINGRATE"), SHARE_PRODUCT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "SHAREPRODUCT"), TAX_COMPONENT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "TAXCOMPONENT"), TAXGROUP(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "TAXGROUP"), ENTITY_DATATABLE_CHECK(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ENTITY_DATATABLE_CHECK"), SS_BENEFICIARY_TPT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "SSBENEFICIARYTPT"), SMS_CAMPAIGN(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "SMSCAMPAIGN"), ADHOC(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "ADHOC"), EMAIL(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "EMAIL"), EMAIL_CAMPAIGN(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "EMAIL_CAMPAIGN"), TWOFACTOR_ACCESS_TOKEN(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "TWOFACTOR_ACCESSTOKEN"), TWOFACTOR_CONFIGURATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "TWOFACTOR_CONFIGURATION"), RATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "RATE"), BUSINESS_DATE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "BUSINESS_DATE"), DELINQUENCY_RANGE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DELINQUENCY_RANGE"), DELINQUENCY_BUCKET(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "DELINQUENCY_BUCKET"), BATCH_BUSINESS_STEP(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BATCH_BUSINESS_STEP"), INLINE_JOB(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "INLINE_JOB"), EXTERNAL_EVENT_CONFIGURATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "EXTERNAL_EVENT_CONFIGURATION"), EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE"), ASSET_OWNER_TRANSACTION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ASSET_OWNER_TRANSACTION"), DELINQUENCY_ACTION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "DELINQUENCY_ACTION"), INTEREST_PAUSE(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "INTEREST_PAUSE"), LOAN_AVAILABLE_DISBURSEMENT_AMOUNT(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "LOAN_AVAILABLE_DISBURSEMENT_AMOUNT"), EMAIL_CONFIGURATION(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "EMAIL_CONFIGURATION"), TWOFACTOR_ACCESSTOKEN(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "TWOFACTOR_ACCESSTOKEN");
 
-  UPDATE_LOAN_APPROVED_AMOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
-
-  MANUAL_INTEREST_REFUND(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU, "/creditBureauConfiguration/template"),
-
-  UPDATE_LOAN_AVAILABLE_DISBURSEMENT_AMOUNT(Action.UPDATE, Entity.ORGANISATION_CREDIT_BUREAU,
-
-          "/creditBureauConfiguration/template");
-
-  private final Action actionName;
-  private final Entity entityName;
-  private final String href;
-
-  @RequiredArgsConstructor
-  private enum Action {
-    CREATE("CREATE"),
-    UPDATE("UPDATE"),
-    DELETE("DELETE"),
-    GET("GET"),
-    SAVE("SAVE"),
-    PERMISSIONS("PERMISSIONS"),
-    CHANGEPWD("CHANGEPWD"),
-    RECOVERGUARANTEES("RECOVERGUARANTEES"),
-    ACTIVATE("ACTIVATE"),
-    CLOSE("CLOSE"),
-    REJECT("REJECT"),
-    WITHDRAW("WITHDRAW"),
-    REACTIVATE("REACTIVATE"),
-    PROPOSETRANSFER("PROPOSETRANSFER"),
-    PROPOSEANDACCEPTTRANSFER("PROPOSEANDACCEPTTRANSFER"),
-    WITHDRAWTRANSFER("WITHDRAWTRANSFER"),
-    ACCEPTTRANSFER("ACCEPTTRANSFER"),
-    REJECTTRANSFER("REJECTTRANSFER"),
-    UNDOREJECT("UNDOREJECT"),
-    UNDOWITHDRAWAL("UNDOWITHDRAWAL"),
-    WAIVE("WAIVE"),
-    PAY("PAY"),
-    ADJUSTMENT("ADJUSTMENT"),
-    DEACTIVATEOVERDUE("DEACTIVATEOVERDUE"),
-    REPAYMENT("REPAYMENT"),
-    MERCHANTISSUEDREFUND("MERCHANTISSUEDREFUND"),
-    PAYOUTREFUND("PAYOUTREFUND"),
-    GOODWILLCREDIT("GOODWILLCREDIT"),
-    INTERESTPAYMENTWAIVER("INTERESTPAYMENTWAIVER"),
-    CHARGEREFUND("CHARGEREFUND"),
-    RECOVERYPAYMENT("RECOVERYPAYMENT"),
-    WAIVEINTERESTPORTION("WAIVEINTERESTPORTION"),
-    WRITEOFF("WRITEOFF"),
-    UNDOWRITEOFF("UNDOWRITEOFF"),
-    CLOSEASRESCHEDULED("CLOSEASRESCHEDULED"),
-    ADJUST("ADJUST"),
-    REFUNDBYCASH("REFUNDBYCASH"),
-    CHARGEBACK("CHARGEBACK"),
-    FORECLOSURE("FORECLOSURE"),
-    CREDITBALANCEREFUND("CREDITBALANCEREFUND"),
-    UNDO("UNDO"),
-    BOUNCE("BOUNCE"),
-    SETFRAUD("SETFRAUD"),
-    APPROVE("APPROVE"),
-    DISBURSE("DISBURSE"),
-    UNDODISBURSAL("UNDODISBURSAL"),
-    UNDOAPPROVAL("UNDOAPPROVAL"),
-    DISBURSETOSAVINGS("DISBURSETOSAVINGS"),
-    DISBURSEWITHOUTAUTODOWNPAYMENT("DISBURSEWITHOUTAUTODOWNPAYMENT"),
-    APPROVALUNDO("APPROVALUNDO"),
-    DISBURSALUNDO("DISBURSALUNDO"),
-    DISBURSALLASTUNDO("DISBURSALLASTUNDO"),
-    UPDATELOANOFFICER("UPDATELOANOFFICER"),
-    REMOVELOANOFFICER("REMOVELOANOFFICER"),
-    BULKREASSIGN("BULKREASSIGN"),
-    UPDATEDELINQUENCY("UPDATEDELINQUENCY"),
-    EXECUTE("EXECUTE"),
-    REVERSE("REVERSE"),
-    UPDATERUNNINGBALANCE("UPDATERUNNINGBALANCE"),
-    DEFINEOPENINGBALANCE("DEFINEOPENINGBALANCE"),
-    UPDATEOPENINGBALANCE("UPDATEOPENINGBALANCE"),
-    DEPOSIT("DEPOSIT"),
-    WITHDRAWAL("WITHDRAWAL"),
-    UNDOTRANSACTION("UNDOTRANSACTION"),
-    REVERSETRANSACTION("REVERSETRANSACTION"),
-    ADJUSTTRANSACTION("ADJUSTTRANSACTION"),
-    CALCULATEINTEREST("CALCULATEINTEREST"),
-    POSTINTEREST("POSTINTEREST"),
-    APPLYANNUALFEE("APPLYANNUALFEE"),
-    INACTIVATE("INACTIVATE"),
-    SAVECOLLECTIONSHEET("SAVECOLLECTIONSHEET"),
-    ASSOCIATECLIENTS("ASSOCIATECLIENTS"),
-    DISASSOCIATECLIENTS("DISASSOCIATECLIENTS"),
-    TRANSFERCLIENTS("TRANSFERCLIENTS"),
-    UNASSIGNSTAFF("UNASSIGNSTAFF"),
-    ASSIGNSTAFF("ASSIGNSTAFF"),
-    ASSOCIATEGROUPS("ASSOCIATEGROUPS"),
-    DISASSOCIATEGROUPS("DISASSOCIATEGROUPS"),
-    ASSIGNROLE("ASSIGNROLE"),
-    UNASSIGNROLE("UNASSIGNROLE"),
-    UPDATEROLE("UPDATEROLE"),
-    UPDATESAVINGSACCOUNT("UPDATESAVINGSACCOUNT"),
-    SAVEORUPDATEATTENDANCE("SAVEORUPDATEATTENDANCE"),
-    PREMATURECLOSE("PREMATURECLOSE"),
-    RECURRINGDEPOSITACCOUNT("RECURRINGDEPOSITACCOUNT"),
-    REGISTER("REGISTER"),
-    UPDATESAVINGSOFFICER("UPDATESAVINGSOFFICER"),
-    REMOVESAVINGSOFFICER("REMOVESAVINGSOFFICER"),
-    POSTINTERESTASONDATE("POSTINTERESTASONDATE"),
-    REFUNDBYTRANSFER("REFUNDBYTRANSFER"),
-    ALLOCATECASHIER("ALLOCATECASHIER"),
-    UPDATECASHIERALLOCATION("UPDATECASHIERALLOCATION"),
-    DELETECASHIERALLOCATION("DELETECASHIERALLOCATION"),
-    ALLOCATECASHTOCASHIER("ALLOCATECASHTOCASHIER"),
-    SETTLECASHFROMCASHIER("SETTLECASHFROMCASHIER"),
-    ENABLE("ENABLE"),
-    RECREATE("RECREATE"),
-    CREATESCHEDULEEXCEPTIONS("CREATESCHEDULEEXCEPTIONS"),
-    DELETESCHEDULEEXCEPTIONS("DELETESCHEDULEEXCEPTIONS"),
-    SHAREPRODUCT("SHAREPRODUCT"),
-    UPDATEWITHHOLDTAX("UPDATEWITHHOLDTAX"),
-    HOLDAMOUNT("HOLDAMOUNT"),
-    RELEASEAMOUNT("RELEASEAMOUNT"),
-    BLOCKDEBIT("BLOCKDEBIT"),
-    UNBLOCKDEBIT("UNBLOCKDEBIT"),
-    BLOCKCREDIT("BLOCKCREDIT"),
-    UNBLOCKCREDIT("UNBLOCKCREDIT"),
-    BLOCK("BLOCK"),
-    UNBLOCK("UNBLOCK"),
-    DISABLE("DISABLE"),
-    INVALIDATE("INVALIDATE"),
-    CHARGEOFF("CHARGEOFF"),
-    UNDOCHARGEOFF("UNDOCHARGEOFF"),
-    INTERMEDIARYSALE("INTERMEDIARYSALE"),
-    SALE("SALE"),
-    BUYBACK("BUYBACK"),
-    CANCEL("CANCEL"),
-    DOWNPAYMENT("DOWNPAYMENT"),
-    REAGE("REAGE"),
-    UNDO_REAGE("UNDO_REAGE"),
-    REAMORTIZE("REAMORTIZE"),
-    UNDO_REAMORTIZE("UNDO_REAMORTIZE"),
-    CAPITALIZEDINCOME("CAPITALIZEDINCOME"),
-    CAPITALIZEDINCOMEADJUSTMENT("CAPITALIZEDINCOMEADJUSTMENT"),
-    BUYDOWNFEEADJUSTMENT("BUYDOWNFEEADJUSTMENT"),
-    CONTRACT_TERMINATION("CONTRACT_TERMINATION"),
-    CONTRACT_TERMINATION_UNDO("CONTRACT_TERMINATION_UNDO"),
-    BUYDOWNFEE("BUYDOWNFEE"),
-    UPDATE_APPROVED_AMOUNT("UPDATE_APPROVED_AMOUNT"),
-    MANUAL_INTEREST_REFUND_TRANSACTION("MANUAL_INTEREST_REFUND_TRANSACTION");
-
-    @Getter
-    private final String value;
-  }
-
-  @RequiredArgsConstructor
-  private enum Entity {
-    ORGANISATION_CREDIT_BUREAU("ORGANISATIONCREDITBUREAU"),
-    CREDIT_BUREAU_LOANPRODUCT_MAPPING("CREDITBUREAU_LOANPRODUCT_MAPPING"),
-    CREDIT_REPORT("CREDITREPORT"),
-    CREDIT_BUREAU_CONFIGURATION("CREDITBUREAU_CONFIGURATION"),
-    ADDRESS("ADDRESS"),
-    FAMILY_MEMBERS("FAMILYMEMBERS"),
-    CONFIGURATION("CONFIGURATION"),
-    PERMISSION("PERMISSION"),
-    ROLE("ROLE"),
-    USER("USER"),
-    OFFICE("OFFICE"),
-    OFFICE_TRANSACTION("OFFICETRANSACTION"),
-    STAFF("STAFF"),
-    GUARANTOR("GUARANTOR"),
-    LOAN("LOAN"),
-    FUND("FUND"),
-    REPORT("REPORT"),
-    CURRENCY("CURRENCY"),
-    SMS("SMS"),
-    CODE("CODE"),
-    HOOK("HOOK"),
-    CHARGE("CHARGE"),
-    COLLATERAL_PRODUCT("COLLATERAL_PRODUCT"),
-    LOAN_PRODUCT("LOANPRODUCT"),
-    CLIENT_IDENTIFIER("CLIENTIDENTIFIER"),
-    CLIENT("CLIENT"),
-    DATATABLE("DATATABLE"),
-    LOANCHARGE("LOANCHARGE"),
-    WAIVECHARGE("WAIVECHARGE"),
-    REPAYMENT_WITH_POSTDATEDCHECKS("REPAYMENT_WITH_POSTDATEDCHECKS"),
-    DISBURSEMENT_DETAIL("DISBURSEMENTDETAIL"),
-    GLIM_LOAN("GLIMLOAN"),
-    CODE_VALUE("CODEVALUE"),
-    GL_CLOSURE("GLCLOSURE"),
-    PERIODIC_ACCRUAL_ACCOUNTING("PERIODICACCRUALACCOUNTING"),
-    GL_ACCOUNT("GLACCOUNT"),
-    JOURNAL_ENTRY("JOURNALENTRY"),
-    SAVINGS_PRODUCT("SAVINGSPRODUCT"),
-    SAVINGS_ACCOUNT("SAVINGSACCOUNT"),
-    GSIM_ACCOUNT("GSIMACCOUNT"),
-    ACCOUNT_TRANSFER("ACCOUNTTRANSFER"),
-    STANDING_INSTRUCTION("STANDINGINSTRUCTION"),
-    SAVINGS_ACCOUNT_CHARGE("SAVINGSACCOUNTCHARGE"),
-    FIXED_DEPOSIT_PRODUCT("FIXEDDEPOSITPRODUCT"),
-    RECURRING_DEPOSIT_PRODUCT("RECURRINGDEPOSITPRODUCT"),
-    INTEREST_RATE_CHART("INTERESTRATECHART"),
-    CHARTSLAB("CHARTSLAB"),
-    CALENDAR("CALENDAR"),
-    GROUP("GROUP"),
-    COLLECTIONSHEET("COLLECTIONSHEET"),
-    COLLATERAL("COLLATERAL"),
-    CLIENT_COLLATERAL_PRODUCT("CLIENT_COLLATERAL_PRODUCT"),
-    LOAN_COLLATERAL_PRODUCT("LOAN_COLLATERAL_PRODUCT"),
-    CENTER("CENTER"),
-    ACCOUNTING_RULE("ACCOUNTINGRULE"),
-    XBRLMAPPING("XBRLMAPPING"),
-    HOLIDAY("HOLIDAY"),
-    TEMPLATE("TEMPLATE"),
-    PRODUCTMIX("PRODUCTMIX"),
-    SCHEDULER("SCHEDULER"),
-    MEETING("MEETING"),
-    CACHE("CACHE"),
-    FIXEDDEPOSIT_ACCOUNT("FIXEDDEPOSITACCOUNT"),
-    RECURRINGDEPOSIT_ACCOUNT("RECURRINGDEPOSITACCOUNT"),
-    FINANCIALACTIVITY_ACCOUNT("FINANCIALACTIVITYACCOUNT"),
-    SURVEY("SURVEY"),
-    LIKELIHOOD("LIKELIHOOD"),
-    TELLER("TELLER"),
-    ENTITY_MAPPING("ENTITYMAPPING"),
-    WORKINGDAYS("WORKINGDAYS"),
-    PAYMENT_TYPE("PAYMENTTYPE"),
-    EXTERNAL_SERVICES("EXTERNALSERVICES"),
-    PROVISION_CATEGORY("PROVISIONCATEGORY"),
-    PROVISION_CRITERIA("PROVISIONCRITERIA"),
-    PROVISION_ENTRIES("PROVISIONENTRIES"),
-    PROVISION_JOURNAL_ENTRIES("PROVISIONJOURNALENTRIES"),
-    FLOATING_RATE("FLOATINGRATE"),
-    SHARE_PRODUCT("SHAREPRODUCT"),
-    TAX_COMPONENT("TAXCOMPONENT"),
-    TAXGROUP("TAXGROUP"),
-    ENTITY_DATATABLE_CHECK("ENTITY_DATATABLE_CHECK"),
-    SS_BENEFICIARY_TPT("SSBENEFICIARYTPT"),
-    SMS_CAMPAIGN("SMSCAMPAIGN"),
-    ADHOC("ADHOC"),
-    EMAIL("EMAIL"),
-    EMAIL_CAMPAIGN("EMAIL_CAMPAIGN"),
-    TWOFACTOR_ACCESS_TOKEN("TWOFACTOR_ACCESSTOKEN"),
-    TWOFACTOR_CONFIGURATION("TWOFACTOR_CONFIGURATION"),
-    RATE("RATE"),
-    BUSINESS_DATE("BUSINESS_DATE"),
-    DELINQUENCY_RANGE("DELINQUENCY_RANGE"),
-    DELINQUENCY_BUCKET("DELINQUENCY_BUCKET"),
-    BATCH_BUSINESS_STEP("BATCH_BUSINESS_STEP"),
-    INLINE_JOB("INLINE_JOB"),
-    EXTERNAL_EVENT_CONFIGURATION("EXTERNAL_EVENT_CONFIGURATION"),
-    EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE("EXTERNAL_ASSET_OWNER_LOAN_PRODUCT_ATTRIBUTE"),
-    ASSET_OWNER_TRANSACTION("ASSET_OWNER_TRANSACTION"),
-    DELINQUENCY_ACTION("DELINQUENCY_ACTION"),
-    INTEREST_PAUSE("INTEREST_PAUSE"),
-    LOAN_AVAILABLE_DISBURSEMENT_AMOUNT("LOAN_AVAILABLE_DISBURSEMENT_AMOUNT"),;
-
-    @Getter
-    private final String value;
-  }
+        @Getter
+        private final String value;
+    }
 }

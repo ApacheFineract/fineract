@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.api;
 
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -26,8 +25,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/helloworld")
@@ -36,10 +33,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HelloWorldApiResource {
 
-  @GET
-  public Response getHelloWorld(@Context UriInfo uriInfo) {
+    @GET
+    public Response getHelloWorld(@Context UriInfo uriInfo) {
 
-    String url = uriInfo.getRequestUri().toString();
-    return Response.ok("Fineract-Maker-Checker: " + url).build();
-  }
+        String url = uriInfo.getRequestUri().toString();
+        return Response.ok("Fineract-Maker-Checker: " + url).build();
+    }
 }

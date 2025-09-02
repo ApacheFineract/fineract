@@ -49,5 +49,4 @@ public class MakerCheckerApiResource {
         return result;
     }
 
-
 }
