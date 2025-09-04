@@ -74,44 +74,59 @@ public class CollectionSheetDao {
     }
 
     private StringBuilder getIndividualCollectionSheetFlatDataSql(final boolean checkForOfficeId, final boolean checkforStaffId) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT loandata.*, sum(lc.amount_outstanding_derived) as chargesDue ");
-        sb.append("from (SELECT cl.display_name As clientName, ");
-        sb.append("cl.id As clientId, ln.id As loanId, ln.account_no As accountId, ln.loan_status_id As accountStatusId,");
-        sb.append(" pl.short_name As productShortName, ln.product_id As productId, ");
-        sb.append("ln.currency_code as currencyCode, ln.currency_digits as currencyDigits, ln.currency_multiplesof as inMultiplesOf, ");
-        sb.append("rc." + sqlGenerator.escape("name")
-                + " as currencyName, rc.display_symbol as currencyDisplaySymbol, rc.internationalized_name_code as currencyNameCode, ");
-        sb.append("(CASE WHEN ln.loan_status_id = 200 THEN ln.principal_amount ELSE null END) As disbursementAmount, ");
-        sb.append(
-                "sum(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.principal_amount ELSE 0.0 END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.principal_completed_derived ELSE 0.0 END), 0.0)) As principalDue, ");
-        sb.append("ln.principal_repaid_derived As principalPaid, ");
-        sb.append(
-                "sum(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.interest_amount ELSE 0.0 END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.interest_completed_derived ELSE 0.0 END), 0.0)) As interestDue, ");
-        sb.append("ln.interest_repaid_derived As interestPaid, ");
-        sb.append(
-                "sum(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.fee_charges_amount ELSE 0.0 END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.fee_charges_completed_derived ELSE 0.0 END), 0.0)) As feeDue, ");
-        sb.append("ln.fee_charges_repaid_derived As feePaid ");
-        sb.append("FROM m_loan ln ");
-        sb.append("JOIN m_client cl ON cl.id = ln.client_id  ");
-        sb.append("LEFT JOIN m_office ofc ON ofc.id = cl.office_id  AND ofc.hierarchy like " + ":officeHierarchy ");
-        sb.append("LEFT JOIN m_product_loan pl ON pl.id = ln.product_id ");
-        sb.append("LEFT JOIN m_currency rc on rc." + sqlGenerator.escape("code") + " = ln.currency_code ");
-        sb.append("JOIN m_loan_repayment_schedule ls ON ls.loan_id = ln.id AND ls.completed_derived = 0 AND ls.duedate <= :dueDate ");
-        sb.append("where ");
+        StringBuilder sqlString = new StringBuilder();
+        sqlString.append("SELECT loandata.*, SUM(lc.amount_outstanding_derived) AS chargesDue ");
+        sqlString.append("FROM (SELECT cl.display_name AS clientName, ");
+        sqlString.append("cl.id AS clientId, ");
+        sqlString.append("ln.id AS loanId, ");
+        sqlString.append("ln.account_no AS accountId, ");
+        sqlString.append("ln.loan_status_id AS accountStatusId, ");
+        sqlString.append("pl.short_name AS productShortName, ");
+        sqlString.append("ln.product_id AS productId, ");
+        sqlString.append("ln.currency_code AS currencyCode, ");
+        sqlString.append("ln.currency_digits AS currencyDigits, ");
+        sqlString.append("ln.currency_multiplesof AS inMultiplesOf, ");
+        sqlString.append("rc.");
+        sqlString.append(sqlGenerator.escape("name"));
+        sqlString.append(" AS currencyName, ");
+        sqlString.append("rc.display_symbol AS currencyDisplaySymbol, ");
+        sqlString.append("rc.internationalized_name_code AS currencyNameCode, ");
+        sqlString.append("(CASE WHEN ln.loan_status_id = 200 THEN ln.principal_amount ELSE NULL END) AS " + "disbursementAmount, ");
+        sqlString.append("SUM(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.principal_amount ELSE 0"
+                + ".0 END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls"
+                + ".principal_completed_derived ELSE 0.0 END), 0.0)) AS principalDue, ");
+        sqlString.append("ln.principal_repaid_derived AS principalPaid, ");
+        sqlString.append("SUM(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.interest_amount ELSE 0.0"
+                + " END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls"
+                + ".interest_completed_derived ELSE 0.0 END), 0.0)) AS interestDue, ");
+        sqlString.append("ln.interest_repaid_derived AS interestPaid, ");
+        sqlString.append("SUM(COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls.fee_charges_amount ELSE "
+                + "0.0 END), 0.0) - COALESCE((CASE WHEN ln.loan_status_id = 300 THEN ls"
+                + ".fee_charges_completed_derived ELSE 0.0 END), 0.0)) AS feeDue, ");
+        sqlString.append("ln.fee_charges_repaid_derived AS feePaid ");
+        sqlString.append("FROM m_loan ln ");
+        sqlString.append("JOIN m_client cl ON cl.id = ln.client_id  ");
+        sqlString.append("LEFT JOIN m_office ofc ON ofc.id = cl.office_id AND ofc.hierarchy LIKE " + ":officeHierarchy ");
+        sqlString.append("LEFT JOIN m_product_loan pl ON pl.id = ln.product_id ");
+        sqlString.append("LEFT JOIN m_currency rc ON rc.");
+        sqlString.append(sqlGenerator.escape("code"));
+        sqlString.append(" = ln.currency_code ");
+        sqlString
+                .append("JOIN m_loan_repayment_schedule ls ON ls.loan_id = ln.id AND ls.completed_derived = 0 AND ls.duedate <= :dueDate ");
+        sqlString.append("WHERE ");
         if (checkForOfficeId) {
-            sb.append("ofc.id = :officeId and ");
+            sqlString.append("ofc.id = :officeId AND ");
         }
         if (checkforStaffId) {
-            sb.append("ln.loan_officer_id = :staffId and ");
+            sqlString.append("ln.loan_officer_id = :staffId AND ");
         }
-        sb.append("(ln.loan_status_id = 300) ");
-        sb.append("and ln.group_id is null GROUP BY cl.id , ln.id ORDER BY cl.id , ln.id ) loandata ");
-        sb.append(
+        sqlString.append("(ln.loan_status_id = 300) ");
+        sqlString.append("AND ln.group_id IS NULL GROUP BY cl.id, ln.id ORDER BY cl.id, ln.id ) " + "loandata ");
+        sqlString.append(
                 "LEFT JOIN m_loan_charge lc ON lc.loan_id = loandata.loanId AND lc.is_paid_derived = false AND lc.is_active = true AND ( lc.due_for_collection_as_of_date  <= :dueDate OR lc.charge_time_enum = 1) ");
-        sb.append("GROUP BY loandata.clientId, loandata.loanId ORDER BY loandata.clientId, loandata.loanId ");
+        sqlString.append("GROUP BY loandata.clientId, loandata.loanId ORDER BY loandata.clientId, loandata.loanId ");
 
-        return sb;
+        return sqlString;
     }
 
     private RowMapper<IndividualCollectionSheetLoanFlatData> rowMapper() {
@@ -164,36 +179,46 @@ public class CollectionSheetDao {
     }
 
     private StringBuilder getIndividualClientDataSql(final boolean checkForOfficeId, final boolean checkForStaffId) {
-        final StringBuilder sb = new StringBuilder(400);
+        final StringBuilder sqlString = new StringBuilder(400);
 
-        sb.append(
-                "SELECT (CASE WHEN sa.deposit_type_enum=100 THEN 'Saving Deposit' ELSE (CASE WHEN sa.deposit_type_enum=300 THEN 'Recurring Deposit' ELSE 'Current Deposit' END) END) as depositAccountType, cl.display_name As clientName, cl.id As clientId, ");
-        sb.append("sa.id As savingsId, sa.account_no As accountId, sa.status_enum As accountStatusId, ");
-        sb.append("sp.short_name As productShortName, sp.id As productId, ");
-        sb.append("sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, ");
-        sb.append("rc." + sqlGenerator.escape("name")
-                + " as currencyName, rc.display_symbol as currencyDisplaySymbol, rc.internationalized_name_code as currencyNameCode, ");
-        sb.append("SUM(COALESCE(mss.deposit_amount,0) - coalesce(mss.deposit_amount_completed_derived,0)) as dueAmount ");
-        sb.append("FROM m_savings_account sa ");
-        sb.append("JOIN m_client cl ON cl.id = sa.client_id ");
-        sb.append("JOIN m_savings_product sp ON sa.product_id=sp.id ");
-        sb.append(
+        sqlString.append("SELECT (CASE WHEN sa.deposit_type_enum=100 THEN 'Saving Deposit' ELSE (CASE WHEN"
+                + " sa.deposit_type_enum=300 THEN 'Recurring Deposit' ELSE 'Current "
+                + "Deposit' END) END) AS depositAccountType, cl.display_name AS clientName," + " cl.id AS clientId, ");
+        sqlString.append("sa.id AS savingsId, ");
+        sqlString.append("sa.account_no AS accountId, ");
+        sqlString.append("sa.status_enum AS accountStatusId, ");
+        sqlString.append("sp.short_name AS productShortName, ");
+        sqlString.append("sp.id AS productId, ");
+        sqlString.append("sa.currency_code AS currencyCode, ");
+        sqlString.append("sa.currency_digits AS currencyDigits, ");
+        sqlString.append("sa.currency_multiplesof AS inMultiplesOf, ");
+        sqlString.append("rc.");
+        sqlString.append(sqlGenerator.escape("name"));
+        sqlString.append(" AS currencyName, ");
+        sqlString.append("rc.display_symbol AS currencyDisplaySymbol, ");
+        sqlString.append("rc.internationalized_name_code AS currencyNameCode, ");
+        sqlString.append("SUM(COALESCE(mss.deposit_amount,0) - coalesce(mss" + ".deposit_amount_completed_derived,0)) AS dueAmount ");
+        sqlString.append("FROM m_savings_account sa ");
+        sqlString.append("JOIN m_client cl ON cl.id = sa.client_id ");
+        sqlString.append("JOIN m_savings_product sp ON sa.product_id = sp.id ");
+        sqlString.append(
                 "LEFT JOIN m_deposit_account_recurring_detail dard ON sa.id = dard.savings_account_id AND dard.is_mandatory = true AND dard.is_calendar_inherited = false ");
-        sb.append(
+        sqlString.append(
                 "LEFT JOIN m_mandatory_savings_schedule mss ON mss.savings_account_id=sa.id AND mss.completed_derived = 0 AND mss.duedate <= :dueDate ");
-        sb.append("LEFT JOIN m_office ofc ON ofc.id = cl.office_id AND ofc.hierarchy like " + ":officeHierarchy ");
-        sb.append("LEFT JOIN m_currency rc on rc." + sqlGenerator.escape("code") + " = sa.currency_code ");
-        sb.append("WHERE sa.status_enum=300 and sa.group_id is null and sa.deposit_type_enum in (100,300,400) ");
-        sb.append("and (cl.status_enum = 300 or (cl.status_enum = 600 and cl.closedon_date >= :dueDate)) ");
+        sqlString.append("LEFT JOIN m_office ofc ON ofc.id = cl.office_id AND ofc.hierarchy like " + ":officeHierarchy ");
+        sqlString.append("LEFT JOIN m_currency rc ON rc.");
+        sqlString.append(sqlGenerator.escape("code"));
+        sqlString.append(" = sa.currency_code ");
+        sqlString.append("WHERE sa.status_enum=300 AND sa.group_id is null AND sa" + ".deposit_type_enum in (100,300,400) ");
+        sqlString.append("AND (cl.status_enum = 300 OR (cl.status_enum = 600 AND cl.closedon_date" + " >= :dueDate)) ");
         if (checkForOfficeId) {
-            sb.append("and ofc.id = :officeId ");
+            sqlString.append("AND ofc.id = :officeId ");
         }
         if (checkForStaffId) {
-            sb.append("and sa.field_officer_id = :staffId ");
+            sqlString.append("AND sa.field_officer_id = :staffId ");
         }
-        sb.append("GROUP BY cl.id, sa.id ORDER BY cl.id, sa.id ");
-
-        return sb;
+        sqlString.append("GROUP BY cl.id, sa.id ORDER BY cl.id, sa.id ");
+        return sqlString;
     }
 
     private ResultSetExtractor<List<IndividualClientData>> individualClientDataExtractor() {
