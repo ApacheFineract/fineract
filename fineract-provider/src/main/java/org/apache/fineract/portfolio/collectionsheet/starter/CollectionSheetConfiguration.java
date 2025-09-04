@@ -62,12 +62,12 @@ public class CollectionSheetConfiguration {
             AttendanceDropdownReadPlatformService attendanceDropdownReadPlatformService,
             CodeValueReadPlatformService codeValueReadPlatformService, PaymentTypeReadPlatformService paymentTypeReadPlatformService,
             CalendarReadPlatformService calendarReadPlatformService, ConfigurationDomainService configurationDomainService,
-            CalendarInstanceRepository calendarInstanceRepository,
-                                                                                 DatabaseSpecificSQLGenerator sqlGenerator, CollectionSheetDao collectionSheetDao) {
+            CalendarInstanceRepository calendarInstanceRepository, DatabaseSpecificSQLGenerator sqlGenerator,
+            CollectionSheetDao collectionSheetDao) {
         return new CollectionSheetReadPlatformServiceImpl(context, namedParameterJdbcTemplate, centerReadPlatformService,
                 groupReadPlatformService, collectionSheetGenerateCommandFromApiJsonDeserializer, calendarRepositoryWrapper,
-                attendanceDropdownReadPlatformService, paymentTypeReadPlatformService,
-                calendarReadPlatformService, configurationDomainService, sqlGenerator, collectionSheetDao);
+                attendanceDropdownReadPlatformService, paymentTypeReadPlatformService, calendarReadPlatformService,
+                configurationDomainService, sqlGenerator, collectionSheetDao);
     }
 
     @Bean

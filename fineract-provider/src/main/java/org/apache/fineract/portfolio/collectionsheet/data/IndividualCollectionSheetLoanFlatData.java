@@ -19,10 +19,7 @@
 package org.apache.fineract.portfolio.collectionsheet.data;
 
 import java.math.BigDecimal;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 
@@ -73,7 +70,7 @@ public class IndividualCollectionSheetLoanFlatData {
         this.feePaid = feePaid;
     }
 
-  public LoanDueData getLoanDueData() {
+    public LoanDueData getLoanDueData() {
         return new LoanDueData(this.loanId, this.accountId, this.accountStatusId, this.productShortName, this.productId, this.currency,
                 this.disbursementAmount, this.principalDue, this.principalPaid, this.interestDue, this.interestPaid, this.chargesDue,
                 this.feeDue, this.feePaid);

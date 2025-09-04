@@ -42,19 +42,16 @@ public final class IndividualClientData {
         return new IndividualClientData(clientId, clientName, new ArrayList<>(), new ArrayList<>());
     }
 
-    public static IndividualClientData withSavings(final IndividualClientData client,
-                                                   final List<SavingsDueData> savings) {
+    public static IndividualClientData withSavings(final IndividualClientData client, final List<SavingsDueData> savings) {
         return new IndividualClientData(client.clientId, client.clientName, client.loans, savings);
     }
 
-    public static IndividualClientData withLoans(final IndividualClientData client,
-                                                 final List<LoanDueData> loans) {
+    public static IndividualClientData withLoans(final IndividualClientData client, final List<LoanDueData> loans) {
         return new IndividualClientData(client.clientId, client.clientName, loans, client.savings);
     }
 
-    private IndividualClientData(final Long clientId, final String clientName,
-                                 final List<LoanDueData> loans,
-                                 final List<SavingsDueData> savings) {
+    private IndividualClientData(final Long clientId, final String clientName, final List<LoanDueData> loans,
+            final List<SavingsDueData> savings) {
         this.clientId = clientId;
         this.clientName = clientName;
         this.loans = loans;

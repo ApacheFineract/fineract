@@ -95,17 +95,14 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
     private final CollectionSheetDao collectionSheetDao;
 
     public CollectionSheetReadPlatformServiceImpl(final PlatformSecurityContext context,
-            final NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-                                                  final CenterReadPlatformService centerReadPlatformService,
+            final NamedParameterJdbcTemplate namedParameterJdbcTemplate, final CenterReadPlatformService centerReadPlatformService,
             final GroupReadPlatformService groupReadPlatformService,
             final CollectionSheetGenerateCommandFromApiJsonDeserializer collectionSheetGenerateCommandFromApiJsonDeserializer,
             final CalendarRepositoryWrapper calendarRepositoryWrapper,
             final AttendanceDropdownReadPlatformService attendanceDropdownReadPlatformService,
             final PaymentTypeReadPlatformService paymentTypeReadPlatformService,
-            final CalendarReadPlatformService calendarReadPlatformService,
-                                                  final ConfigurationDomainService configurationDomainService,
-                                                  final DatabaseSpecificSQLGenerator sqlGenerator,
-                                                  final CollectionSheetDao collectionSheetDao) {
+            final CalendarReadPlatformService calendarReadPlatformService, final ConfigurationDomainService configurationDomainService,
+            final DatabaseSpecificSQLGenerator sqlGenerator, final CollectionSheetDao collectionSheetDao) {
         this.context = context;
         this.centerReadPlatformService = centerReadPlatformService;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -699,38 +696,36 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
             ((MapSqlParameterSource) namedParameters).addValue("staffId", staffId);
         }
 
-      final List<IndividualCollectionSheetLoanFlatData> collectionSheetFlatDatas =
-              collectionSheetDao.getIndividualCollectionSheetFlatDataList(transactionDate, officeHierarchy,
-              officeId, staffId);
+        final List<IndividualCollectionSheetLoanFlatData> collectionSheetFlatDatas = collectionSheetDao
+                .getIndividualCollectionSheetFlatDataList(transactionDate, officeHierarchy, officeId, staffId);
 
-        List<IndividualClientData> clientData = collectionSheetDao.getIndividualClientData(transactionDateStr, officeHierarchy,
-                officeId, staffId);
+        List<IndividualClientData> clientData = collectionSheetDao.getIndividualClientData(transactionDateStr, officeHierarchy, officeId,
+                staffId);
 
         // merge savings data into loan data
-      final List<IndividualClientData> response = mergeLoanData(collectionSheetFlatDatas,
-              clientData);
+        final List<IndividualClientData> response = mergeLoanData(collectionSheetFlatDatas, clientData);
 
-        final List<PaymentTypeData> paymentOptions =
-                this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
+        final List<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
 
         return new IndividualCollectionSheetData(transactionDate, response, paymentOptions);
     }
 
-  private List<IndividualClientData> mergeLoanData(final List<IndividualCollectionSheetLoanFlatData> loanFlatDataList,
-                             List<IndividualClientData> clientDatas) {
+    private List<IndividualClientData> mergeLoanData(final List<IndividualCollectionSheetLoanFlatData> loanFlatDataList,
+            List<IndividualClientData> clientDatas) {
 
-    final Map<Long, IndividualClientData> responseMap = new LinkedHashMap<>();
+        final Map<Long, IndividualClientData> responseMap = new LinkedHashMap<>();
 
-    for(IndividualClientData element : clientDatas){
-      responseMap.putIfAbsent(element.getClientId(), element);
+        for (IndividualClientData element : clientDatas) {
+            responseMap.putIfAbsent(element.getClientId(), element);
+        }
+
+        for (IndividualCollectionSheetLoanFlatData loanFlatData : loanFlatDataList) {
+            final IndividualClientData clientData = loanFlatData.getClientData();
+            responseMap
+                    .computeIfAbsent(clientData.getClientId(),
+                            id -> IndividualClientData.instance(clientData.getClientId(), clientData.getClientName()))
+                    .addLoans(loanFlatData.getLoanDueData());
+        }
+        return new ArrayList<>(responseMap.values());
     }
-
-    for (IndividualCollectionSheetLoanFlatData loanFlatData : loanFlatDataList) {
-      final IndividualClientData clientData = loanFlatData.getClientData();
-      responseMap.computeIfAbsent(clientData.getClientId(),
-                      id -> IndividualClientData.instance(clientData.getClientId(), clientData.getClientName()))
-              .addLoans(loanFlatData.getLoanDueData());
-    }
-    return new ArrayList<>(responseMap.values());
-  }
 }
