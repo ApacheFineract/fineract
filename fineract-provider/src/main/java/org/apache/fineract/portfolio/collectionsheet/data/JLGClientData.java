@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
@@ -34,7 +33,6 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
 public final class JLGClientData implements Serializable {
 
     @Serial
