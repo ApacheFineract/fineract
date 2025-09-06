@@ -30,11 +30,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
@@ -95,95 +99,177 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
      * Reads all the loans which are due for disbursement or collection and builds hierarchical data structure for
      * collections sheet with hierarchy Groups >> Clients >> Loans.
      */
-    private JLGCollectionSheetData buildJLGCollectionSheet(final LocalDate dueDate,
-            final Collection<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData) {
+//    public JLGCollectionSheetData buildJLGCollectionSheet(final LocalDate dueDate,
+//            final List<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData) {
+//
+//        boolean firstTime = true;
+//        Long prevGroupId = null;
+//        Long prevClientId = null;
+//        final List<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
+//
+//        final List<JLGGroupData> jlgGroupsData = new ArrayList<>();
+//        List<JLGClientData> clientsData = new ArrayList<>();
+//        List<LoanDueData> loansDueData = new ArrayList<>();
+//
+//        JLGCollectionSheetData jlgCollectionSheetData = null;
+//        JLGCollectionSheetFlatData prevCollectionSheetFlatData = null;
+//        JLGCollectionSheetFlatData corrCollectionSheetFlatData = null;
+//        final Set<LoanProductData> loanProducts = new HashSet<>();
+//        if (jlgCollectionSheetFlatData != null) {
+//
+//            for (final JLGCollectionSheetFlatData collectionSheetFlatData : jlgCollectionSheetFlatData) {
+//
+//                if (collectionSheetFlatData.getProductId() != null) {
+//                    loanProducts.add(LoanProductData.lookupWithCurrency(collectionSheetFlatData.getProductId(),
+//                            collectionSheetFlatData.getProductShortName(), collectionSheetFlatData.getCurrency()));
+//                }
+//                corrCollectionSheetFlatData = collectionSheetFlatData;
+//
+//                if (firstTime || collectionSheetFlatData.getGroupId().equals(prevGroupId)) {
+//                    if (firstTime || collectionSheetFlatData.getClientId().equals(prevClientId)) {
+//                        if (collectionSheetFlatData.getLoanId() != null) {
+//                            loansDueData.add(collectionSheetFlatData.getLoanDueData());
+//                        }
+//                    } else {
+//                        final JLGClientData clientData = prevCollectionSheetFlatData.getClientData();
+//                        clientData.setLoans(loansDueData);
+//                        clientsData.add(clientData);
+//                        loansDueData = new ArrayList<>();
+//
+//                        if (collectionSheetFlatData.getLoanId() != null) {
+//                            loansDueData.add(collectionSheetFlatData.getLoanDueData());
+//                        }
+//
+//                    }
+//                } else {
+//
+//                    final JLGClientData clientData = prevCollectionSheetFlatData.getClientData();
+//                    clientData.setLoans(loansDueData);
+//                    clientsData.add(clientData);
+//
+//                    final JLGGroupData jlgGroupData = prevCollectionSheetFlatData.getJLGGroupData();
+//                    jlgGroupData.setClients(clientsData);
+//
+//                    jlgGroupsData.add(jlgGroupData);
+//
+//                    loansDueData = new ArrayList<>();
+//                    clientsData = new ArrayList<>();
+//
+//                    if (collectionSheetFlatData.getLoanId() != null) {
+//                        loansDueData.add(collectionSheetFlatData.getLoanDueData());
+//                    }
+//                }
+//
+//                prevClientId = collectionSheetFlatData.getClientId();
+//                prevGroupId = collectionSheetFlatData.getGroupId();
+//                prevCollectionSheetFlatData = collectionSheetFlatData;
+//                firstTime = false;
+//            }
+//
+//            // FIXME Need to check last loan is added under previous
+//            // client/group or new client / previous group or new client / new
+//            // group
+//            if (corrCollectionSheetFlatData != null) {
+//                final JLGClientData lastClientData = corrCollectionSheetFlatData.getClientData();
+//                lastClientData.setLoans(loansDueData);
+//                clientsData.add(lastClientData);
+//
+//                final JLGGroupData jlgGroupData = corrCollectionSheetFlatData.getJLGGroupData();
+//                jlgGroupData.setClients(clientsData);
+//                jlgGroupsData.add(jlgGroupData);
+//            }
+//
+//            jlgCollectionSheetData = JLGCollectionSheetData.instance(dueDate, loanProducts, jlgGroupsData,
+//                    this.attendanceDropdownReadPlatformService.retrieveAttendanceTypeOptions(), paymentOptions);
+//        }
+//        return jlgCollectionSheetData;
+//    }
 
-        boolean firstTime = true;
-        Long prevGroupId = null;
-        Long prevClientId = null;
-        final Collection<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
+    public JLGCollectionSheetData buildJLGCollectionSheet(final LocalDate dueDate,
+                                                           final List<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData) {
 
-        final List<JLGGroupData> jlgGroupsData = new ArrayList<>();
-        List<JLGClientData> clientsData = new ArrayList<>();
-        List<LoanDueData> loansDueData = new ArrayList<>();
+      if (jlgCollectionSheetFlatData == null || jlgCollectionSheetFlatData.isEmpty()) {
+        return null;
+      }
 
-        JLGCollectionSheetData jlgCollectionSheetData = null;
-        JLGCollectionSheetFlatData prevCollectioSheetFlatData = null;
-        JLGCollectionSheetFlatData corrCollectioSheetFlatData = null;
-        final Set<LoanProductData> loanProducts = new HashSet<>();
-        if (jlgCollectionSheetFlatData != null) {
+      final List<PaymentTypeData> paymentOptions = paymentTypeReadPlatformService.retrieveAllPaymentTypes();
+      final List<EnumOptionData> attendanceOptions = attendanceDropdownReadPlatformService.retrieveAttendanceTypeOptions();
 
-            for (final JLGCollectionSheetFlatData collectionSheetFlatData : jlgCollectionSheetFlatData) {
+      // keep insertion order (optional)
+      final Set<LoanProductData> loanProducts = new LinkedHashSet<>();
 
-                if (collectionSheetFlatData.getProductId() != null) {
-                    loanProducts.add(LoanProductData.lookupWithCurrency(collectionSheetFlatData.getProductId(),
-                            collectionSheetFlatData.getProductShortName(), collectionSheetFlatData.getCurrency()));
-                }
-                corrCollectioSheetFlatData = collectionSheetFlatData;
+      // groupId -> ( clientId -> list of loans )
+      final LinkedHashMap<Long, LinkedHashMap<Long, List<LoanDueData>>> grouped = new LinkedHashMap<>();
 
-                if (firstTime || collectionSheetFlatData.getGroupId().equals(prevGroupId)) {
-                    if (firstTime || collectionSheetFlatData.getClientId().equals(prevClientId)) {
-                        if (collectionSheetFlatData.getLoanId() != null) {
-                            loansDueData.add(collectionSheetFlatData.getLoanDueData());
-                        }
-                    } else {
-                        final JLGClientData clientData = prevCollectioSheetFlatData.getClientData();
-                        clientData.setLoans(loansDueData);
-                        clientsData.add(clientData);
-                        loansDueData = new ArrayList<>();
+      // representatives to avoid re-scanning rows later
+      final Map<Long, JLGGroupData> groupById = new LinkedHashMap<>();
+      final Map<Long, JLGClientData> clientById = new LinkedHashMap<>();
 
-                        if (collectionSheetFlatData.getLoanId() != null) {
-                            loansDueData.add(collectionSheetFlatData.getLoanDueData());
-                        }
-
-                    }
-                } else {
-
-                    final JLGClientData clientData = prevCollectioSheetFlatData.getClientData();
-                    clientData.setLoans(loansDueData);
-                    clientsData.add(clientData);
-
-                    final JLGGroupData jlgGroupData = prevCollectioSheetFlatData.getJLGGroupData();
-                    jlgGroupData.setClients(clientsData);
-
-                    jlgGroupsData.add(jlgGroupData);
-
-                    loansDueData = new ArrayList<>();
-                    clientsData = new ArrayList<>();
-
-                    if (collectionSheetFlatData.getLoanId() != null) {
-                        loansDueData.add(collectionSheetFlatData.getLoanDueData());
-                    }
-                }
-
-                prevClientId = collectionSheetFlatData.getClientId();
-                prevGroupId = collectionSheetFlatData.getGroupId();
-                prevCollectioSheetFlatData = collectionSheetFlatData;
-                firstTime = false;
-            }
-
-            // FIXME Need to check last loan is added under previous
-            // client/group or new client / previous group or new client / new
-            // group
-            if (corrCollectioSheetFlatData != null) {
-                final JLGClientData lastClientData = corrCollectioSheetFlatData.getClientData();
-                lastClientData.setLoans(loansDueData);
-                clientsData.add(lastClientData);
-
-                final JLGGroupData jlgGroupData = corrCollectioSheetFlatData.getJLGGroupData();
-                jlgGroupData.setClients(clientsData);
-                jlgGroupsData.add(jlgGroupData);
-            }
-
-            jlgCollectionSheetData = JLGCollectionSheetData.instance(dueDate, loanProducts, jlgGroupsData,
-                    this.attendanceDropdownReadPlatformService.retrieveAttendanceTypeOptions(), paymentOptions);
+      for (JLGCollectionSheetFlatData row : jlgCollectionSheetFlatData) {
+        // collect unique loan products
+        if (row.getProductId() != null) {
+          loanProducts.add(LoanProductData.lookupWithCurrency(
+                  row.getProductId(), row.getProductShortName(), row.getCurrency()));
         }
-        return jlgCollectionSheetData;
+
+        final Long groupId = row.getGroupId();
+        final Long clientId = row.getClientId();
+
+        // lazily create group map and client list
+        grouped
+                .computeIfAbsent(groupId, g -> new LinkedHashMap<>())
+                .computeIfAbsent(clientId, c -> new ArrayList<>());
+
+        // add loan if exists
+        if (row.getLoanId() != null) {
+          grouped.get(groupId).get(clientId).add(row.getLoanDueData());
+        }
+
+        // store representative group/client objects (first occurrence)
+        groupById.putIfAbsent(groupId, row.getJLGGroupData());
+        clientById.putIfAbsent(clientId, row.getClientData());
+      }
+
+      // At this point we have grouped loans; converting to domain objects is a separate pass.
+      // But we can show how to build the groups list quickly (one pass over grouped map):
+      final List<JLGGroupData> groups = new ArrayList<>(grouped.size());
+      for (Map.Entry<Long, LinkedHashMap<Long, List<LoanDueData>>> groupEntry : grouped.entrySet()) {
+        final Long groupId = groupEntry.getKey();
+        final LinkedHashMap<Long, List<LoanDueData>> clientsMap = groupEntry.getValue();
+
+        final List<JLGClientData> clients = new ArrayList<>(clientsMap.size());
+        for (Map.Entry<Long, List<LoanDueData>> clientEntry : clientsMap.entrySet()) {
+          final Long clientId = clientEntry.getKey();
+          final List<LoanDueData> loans = clientEntry.getValue();
+
+          final JLGClientData client = clientById.get(clientId);
+          if (client == null) {
+            // defensive: skip or create placeholder
+            continue;
+          }
+          client.setLoans(new ArrayList<>(loans)); // defensive copy
+          clients.add(client);
+        }
+
+        final JLGGroupData group = groupById.get(groupId);
+        if (group == null) {
+          // defensive: skip or create placeholder
+          continue;
+        }
+        group.setClients(clients);
+        groups.add(group);
+      }
+
+      return JLGCollectionSheetData.instance(
+              dueDate,
+              loanProducts,
+              groups,
+              attendanceOptions,
+              paymentOptions);
     }
 
     @Override
     public JLGCollectionSheetData generateGroupCollectionSheet(final Long groupId, final JsonQuery query) {
-
         this.collectionSheetGenerateCommandFromApiJsonDeserializer.validateForGenerateCollectionSheet(query.json());
 
         final Long calendarId = query.longValueOfParameterNamed(calendarIdParamName);
@@ -302,7 +388,6 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
 
     @Override
     public JLGCollectionSheetData generateCenterCollectionSheet(final Long centerId, final JsonQuery query) {
-
         this.collectionSheetGenerateCommandFromApiJsonDeserializer.validateForGenerateCollectionSheet(query.json());
 
         final AppUser currentUser = this.context.authenticatedUser();

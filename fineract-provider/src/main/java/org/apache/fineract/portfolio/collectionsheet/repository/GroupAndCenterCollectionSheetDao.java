@@ -63,7 +63,7 @@ public class GroupAndCenterCollectionSheetDao {
     }
 
     private SqlParameterSource getGroupNamedParameters(final String transactionDateStr, final String officeHierarchy,
-                                                       final GroupGeneralData group, final CalendarEntityType entityType) {
+            final GroupGeneralData group, final CalendarEntityType entityType) {
 
         return new MapSqlParameterSource().addValue("dueDate", transactionDateStr).addValue("groupId", group.getId())
                 .addValue("officeHierarchy", officeHierarchy).addValue("entityTypeId", entityType.getValue());
@@ -196,194 +196,193 @@ public class GroupAndCenterCollectionSheetDao {
         };
     }
 
-    public List<JLGGroupData> getGroupsWithSavingsData(final LocalDate transactionDate,
-                                                          final String officeHierarchy, final GroupGeneralData group, final CalendarEntityType entityType) {
-      final boolean isCenterCollection = false;
-      final String transactionDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
-      StringBuilder sqlString = getGroupsAndCentersWithSavingsDataSql(isCenterCollection);
+    public List<JLGGroupData> getGroupsWithSavingsData(final LocalDate transactionDate, final String officeHierarchy,
+            final GroupGeneralData group, final CalendarEntityType entityType) {
+        final boolean isCenterCollection = false;
+        final String transactionDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
+        StringBuilder sqlString = getGroupsAndCentersWithSavingsDataSql(isCenterCollection);
 
-      return namedParameterJdbcTemplate
-            .query(sqlString.toString(), getGroupNamedParameters(transactionDateStr, officeHierarchy, group, entityType), savingsDataResultSet());
-  }
+        return namedParameterJdbcTemplate.query(sqlString.toString(),
+                getGroupNamedParameters(transactionDateStr, officeHierarchy, group, entityType), savingsDataResultSet());
+    }
 
-  private StringBuilder getGroupsAndCentersWithSavingsDataSql(final boolean isCenterCollection) {
+    private StringBuilder getGroupsAndCentersWithSavingsDataSql(final boolean isCenterCollection) {
         final StringBuilder sqlString = new StringBuilder(400);
-          sqlString.append("SELECT gp.display_name AS groupName, ");
-          sqlString.append("gp.id AS groupId, ");
-          sqlString.append("cl.display_name AS clientName, ");
-          sqlString.append("cl.id AS clientId, ");
-          sqlString.append("sf.id AS staffId, ");
-          sqlString.append("sf.display_name AS staffName, ");
-          sqlString.append("gl.id AS levelId, ");
-          sqlString.append("gl.level_name AS levelName, ");
-          sqlString.append("sa.id AS savingsId, ");
-          sqlString.append("sa.account_no AS accountId, ");
-          sqlString.append("sa.status_enum AS accountStatusId, ");
-          sqlString.append("sp.short_name AS productShortName, ");
-          sqlString.append("sp.id AS productId, ");
-          sqlString.append("sa.currency_code AS currencyCode, ");
-          sqlString.append("sa.currency_digits AS currencyDigits, ");
-          sqlString.append("sa.currency_multiplesof AS inMultiplesOf, ");
-          sqlString.append("rc.");
-          sqlString.append(sqlGenerator.escape("name"));
-          sqlString.append(" AS currencyName, ");
-          sqlString.append("rc.display_symbol AS currencyDisplaySymbol, ");
-          sqlString.append("(CASE WHEN sa.deposit_type_enum=100 THEN 'Saving Deposit' ELSE (CASE WHEN sa"
-                  + ".deposit_type_enum=300 THEN 'Recurring Deposit' ELSE 'Current Deposit' END) END) " + "AS depositAccountType, ");
-          sqlString.append("rc.internationalized_name_code AS currencyNameCode, ");
-          sqlString.append("SUM(COALESCE(mss.deposit_amount,0) - COALESCE(mss" + ".deposit_amount_completed_derived,0)) AS dueAmount ");
-          sqlString.append("FROM m_group gp ");
-          sqlString.append("LEFT JOIN m_office ofc ON ofc.id = gp.office_id AND ofc.hierarchy LIKE " + ":officeHierarchy ");
-          sqlString.append("JOIN m_group_level gl ON gl.id = gp.level_Id ");
-          sqlString.append("LEFT JOIN m_staff sf ON sf.id = gp.staff_id ");
-          sqlString.append("JOIN m_group_client gc ON gc.group_id = gp.id ");
-          sqlString.append("JOIN m_client cl ON cl.id = gc.client_id ");
-          sqlString.append("JOIN m_savings_account sa ON sa.client_id=cl.id AND sa.status_enum = 300 ");
-          sqlString.append("JOIN m_savings_product sp ON sa.product_id=sp.id ");
-          sqlString.append("LEFT JOIN m_deposit_account_recurring_detail dard ON sa.id = dard"
-                  + ".savings_account_id AND dard.is_mandatory = TRUE AND dard.is_calendar_inherited = " + "TRUE ");
-          sqlString.append("LEFT JOIN m_mandatory_savings_schedule mss ON mss.savings_account_id = sa.id " + "AND mss.duedate <= :dueDate ");
-          sqlString.append("LEFT JOIN m_currency rc ON rc.");
-          sqlString.append(sqlGenerator.escape("code"));
-          sqlString.append(" = sa.currency_code ");
-          if (isCenterCollection) {
-              sqlString.append("WHERE gp.parent_id = :centerId ");
-          } else {
-              sqlString.append("WHERE gp.id = :groupId ");
-          }
+        sqlString.append("SELECT gp.display_name AS groupName, ");
+        sqlString.append("gp.id AS groupId, ");
+        sqlString.append("cl.display_name AS clientName, ");
+        sqlString.append("cl.id AS clientId, ");
+        sqlString.append("sf.id AS staffId, ");
+        sqlString.append("sf.display_name AS staffName, ");
+        sqlString.append("gl.id AS levelId, ");
+        sqlString.append("gl.level_name AS levelName, ");
+        sqlString.append("sa.id AS savingsId, ");
+        sqlString.append("sa.account_no AS accountId, ");
+        sqlString.append("sa.status_enum AS accountStatusId, ");
+        sqlString.append("sp.short_name AS productShortName, ");
+        sqlString.append("sp.id AS productId, ");
+        sqlString.append("sa.currency_code AS currencyCode, ");
+        sqlString.append("sa.currency_digits AS currencyDigits, ");
+        sqlString.append("sa.currency_multiplesof AS inMultiplesOf, ");
+        sqlString.append("rc.");
+        sqlString.append(sqlGenerator.escape("name"));
+        sqlString.append(" AS currencyName, ");
+        sqlString.append("rc.display_symbol AS currencyDisplaySymbol, ");
+        sqlString.append("(CASE WHEN sa.deposit_type_enum=100 THEN 'Saving Deposit' ELSE (CASE WHEN sa"
+                + ".deposit_type_enum=300 THEN 'Recurring Deposit' ELSE 'Current Deposit' END) END) " + "AS depositAccountType, ");
+        sqlString.append("rc.internationalized_name_code AS currencyNameCode, ");
+        sqlString.append("SUM(COALESCE(mss.deposit_amount,0) - COALESCE(mss" + ".deposit_amount_completed_derived,0)) AS dueAmount ");
+        sqlString.append("FROM m_group gp ");
+        sqlString.append("LEFT JOIN m_office ofc ON ofc.id = gp.office_id AND ofc.hierarchy LIKE " + ":officeHierarchy ");
+        sqlString.append("JOIN m_group_level gl ON gl.id = gp.level_Id ");
+        sqlString.append("LEFT JOIN m_staff sf ON sf.id = gp.staff_id ");
+        sqlString.append("JOIN m_group_client gc ON gc.group_id = gp.id ");
+        sqlString.append("JOIN m_client cl ON cl.id = gc.client_id ");
+        sqlString.append("JOIN m_savings_account sa ON sa.client_id=cl.id AND sa.status_enum = 300 ");
+        sqlString.append("JOIN m_savings_product sp ON sa.product_id=sp.id ");
+        sqlString.append("LEFT JOIN m_deposit_account_recurring_detail dard ON sa.id = dard"
+                + ".savings_account_id AND dard.is_mandatory = TRUE AND dard.is_calendar_inherited = " + "TRUE ");
+        sqlString.append("LEFT JOIN m_mandatory_savings_schedule mss ON mss.savings_account_id = sa.id " + "AND mss.duedate <= :dueDate ");
+        sqlString.append("LEFT JOIN m_currency rc ON rc.");
+        sqlString.append(sqlGenerator.escape("code"));
+        sqlString.append(" = sa.currency_code ");
+        if (isCenterCollection) {
+            sqlString.append("WHERE gp.parent_id = :centerId ");
+        } else {
+            sqlString.append("WHERE gp.id = :groupId ");
+        }
 
-          sqlString.append("AND (gp.status_enum = 300 OR (gp.status_enum = 600 AND gp.closedon_date >= " + ":dueDate)) ");
-          sqlString.append("AND (cl.status_enum = 300 OR (cl.status_enum = 600 AND cl.closedon_date >= " + ":dueDate)) ");
-          sqlString.append("GROUP BY gp.id, cl.id, sa.id ORDER BY gp.id, cl.id, sa.id ");
+        sqlString.append("AND (gp.status_enum = 300 OR (gp.status_enum = 600 AND gp.closedon_date >= " + ":dueDate)) ");
+        sqlString.append("AND (cl.status_enum = 300 OR (cl.status_enum = 600 AND cl.closedon_date >= " + ":dueDate)) ");
+        sqlString.append("GROUP BY gp.id, cl.id, sa.id ORDER BY gp.id, cl.id, sa.id ");
         return sqlString;
     }
 
-  private ResultSetExtractor<List<JLGGroupData>> savingsDataResultSet() {
-      return rs -> {
-        List<JLGGroupData> groups = new ArrayList<>();
-        JLGGroupData group = null;
-        int groupIndex = 0;
-        boolean isEndOfRecords = false;
-        // move cursor to first row.
-        final boolean isNotEmptyResultSet = rs.next();
+    private ResultSetExtractor<List<JLGGroupData>> savingsDataResultSet() {
+        return rs -> {
+            List<JLGGroupData> groups = new ArrayList<>();
+            JLGGroupData group = null;
+            int groupIndex = 0;
+            boolean isEndOfRecords = false;
+            // move cursor to first row.
+            final boolean isNotEmptyResultSet = rs.next();
 
-        if (isNotEmptyResultSet) {
-          while (!isEndOfRecords) {
-            group = mapRowData(rs, groupIndex++);
-            groups.add(group);
-            isEndOfRecords = rs.isAfterLast();
-          }
+            if (isNotEmptyResultSet) {
+                while (!isEndOfRecords) {
+                    group = mapRowData(rs, groupIndex++);
+                    groups.add(group);
+                    isEndOfRecords = rs.isAfterLast();
+                }
+            }
+            return groups;
+        };
+    }
+
+    private JLGGroupData mapRowData(ResultSet rs, int rowNum) throws SQLException {
+        final List<JLGClientData> clients = new ArrayList<>();
+        final JLGGroupData group = mapGroupRow(rs, rowNum);
+        final Long previousGroupId = group.getGroupId();
+
+        // first client row of new group
+        JLGClientData client = mapClientRowData(rs, rowNum);
+        clients.add(client);
+
+        // if it's not after last row loop
+        while (!rs.isAfterLast()) {
+            final Long groupId = JdbcSupport.getLong(rs, "groupId");
+            if (previousGroupId != null && groupId.compareTo(previousGroupId) != 0) {
+                // return for next group details
+                return JLGGroupData.withClients(group, clients);
+            }
+            client = mapClientRowData(rs, rowNum);
+            clients.add(client);
         }
-        return groups;
-      };
-    }
-
-  private JLGGroupData mapRowData(ResultSet rs, int rowNum) throws SQLException {
-    final List<JLGClientData> clients = new ArrayList<>();
-    final JLGGroupData group = mapGroupRow(rs, rowNum);
-    final Long previousGroupId = group.getGroupId();
-
-    // first client row of new group
-    JLGClientData client = mapClientRowData(rs, rowNum);
-    clients.add(client);
-
-    // if it's not after last row loop
-    while (!rs.isAfterLast()) {
-      final Long groupId = JdbcSupport.getLong(rs, "groupId");
-      if (previousGroupId != null && groupId.compareTo(previousGroupId) != 0) {
-        // return for next group details
         return JLGGroupData.withClients(group, clients);
-      }
-      client = mapClientRowData(rs, rowNum);
-      clients.add(client);
     }
-    return JLGGroupData.withClients(group, clients);
-  }
 
-  private JLGClientData mapClientRowData(ResultSet rs, int rowNum) throws SQLException {
+    private JLGClientData mapClientRowData(ResultSet rs, int rowNum) throws SQLException {
 
-    List<SavingsDueData> savings = new ArrayList<>();
+        List<SavingsDueData> savings = new ArrayList<>();
 
-    JLGClientData client = mapClientRow(rs, rowNum);
-    final Long previousClientId = client.getClientId();
+        JLGClientData client = mapClientRow(rs, rowNum);
+        final Long previousClientId = client.getClientId();
 
-    // first savings row of new client record
-    SavingsDueData saving = mapSavingsDataRow(rs, rowNum);
-    savings.add(saving);
+        // first savings row of new client record
+        SavingsDueData saving = mapSavingsDataRow(rs, rowNum);
+        savings.add(saving);
 
-    while (rs.next()) {
-      final Long clientId = JdbcSupport.getLong(rs, "clientId");
-      if (previousClientId != null && clientId.compareTo(previousClientId) != 0) {
-        // client id changes then return for next client data
+        while (rs.next()) {
+            final Long clientId = JdbcSupport.getLong(rs, "clientId");
+            if (previousClientId != null && clientId.compareTo(previousClientId) != 0) {
+                // client id changes then return for next client data
+                return JLGClientData.withSavings(client, savings);
+            }
+            saving = mapSavingsDataRow(rs, rowNum);
+            savings.add(saving);
+        }
         return JLGClientData.withSavings(client, savings);
-      }
-      saving = mapSavingsDataRow(rs, rowNum);
-      savings.add(saving);
     }
-    return JLGClientData.withSavings(client, savings);
-  }
 
-  private JLGGroupData mapGroupRow(ResultSet rs, int rowNum) throws SQLException {
-    final String groupName = rs.getString("groupName");
-    final Long groupId = JdbcSupport.getLong(rs, "groupId");
-    final Long staffId = JdbcSupport.getLong(rs, "staffId");
-    final String staffName = rs.getString("staffName");
-    final Long levelId = JdbcSupport.getLong(rs, "levelId");
-    final String levelName = rs.getString("levelName");
-    return JLGGroupData.instance(groupId, groupName, staffId, staffName, levelId, levelName);
-  }
+    private JLGGroupData mapGroupRow(ResultSet rs, int rowNum) throws SQLException {
+        final String groupName = rs.getString("groupName");
+        final Long groupId = JdbcSupport.getLong(rs, "groupId");
+        final Long staffId = JdbcSupport.getLong(rs, "staffId");
+        final String staffName = rs.getString("staffName");
+        final Long levelId = JdbcSupport.getLong(rs, "levelId");
+        final String levelName = rs.getString("levelName");
+        return JLGGroupData.instance(groupId, groupName, staffId, staffName, levelId, levelName);
+    }
 
-  private JLGClientData mapClientRow(ResultSet rs, int rowNum) throws SQLException {
-    final String clientName = rs.getString("clientName");
-    final Long clientId = JdbcSupport.getLong(rs, "clientId");
+    private JLGClientData mapClientRow(ResultSet rs, int rowNum) throws SQLException {
+        final String clientName = rs.getString("clientName");
+        final Long clientId = JdbcSupport.getLong(rs, "clientId");
 
-    return JLGClientData.instance(clientId, clientName, null);
-  }
+        return JLGClientData.instance(clientId, clientName, null);
+    }
 
-  private SavingsDueData mapSavingsDataRow(ResultSet rs, int rowNum) throws SQLException {
-    final Long savingsId = rs.getLong("savingsId");
-    final String accountId = rs.getString("accountId");
-    final Integer accountStatusId = JdbcSupport.getInteger(rs, "accountStatusId");
-    final String productName = rs.getString("productShortName");
-    final Long productId = rs.getLong("productId");
-    final BigDecimal dueAmount = rs.getBigDecimal("dueAmount");
-    final String currencyCode = rs.getString("currencyCode");
-    final String currencyName = rs.getString("currencyName");
-    final String currencyNameCode = rs.getString("currencyNameCode");
-    final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
-    final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
-    final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-    final String depositAccountType = rs.getString("depositAccountType");
+    private SavingsDueData mapSavingsDataRow(ResultSet rs, int rowNum) throws SQLException {
+        final Long savingsId = rs.getLong("savingsId");
+        final String accountId = rs.getString("accountId");
+        final Integer accountStatusId = JdbcSupport.getInteger(rs, "accountStatusId");
+        final String productName = rs.getString("productShortName");
+        final Long productId = rs.getLong("productId");
+        final BigDecimal dueAmount = rs.getBigDecimal("dueAmount");
+        final String currencyCode = rs.getString("currencyCode");
+        final String currencyName = rs.getString("currencyName");
+        final String currencyNameCode = rs.getString("currencyNameCode");
+        final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
+        final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
+        final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
+        final String depositAccountType = rs.getString("depositAccountType");
 
-    final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
-            currencyNameCode);
+        final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
+                currencyNameCode);
 
-    return SavingsDueData.instance(savingsId, accountId, accountStatusId, productName, productId, currency, dueAmount,
-            depositAccountType);
-  }
+        return SavingsDueData.instance(savingsId, accountId, accountStatusId, productName, productId, currency, dueAmount,
+                depositAccountType);
+    }
 
-  public List<JLGCollectionSheetFlatData> getCenterCollectionSheetFlatDataList(final LocalDate transactionDate, final String officeHierarchy, final CenterData center) {
-    final boolean isCenterCollection = true;
-    final String dueDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
-    final StringBuilder sqlString = getCollectionSheetFlatDataSql(isCenterCollection);
+    public List<JLGCollectionSheetFlatData> getCenterCollectionSheetFlatDataList(final LocalDate transactionDate,
+            final String officeHierarchy, final CenterData center) {
+        final boolean isCenterCollection = true;
+        final String dueDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
+        final StringBuilder sqlString = getCollectionSheetFlatDataSql(isCenterCollection);
 
-    return namedParameterJdbcTemplate.query(sqlString.toString(),
-            getCenterNamedParameters(dueDateStr, officeHierarchy, center),
-            rowMapperFlatData());
-  }
+        return namedParameterJdbcTemplate.query(sqlString.toString(), getCenterNamedParameters(dueDateStr, officeHierarchy, center),
+                rowMapperFlatData());
+    }
 
-  private SqlParameterSource getCenterNamedParameters(String dueDateStr, String officeHierarchy, CenterData center) {
-      return new MapSqlParameterSource().addValue("dueDate", dueDateStr)
-        .addValue("centerId", center.getId()).addValue("officeHierarchy", officeHierarchy)
-        .addValue("entityTypeId", CalendarEntityType.CENTERS.getValue());
-  }
+    private SqlParameterSource getCenterNamedParameters(String dueDateStr, String officeHierarchy, CenterData center) {
+        return new MapSqlParameterSource().addValue("dueDate", dueDateStr).addValue("centerId", center.getId())
+                .addValue("officeHierarchy", officeHierarchy).addValue("entityTypeId", CalendarEntityType.CENTERS.getValue());
+    }
 
-  public List<JLGGroupData> getCenterWithSavingsData(LocalDate transactionDate, String officeHierarchy, CenterData center) {
-    final boolean isCenterCollection = true;
-    final String dueDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
-    StringBuilder sqlString = getGroupsAndCentersWithSavingsDataSql(isCenterCollection);
+    public List<JLGGroupData> getCenterWithSavingsData(LocalDate transactionDate, String officeHierarchy, CenterData center) {
+        final boolean isCenterCollection = true;
+        final String dueDateStr = DateUtils.DEFAULT_DATE_FORMATTER.format(transactionDate);
+        StringBuilder sqlString = getGroupsAndCentersWithSavingsDataSql(isCenterCollection);
 
-    return namedParameterJdbcTemplate
-            .query(sqlString.toString(), getCenterNamedParameters(dueDateStr, officeHierarchy, center), savingsDataResultSet());
-  }
+        return namedParameterJdbcTemplate.query(sqlString.toString(), getCenterNamedParameters(dueDateStr, officeHierarchy, center),
+                savingsDataResultSet());
+    }
 }

@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 
 /**
@@ -32,6 +33,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 public class LoanDueData implements Serializable {
 
     @Serial

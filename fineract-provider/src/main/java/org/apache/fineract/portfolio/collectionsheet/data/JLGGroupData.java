@@ -22,8 +22,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Immutable data object for groups with clients due for disbursement or collection.
@@ -31,6 +33,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
+@Builder
 public final class JLGGroupData implements Serializable {
 
     @Serial

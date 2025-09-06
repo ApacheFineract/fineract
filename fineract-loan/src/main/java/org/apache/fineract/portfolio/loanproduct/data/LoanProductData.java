@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.ToString;
 import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
@@ -77,6 +78,7 @@ import org.springframework.util.CollectionUtils;
  * Immutable data object to represent loan products.
  */
 @Getter
+@ToString
 public class LoanProductData implements Serializable {
 
     private final Long id;
