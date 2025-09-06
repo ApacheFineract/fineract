@@ -53,8 +53,7 @@ public final class JLGCollectionSheetData implements Serializable {
     private final List<EnumOptionData> attendanceTypeOptions;
     private final List<PaymentTypeData> paymentTypeOptions;
 
-    public static JLGCollectionSheetData instance(final LocalDate date,
-                                                  final Set<LoanProductData> loanProducts,
+    public static JLGCollectionSheetData instance(final LocalDate date, final Set<LoanProductData> loanProducts,
             final List<JLGGroupData> groups, final List<EnumOptionData> attendanceTypeOptions,
             final List<PaymentTypeData> paymentTypeOptions) {
         return new JLGCollectionSheetData(date, loanProducts, null, groups, attendanceTypeOptions, paymentTypeOptions);
