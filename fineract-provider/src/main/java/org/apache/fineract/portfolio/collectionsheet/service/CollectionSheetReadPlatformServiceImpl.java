@@ -353,7 +353,7 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
     // }
 
     private JLGCollectionSheetData mergeCollectionSheetWithSavings(final List<JLGGroupData> groupsWithSavingsData,
-                                                                   final JLGCollectionSheetData collectionSheetData) {
+            final JLGCollectionSheetData collectionSheetData) {
 
         if (collectionSheetData == null) {
             return null;
