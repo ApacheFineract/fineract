@@ -100,92 +100,6 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
      * Reads all the loans which are due for disbursement or collection and builds hierarchical data structure for
      * collections sheet with hierarchy Groups >> Clients >> Loans.
      */
-    // public JLGCollectionSheetData buildJLGCollectionSheet(final LocalDate dueDate,
-    // final List<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData) {
-    //
-    // boolean firstTime = true;
-    // Long prevGroupId = null;
-    // Long prevClientId = null;
-    // final List<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
-    //
-    // final List<JLGGroupData> jlgGroupsData = new ArrayList<>();
-    // List<JLGClientData> clientsData = new ArrayList<>();
-    // List<LoanDueData> loansDueData = new ArrayList<>();
-    //
-    // JLGCollectionSheetData jlgCollectionSheetData = null;
-    // JLGCollectionSheetFlatData prevCollectionSheetFlatData = null;
-    // JLGCollectionSheetFlatData corrCollectionSheetFlatData = null;
-    // final Set<LoanProductData> loanProducts = new HashSet<>();
-    // if (jlgCollectionSheetFlatData != null) {
-    //
-    // for (final JLGCollectionSheetFlatData collectionSheetFlatData : jlgCollectionSheetFlatData) {
-    //
-    // if (collectionSheetFlatData.getProductId() != null) {
-    // loanProducts.add(LoanProductData.lookupWithCurrency(collectionSheetFlatData.getProductId(),
-    // collectionSheetFlatData.getProductShortName(), collectionSheetFlatData.getCurrency()));
-    // }
-    // corrCollectionSheetFlatData = collectionSheetFlatData;
-    //
-    // if (firstTime || collectionSheetFlatData.getGroupId().equals(prevGroupId)) {
-    // if (firstTime || collectionSheetFlatData.getClientId().equals(prevClientId)) {
-    // if (collectionSheetFlatData.getLoanId() != null) {
-    // loansDueData.add(collectionSheetFlatData.getLoanDueData());
-    // }
-    // } else {
-    // final JLGClientData clientData = prevCollectionSheetFlatData.getClientData();
-    // clientData.setLoans(loansDueData);
-    // clientsData.add(clientData);
-    // loansDueData = new ArrayList<>();
-    //
-    // if (collectionSheetFlatData.getLoanId() != null) {
-    // loansDueData.add(collectionSheetFlatData.getLoanDueData());
-    // }
-    //
-    // }
-    // } else {
-    //
-    // final JLGClientData clientData = prevCollectionSheetFlatData.getClientData();
-    // clientData.setLoans(loansDueData);
-    // clientsData.add(clientData);
-    //
-    // final JLGGroupData jlgGroupData = prevCollectionSheetFlatData.getJLGGroupData();
-    // jlgGroupData.setClients(clientsData);
-    //
-    // jlgGroupsData.add(jlgGroupData);
-    //
-    // loansDueData = new ArrayList<>();
-    // clientsData = new ArrayList<>();
-    //
-    // if (collectionSheetFlatData.getLoanId() != null) {
-    // loansDueData.add(collectionSheetFlatData.getLoanDueData());
-    // }
-    // }
-    //
-    // prevClientId = collectionSheetFlatData.getClientId();
-    // prevGroupId = collectionSheetFlatData.getGroupId();
-    // prevCollectionSheetFlatData = collectionSheetFlatData;
-    // firstTime = false;
-    // }
-    //
-    // // FIXME Need to check last loan is added under previous
-    // // client/group or new client / previous group or new client / new
-    // // group
-    // if (corrCollectionSheetFlatData != null) {
-    // final JLGClientData lastClientData = corrCollectionSheetFlatData.getClientData();
-    // lastClientData.setLoans(loansDueData);
-    // clientsData.add(lastClientData);
-    //
-    // final JLGGroupData jlgGroupData = corrCollectionSheetFlatData.getJLGGroupData();
-    // jlgGroupData.setClients(clientsData);
-    // jlgGroupsData.add(jlgGroupData);
-    // }
-    //
-    // jlgCollectionSheetData = JLGCollectionSheetData.instance(dueDate, loanProducts, jlgGroupsData,
-    // this.attendanceDropdownReadPlatformService.retrieveAttendanceTypeOptions(), paymentOptions);
-    // }
-    // return jlgCollectionSheetData;
-    // }
-
     public JLGCollectionSheetData buildJLGCollectionSheet(final LocalDate dueDate,
             final List<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData) {
 
@@ -252,7 +166,6 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
             group.setClients(clients);
             groups.add(group);
         }
-
         return JLGCollectionSheetData.instance(dueDate, loanProducts, groups, attendanceOptions, paymentOptions);
     }
 
@@ -308,49 +221,6 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
         JLGCollectionSheetData aggregatedData = mergeCollectionSheetWithSavings(groupsWithSavingsData, collectionSheetData);
         return aggregatedData;
     }
-
-    // private void mergeSavingsGroupDataIntoCollectionsheetData(final List<JLGGroupData> groupsWithSavingsData,
-    // final JLGCollectionSheetData collectionSheetData) {
-    // final List<JLGGroupData> groupsWithLoanData = collectionSheetData.getGroups();
-    // for (JLGGroupData groupSavingsData : groupsWithSavingsData) {
-    // if (groupsWithLoanData.contains(groupSavingsData)) {
-    // mergeGroup(groupSavingsData, groupsWithLoanData);
-    // } else {
-    // groupsWithLoanData.add(groupSavingsData);
-    // }
-    // }
-    // }
-    //
-    // private void mergeGroup(final JLGGroupData groupSavingsData, final List<JLGGroupData> groupsWithLoanData) {
-    // final int index = groupsWithLoanData.indexOf(groupSavingsData);
-    //
-    // if (index < 0) {
-    // return;
-    // }
-    //
-    // JLGGroupData groupLoanData = groupsWithLoanData.get(index);
-    // List<JLGClientData> clientsLoanData = groupLoanData.getClients();
-    // List<JLGClientData> clientsSavingsData = groupSavingsData.getClients();
-    //
-    // for (JLGClientData clientSavingsData : clientsSavingsData) {
-    // if (clientsLoanData.contains(clientSavingsData)) {
-    // mergeClient(clientSavingsData, clientsLoanData);
-    // } else {
-    // clientsLoanData.add(clientSavingsData);
-    // }
-    // }
-    // }
-    //
-    // private void mergeClient(final JLGClientData clientSavingsData, List<JLGClientData> clientsLoanData) {
-    // final int index = clientsLoanData.indexOf(clientSavingsData);
-    //
-    // if (index < 0) {
-    // return;
-    // }
-    //
-    // JLGClientData clientLoanData = clientsLoanData.get(index);
-    // clientLoanData.setSavings(clientSavingsData.getSavings());
-    // }
 
     private JLGCollectionSheetData mergeCollectionSheetWithSavings(final List<JLGGroupData> groupsWithSavingsData,
             final JLGCollectionSheetData collectionSheetData) {
@@ -450,30 +320,10 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 collectionSheetData.getAttendanceTypeOptions(), collectionSheetData.getPaymentTypeOptions());
     }
 
-    // private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
-    // List<SavingsProductData> savingsProducts = new ArrayList<>();
-    // for (JLGGroupData groupSavingsData : groupsWithSavingsData) {
-    // List<JLGClientData> clientsSavingsData = groupSavingsData.getClients();
-    // for (JLGClientData clientSavingsData : clientsSavingsData) {
-    // List<SavingsDueData> savingsDatas = clientSavingsData.getSavings();
-    // for (SavingsDueData savingsDueData : savingsDatas) {
-    // final SavingsProductData savingsProduct = SavingsProductData.lookup(savingsDueData.productId(),
-    // savingsDueData.productName());
-    // savingsProduct.setDepositAccountType(savingsDueData.getDepositAccountType());
-    // if (!savingsProducts.contains(savingsProduct)) {
-    // savingsProducts.add(savingsProduct);
-    // }
-    // }
-    // }
-    // }
-    // return savingsProducts;
-    // }
-
     private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
         if (groupsWithSavingsData == null || groupsWithSavingsData.isEmpty()) {
             return Collections.emptyList();
         }
-
         // Use a map keyed by productId to ensure unique products and fast lookup
         Map<Long, SavingsProductData> productMap = new LinkedHashMap<>();
 
