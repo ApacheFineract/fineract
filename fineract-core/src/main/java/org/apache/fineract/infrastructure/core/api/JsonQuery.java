@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
+import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -37,6 +38,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncod
  *
  * Wraps the provided JSON with convenience functions for extracting parameter values.
  */
+@ToString
 public final class JsonQuery {
 
     private final String jsonQuery;
