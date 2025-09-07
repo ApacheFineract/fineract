@@ -320,41 +320,41 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 collectionSheetData.getAttendanceTypeOptions(), collectionSheetData.getPaymentTypeOptions());
     }
 
-    private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
-        if (groupsWithSavingsData == null || groupsWithSavingsData.isEmpty()) {
-            return Collections.emptyList();
-        }
-        // Use a map keyed by productId to ensure unique products and fast lookup
-        Map<Long, SavingsProductData> productMap = new LinkedHashMap<>();
-
-        for (JLGGroupData group : groupsWithSavingsData) {
-            if (group == null) {
-                continue;
-            }
-            List<JLGClientData> clients = Optional.ofNullable(group.getClients()).orElse(Collections.emptyList());
-            for (JLGClientData client : clients) {
-                if (client == null) {
-                    continue;
-                }
-                List<SavingsDueData> savingsList = Optional.ofNullable(client.getSavings()).orElse(Collections.emptyList());
-                for (SavingsDueData savingsDueData : savingsList) {
-                    if (savingsDueData == null) {
-                        continue;
-                    }
-                    Long productId = savingsDueData.productId();
-                    String productName = savingsDueData.productName();
-
-                    // create if absent; keep one canonical SavingsProductData per productId
-                    SavingsProductData savingsProduct = productMap.computeIfAbsent(productId,
-                            id -> SavingsProductData.lookup(id, productName));
-
-                    // update/overwrite deposit account type (or merge as required)
-                    savingsProduct.setDepositAccountType(savingsDueData.getDepositAccountType());
-                }
-            }
-        }
-        return new ArrayList<>(productMap.values());
-    }
+//    private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
+//        if (groupsWithSavingsData == null || groupsWithSavingsData.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//        // Use a map keyed by productId to ensure unique products and fast lookup
+//        Map<Long, SavingsProductData> productMap = new LinkedHashMap<>();
+//
+//        for (JLGGroupData group : groupsWithSavingsData) {
+//            if (group == null) {
+//                continue;
+//            }
+//            List<JLGClientData> clients = Optional.ofNullable(group.getClients()).orElse(Collections.emptyList());
+//            for (JLGClientData client : clients) {
+//                if (client == null) {
+//                    continue;
+//                }
+//                List<SavingsDueData> savingsList = Optional.ofNullable(client.getSavings()).orElse(Collections.emptyList());
+//                for (SavingsDueData savingsDueData : savingsList) {
+//                    if (savingsDueData == null) {
+//                        continue;
+//                    }
+//                    Long productId = savingsDueData.productId();
+//                    String productName = savingsDueData.productName();
+//
+//                    // create if absent; keep one canonical SavingsProductData per productId
+//                    SavingsProductData savingsProduct = productMap.computeIfAbsent(productId,
+//                            id -> SavingsProductData.lookup(id, productName));
+//
+//                    // update/overwrite deposit account type (or merge as required)
+//                    savingsProduct.setDepositAccountType(savingsDueData.getDepositAccountType());
+//                }
+//            }
+//        }
+//        return new ArrayList<>(productMap.values());
+//    }
 
     @Override
     public JLGCollectionSheetData generateCenterCollectionSheet(final Long centerId, final JsonQuery query) {
