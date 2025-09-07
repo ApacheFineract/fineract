@@ -65,8 +65,4 @@ public final class JLGCollectionSheetData implements Serializable {
         return new JLGCollectionSheetData(data.dueDate, data.loanProducts, savingsProducts, data.groups, data.attendanceTypeOptions,
                 data.paymentTypeOptions);
     }
-
-    public LocalDate getDate() {
-        return this.dueDate;
-    }
 }

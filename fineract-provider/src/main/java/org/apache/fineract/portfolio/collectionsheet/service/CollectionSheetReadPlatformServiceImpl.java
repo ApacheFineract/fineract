@@ -446,7 +446,7 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
             mergedGroups.add(clonedGroup);
         }
 
-        return JLGCollectionSheetData.instance(collectionSheetData.getDate(), collectionSheetData.getLoanProducts(), mergedGroups,
+        return JLGCollectionSheetData.instance(collectionSheetData.getDueDate(), collectionSheetData.getLoanProducts(), mergedGroups,
                 collectionSheetData.getAttendanceTypeOptions(), collectionSheetData.getPaymentTypeOptions());
     }
 
