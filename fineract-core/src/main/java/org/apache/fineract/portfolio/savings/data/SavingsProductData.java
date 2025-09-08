@@ -23,6 +23,10 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ChargeToGLAccountMapper;
@@ -36,6 +40,10 @@ import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 /**
  * Immutable data object represent a savings product.
  */
+@Getter
+@Setter
+@AllArgsConstructor
+@Builder
 public final class SavingsProductData implements Serializable {
 
     private final Long id;
@@ -173,8 +181,7 @@ public final class SavingsProductData implements Serializable {
      * template data for dropdowns.
      *
      * @param taxGroupOptions
-     *            TODO
-     * @param accountMapping
+     *            // * TODO // * @param accountMapping
      */
     public static SavingsProductData withTemplate(final SavingsProductData existingProduct, final Collection<CurrencyData> currencyOptions,
             final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions,

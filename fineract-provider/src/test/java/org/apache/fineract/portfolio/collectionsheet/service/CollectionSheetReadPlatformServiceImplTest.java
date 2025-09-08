@@ -20,15 +20,18 @@ import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDoma
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
 import org.apache.fineract.portfolio.calendar.exception.NotValidRecurringDateException;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
+import org.apache.fineract.portfolio.collectionsheet.data.JLGClientData;
 import org.apache.fineract.portfolio.collectionsheet.data.JLGCollectionSheetData;
 import org.apache.fineract.portfolio.collectionsheet.data.JLGCollectionSheetFlatData;
 import org.apache.fineract.portfolio.collectionsheet.data.JLGGroupData;
+import org.apache.fineract.portfolio.collectionsheet.data.SavingsDueData;
 import org.apache.fineract.portfolio.collectionsheet.repository.GroupAndCenterCollectionSheetDao;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetGenerateCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.group.data.CenterData;
@@ -54,6 +57,7 @@ class CollectionSheetReadPlatformServiceImplTest {
     private List<JLGCollectionSheetFlatData> jlgCollectionSheetFlatData;
     private JLGCollectionSheetFlatData mockJlgCollectionSheetFlatData;
     private List<JLGCollectionSheetFlatData> mockJlgCollectionSheetFlatDataList;
+    private List<JLGGroupData> groupsWithSavingsData;
     private Calendar calendar;
     private GroupGeneralData groups;
     private CenterData centerData;
@@ -225,47 +229,134 @@ class CollectionSheetReadPlatformServiceImplTest {
         Mockito.doNothing().when(collectionSheetGenerateCommandFromApiJsonDeserializer).validateForGenerateCollectionSheet(anyString());
         Mockito.when(centerReadPlatformService.retrieveOne(1L)).thenReturn(centerData);
         Mockito.when(context.authenticatedUser()).thenReturn(currentUser);
-        Mockito.when(groupAndCenterCollectionSheetDao.getCenterCollectionSheetFlatDataList(eq(date), anyString(),
-                any(CenterData.class))).thenReturn(mockJlgCollectionSheetFlatDataList);
-        Mockito.when(groupAndCenterCollectionSheetDao.getCenterWithSavingsData(eq(date),
-                anyString(), any(CenterData.class))).thenReturn(dummyList);
+        Mockito.when(groupAndCenterCollectionSheetDao.getCenterCollectionSheetFlatDataList(eq(date), anyString(), any(CenterData.class)))
+                .thenReturn(mockJlgCollectionSheetFlatDataList);
+        Mockito.when(groupAndCenterCollectionSheetDao.getCenterWithSavingsData(eq(date), anyString(), any(CenterData.class)))
+                .thenReturn(dummyList);
         Collections.shuffle(jlgCollectionSheetFlatData);
         Assertions.assertNotNull(underTest.generateCenterCollectionSheet(1L, query));
     }
 
-  @Test
-  void generateGroupCollectionSheet_Exception() {
-    final String apiRequestBodyAsJson = "{\n" + "    \"transactionDate\":\"01 September 2025\",\n"
-            + "    \"dateFormat\":\"dd MMMM yyyy\",\n" + "    \"locale\":\"en\",\n" + "    \"calendarId\":1\n" + "}";
-    final FromJsonHelper fromJsonHelper = new FromJsonHelper();
-    final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
-    final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
+    @Test
+    void generateGroupCollectionSheet_Exception() {
+        final String apiRequestBodyAsJson = "{\n" + "    \"transactionDate\":\"01 September 2025\",\n"
+                + "    \"dateFormat\":\"dd MMMM yyyy\",\n" + "    \"locale\":\"en\",\n" + "    \"calendarId\":1\n" + "}";
+        final FromJsonHelper fromJsonHelper = new FromJsonHelper();
+        final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
+        final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
 
-    Mockito.doNothing().when(collectionSheetGenerateCommandFromApiJsonDeserializer).validateForGenerateCollectionSheet(anyString());
-    Mockito.when(groupReadPlatformService.retrieveOne(1L)).thenReturn(groups);
-    Mockito.when(configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled()).thenReturn(false);
-    Mockito.when(calendarRepositoryWrapper.findOneWithNotFoundDetection(anyLong())).thenReturn(calendarMock);
-    Mockito.when(calendarMock.isValidRecurringDate(any(LocalDate.class), anyBoolean(), anyInt())).thenReturn(false);
-    Assertions.assertThrows(NotValidRecurringDateException.class, () -> {
-      // call the method under test that should throw
-      underTest.generateGroupCollectionSheet(1L, query);
-    });
-  }
+        Mockito.doNothing().when(collectionSheetGenerateCommandFromApiJsonDeserializer).validateForGenerateCollectionSheet(anyString());
+        Mockito.when(groupReadPlatformService.retrieveOne(1L)).thenReturn(groups);
+        Mockito.when(configurationDomainService.isSkippingMeetingOnFirstDayOfMonthEnabled()).thenReturn(false);
+        Mockito.when(calendarRepositoryWrapper.findOneWithNotFoundDetection(anyLong())).thenReturn(calendarMock);
+        Mockito.when(calendarMock.isValidRecurringDate(any(LocalDate.class), anyBoolean(), anyInt())).thenReturn(false);
+        Assertions.assertThrows(NotValidRecurringDateException.class, () -> {
+            // call the method under test that should throw
+            underTest.generateGroupCollectionSheet(1L, query);
+        });
+    }
 
-  @Test
-  void generateCenterCollectionSheet_Exception() {
-    final String apiRequestBodyAsJson = "{\n" + "    \"transactionDate\":\"01 September 2025\",\n"
-            + "    \"dateFormat\":\"dd MMMM yyyy\",\n" + "    \"locale\":\"en\",\n" + "    \"calendarId\":1\n" + "}";
-    final FromJsonHelper fromJsonHelper = new FromJsonHelper();
-    final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
-    final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
-    List<JLGGroupData> dummyList = Arrays.asList(mock(JLGGroupData.class));
+    @Test
+    void generateCenterCollectionSheet_Exception() {
+        final String apiRequestBodyAsJson = "{\n" + "    \"transactionDate\":\"01 September 2025\",\n"
+                + "    \"dateFormat\":\"dd MMMM yyyy\",\n" + "    \"locale\":\"en\",\n" + "    \"calendarId\":1\n" + "}";
+        final FromJsonHelper fromJsonHelper = new FromJsonHelper();
+        final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
+        final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
+        List<JLGGroupData> dummyList = Arrays.asList(mock(JLGGroupData.class));
 
-    // office returns hierarchy string
-    Mockito.doNothing().when(collectionSheetGenerateCommandFromApiJsonDeserializer).validateForGenerateCollectionSheet(anyString());
-    Collections.shuffle(jlgCollectionSheetFlatData);
-    Assertions.assertThrows(Exception.class, () -> {
-      underTest.generateGroupCollectionSheet(1L, query);
-    });
-  }
+        // office returns hierarchy string
+        Mockito.doNothing().when(collectionSheetGenerateCommandFromApiJsonDeserializer).validateForGenerateCollectionSheet(anyString());
+        Collections.shuffle(jlgCollectionSheetFlatData);
+        Assertions.assertThrows(Exception.class, () -> {
+            underTest.generateGroupCollectionSheet(1L, query);
+        });
+    }
+
+    @Test
+    void mergeCollectionSheetWithSavings_happyPath() {
+        Collections.shuffle(jlgCollectionSheetFlatData);
+
+        // Expected Results Data
+        Set<LoanProductData> loanProducts = new LinkedHashSet<>();
+        for (JLGCollectionSheetFlatData row : jlgCollectionSheetFlatData) {
+            // collect unique loan products
+            if (row.getProductId() != null) {
+                loanProducts.add(LoanProductData.lookupWithCurrency(row.getProductId(), row.getProductShortName(), row.getCurrency()));
+            }
+        }
+
+        Map<Long, JLGGroupData> groupMap = new LinkedHashMap<>();
+        for (JLGCollectionSheetFlatData element : jlgCollectionSheetFlatData) {
+            Long groupId = element.getGroupId();
+
+            // if group does not exist, create it
+            JLGGroupData group = groupMap.computeIfAbsent(groupId,
+                    id -> JLGGroupData.builder().groupId(element.getGroupId()).groupName(element.getGroupName())
+                            .staffId(element.getStaffId()).staffName(element.getStaffName()).levelId(element.getLevelId())
+                            .levelName(element.getLevelName())
+                            .clients(List.of(JLGClientData.builder().savings(List.of(SavingsDueData.builder().savingsId(1L)
+                                    .accountId("000000001").accountStatusId(300).productName("SACC").productId(1L)
+                                    .currency(CurrencyData.builder().code("USD").nameCode("US Dollar").decimalPlaces(2).inMultiplesOf(1)
+                                            .displaySymbol("$").nameCode("currency.USD").displayLabel("US Dollar ($)").build())
+                                    .dueAmount(BigDecimal.ZERO).depositAccountType("Saving Deposit").build())).build()))
+                            .build());
+
+            // add client to that group
+            // group.getClients().add(element.getClientData());
+        }
+        // finally get all groups as a list
+        List<JLGGroupData> groupsDataList = new ArrayList<>(groupMap.values());
+
+        JLGCollectionSheetData jlgCollectionSheetData = JLGCollectionSheetData.builder().dueDate(LocalDate.of(2025, 9, 1))
+                .loanProducts(loanProducts).groups(groupsDataList).attendanceTypeOptions(new ArrayList<>())
+                .paymentTypeOptions(new ArrayList<>()).build();
+
+        // "savingsId": 1,
+        // "accountId": "000000001",
+        // "accountStatusId": 300,
+        // "productName": "SACC",
+        // "productId": 1,
+        // "currency": {
+        // "code": "USD",
+        // "name": "US Dollar",
+        // "decimalPlaces": 2,
+        // "inMultiplesOf": 1,
+        // "displaySymbol": "$",
+        // "nameCode": "currency.USD",
+        // "displayLabel": "US Dollar ($)"
+        // },
+        // "dueAmount": 0.000000,
+        // "depositAccountType": "Saving Deposit"
+        // },
+        //
+        // JLGGroupData data = JLGGroupData.builder()
+        // .clients(List.of(
+        // JLGClientData.builder()
+        // .savings(List.of(SavingsDueData.builder()
+        // .savingsId(1L)
+        // .accountId("000000001")
+        // .accountStatusId(300)
+        // .productName("SACC")
+        // .productId(1L)
+        // .currency(CurrencyData.builder()
+        // .code("USD")
+        // .nameCode("US Dollar")
+        // .decimalPlaces(2)
+        // .inMultiplesOf(1)
+        // .displaySymbol("$")
+        // .nameCode("currency.USD")
+        // .displayLabel("US Dollar ($)")
+        // .build())
+        // .dueAmount(BigDecimal.ZERO)
+        // .depositAccountType("Saving Deposit")
+        // .build())).build()))
+        //
+        // .build();
+
+        JLGCollectionSheetData mergedResults = JLGCollectionSheetData.builder().dueDate(LocalDate.of(2025, 9, 1)).loanProducts(loanProducts)
+                .groups(groupsDataList).attendanceTypeOptions(new ArrayList<>()).paymentTypeOptions(new ArrayList<>()).build();
+
+        Assertions.assertEquals(underTest.mergeCollectionSheetWithSavings(groupsDataList, jlgCollectionSheetData), mergedResults);
+    }
 }

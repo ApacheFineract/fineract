@@ -29,12 +29,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -69,7 +67,6 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.meeting.attendance.service.AttendanceDropdownReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
-import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -222,7 +219,7 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
         return aggregatedData;
     }
 
-    private JLGCollectionSheetData mergeCollectionSheetWithSavings(final List<JLGGroupData> groupsWithSavingsData,
+    public JLGCollectionSheetData mergeCollectionSheetWithSavings(final List<JLGGroupData> groupsWithSavingsData,
             final JLGCollectionSheetData collectionSheetData) {
 
         if (collectionSheetData == null) {
@@ -320,41 +317,41 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 collectionSheetData.getAttendanceTypeOptions(), collectionSheetData.getPaymentTypeOptions());
     }
 
-//    private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
-//        if (groupsWithSavingsData == null || groupsWithSavingsData.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//        // Use a map keyed by productId to ensure unique products and fast lookup
-//        Map<Long, SavingsProductData> productMap = new LinkedHashMap<>();
-//
-//        for (JLGGroupData group : groupsWithSavingsData) {
-//            if (group == null) {
-//                continue;
-//            }
-//            List<JLGClientData> clients = Optional.ofNullable(group.getClients()).orElse(Collections.emptyList());
-//            for (JLGClientData client : clients) {
-//                if (client == null) {
-//                    continue;
-//                }
-//                List<SavingsDueData> savingsList = Optional.ofNullable(client.getSavings()).orElse(Collections.emptyList());
-//                for (SavingsDueData savingsDueData : savingsList) {
-//                    if (savingsDueData == null) {
-//                        continue;
-//                    }
-//                    Long productId = savingsDueData.productId();
-//                    String productName = savingsDueData.productName();
-//
-//                    // create if absent; keep one canonical SavingsProductData per productId
-//                    SavingsProductData savingsProduct = productMap.computeIfAbsent(productId,
-//                            id -> SavingsProductData.lookup(id, productName));
-//
-//                    // update/overwrite deposit account type (or merge as required)
-//                    savingsProduct.setDepositAccountType(savingsDueData.getDepositAccountType());
-//                }
-//            }
-//        }
-//        return new ArrayList<>(productMap.values());
-//    }
+    // private List<SavingsProductData> retrieveSavingsProducts(List<JLGGroupData> groupsWithSavingsData) {
+    // if (groupsWithSavingsData == null || groupsWithSavingsData.isEmpty()) {
+    // return Collections.emptyList();
+    // }
+    // // Use a map keyed by productId to ensure unique products and fast lookup
+    // Map<Long, SavingsProductData> productMap = new LinkedHashMap<>();
+    //
+    // for (JLGGroupData group : groupsWithSavingsData) {
+    // if (group == null) {
+    // continue;
+    // }
+    // List<JLGClientData> clients = Optional.ofNullable(group.getClients()).orElse(Collections.emptyList());
+    // for (JLGClientData client : clients) {
+    // if (client == null) {
+    // continue;
+    // }
+    // List<SavingsDueData> savingsList = Optional.ofNullable(client.getSavings()).orElse(Collections.emptyList());
+    // for (SavingsDueData savingsDueData : savingsList) {
+    // if (savingsDueData == null) {
+    // continue;
+    // }
+    // Long productId = savingsDueData.productId();
+    // String productName = savingsDueData.productName();
+    //
+    // // create if absent; keep one canonical SavingsProductData per productId
+    // SavingsProductData savingsProduct = productMap.computeIfAbsent(productId,
+    // id -> SavingsProductData.lookup(id, productName));
+    //
+    // // update/overwrite deposit account type (or merge as required)
+    // savingsProduct.setDepositAccountType(savingsDueData.getDepositAccountType());
+    // }
+    // }
+    // }
+    // return new ArrayList<>(productMap.values());
+    // }
 
     @Override
     public JLGCollectionSheetData generateCenterCollectionSheet(final Long centerId, final JsonQuery query) {
