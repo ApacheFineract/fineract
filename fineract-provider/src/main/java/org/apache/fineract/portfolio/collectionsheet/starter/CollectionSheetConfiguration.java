@@ -18,55 +18,42 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.starter;
 
-import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
-import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.calendar.domain.CalendarRepositoryWrapper;
-import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
-import org.apache.fineract.portfolio.collectionsheet.repository.GroupAndCenterCollectionSheetDao;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkDisbursalCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetBulkRepaymentCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.collectionsheet.serialization.CollectionSheetGenerateCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
-import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformService;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
-import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
-import org.apache.fineract.portfolio.meeting.attendance.service.AttendanceDropdownReadPlatformService;
 import org.apache.fineract.portfolio.meeting.service.MeetingWritePlatformService;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetailAssembler;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
 import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
 public class CollectionSheetConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(CollectionSheetReadPlatformService.class)
-    public CollectionSheetReadPlatformService collectionSheetReadPlatformService(PlatformSecurityContext context,
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate, CenterReadPlatformService centerReadPlatformService,
-            GroupReadPlatformService groupReadPlatformService,
-            CollectionSheetGenerateCommandFromApiJsonDeserializer collectionSheetGenerateCommandFromApiJsonDeserializer,
-            CalendarRepositoryWrapper calendarRepositoryWrapper,
-            AttendanceDropdownReadPlatformService attendanceDropdownReadPlatformService,
-            PaymentTypeReadPlatformService paymentTypeReadPlatformService, CalendarReadPlatformService calendarReadPlatformService,
-            ConfigurationDomainService configurationDomainService,
-
-            DatabaseSpecificSQLGenerator sqlGenerator, GroupAndCenterCollectionSheetDao groupAndCenterCollectionSheetDao) {
-        return new CollectionSheetReadPlatformServiceImpl(context, namedParameterJdbcTemplate, centerReadPlatformService,
-                groupReadPlatformService, collectionSheetGenerateCommandFromApiJsonDeserializer, calendarRepositoryWrapper,
-                attendanceDropdownReadPlatformService, paymentTypeReadPlatformService, calendarReadPlatformService,
-                configurationDomainService, sqlGenerator, groupAndCenterCollectionSheetDao);
-    }
+    // @Bean
+    // @ConditionalOnMissingBean(CollectionSheetReadPlatformService.class)
+    // public CollectionSheetReadPlatformService collectionSheetReadPlatformService(PlatformSecurityContext context,
+    // NamedParameterJdbcTemplate namedParameterJdbcTemplate, CenterReadPlatformService centerReadPlatformService,
+    // GroupReadPlatformService groupReadPlatformService,
+    // CollectionSheetGenerateCommandFromApiJsonDeserializer collectionSheetGenerateCommandFromApiJsonDeserializer,
+    // CalendarRepositoryWrapper calendarRepositoryWrapper,
+    // AttendanceDropdownReadPlatformService attendanceDropdownReadPlatformService,
+    // PaymentTypeReadPlatformService paymentTypeReadPlatformService, CalendarReadPlatformService
+    // calendarReadPlatformService,
+    // ConfigurationDomainService configurationDomainService,
+    //
+    // DatabaseSpecificSQLGenerator sqlGenerator, GroupAndCenterCollectionSheetDao groupAndCenterCollectionSheetDao) {
+    // return new CollectionSheetReadPlatformServiceImpl(context, namedParameterJdbcTemplate, centerReadPlatformService,
+    // groupReadPlatformService, collectionSheetGenerateCommandFromApiJsonDeserializer, calendarRepositoryWrapper,
+    // attendanceDropdownReadPlatformService, paymentTypeReadPlatformService, calendarReadPlatformService,
+    // configurationDomainService, sqlGenerator, groupAndCenterCollectionSheetDao);
+    // }
 
     @Bean
     @ConditionalOnMissingBean(CollectionSheetWritePlatformService.class)

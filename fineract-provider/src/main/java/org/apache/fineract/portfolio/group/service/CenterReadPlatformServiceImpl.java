@@ -70,8 +70,10 @@ import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+@Service
 @RequiredArgsConstructor
 public class CenterReadPlatformServiceImpl implements CenterReadPlatformService {
 

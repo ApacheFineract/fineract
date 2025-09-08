@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.calendar.domain;
 
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
  * required.
  * </p>
  */
-@Service
+@Component
 public class CalendarRepositoryWrapper {
 
     private final CalendarRepository repository;
