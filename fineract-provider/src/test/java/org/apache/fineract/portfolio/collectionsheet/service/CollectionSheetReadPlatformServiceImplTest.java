@@ -142,7 +142,6 @@ class CollectionSheetReadPlatformServiceImplTest {
             if (row.getProductId() != null) {
                 loanProducts.add(LoanProductData.lookupWithCurrency(row.getProductId(), row.getProductShortName(), row.getCurrency()));
             }
-            // System.out.println("LoanProductData: " + loanProducts);
         }
 
         Map<Long, JLGGroupData> groupMap = new LinkedHashMap<>();
@@ -158,8 +157,6 @@ class CollectionSheetReadPlatformServiceImplTest {
             // add client to that group
             group.getClients().add(element.getClientData());
         }
-        // System.out.println("GroupMaps: " + groupMap);
-
         // finally get all groups as a list
         List<JLGGroupData> groupsDataList = new ArrayList<>(groupMap.values());
 
@@ -311,48 +308,6 @@ class CollectionSheetReadPlatformServiceImplTest {
         JLGCollectionSheetData jlgCollectionSheetData = JLGCollectionSheetData.builder().dueDate(LocalDate.of(2025, 9, 1))
                 .loanProducts(loanProducts).groups(groupsDataList).attendanceTypeOptions(new ArrayList<>())
                 .paymentTypeOptions(new ArrayList<>()).build();
-
-        // "savingsId": 1,
-        // "accountId": "000000001",
-        // "accountStatusId": 300,
-        // "productName": "SACC",
-        // "productId": 1,
-        // "currency": {
-        // "code": "USD",
-        // "name": "US Dollar",
-        // "decimalPlaces": 2,
-        // "inMultiplesOf": 1,
-        // "displaySymbol": "$",
-        // "nameCode": "currency.USD",
-        // "displayLabel": "US Dollar ($)"
-        // },
-        // "dueAmount": 0.000000,
-        // "depositAccountType": "Saving Deposit"
-        // },
-        //
-        // JLGGroupData data = JLGGroupData.builder()
-        // .clients(List.of(
-        // JLGClientData.builder()
-        // .savings(List.of(SavingsDueData.builder()
-        // .savingsId(1L)
-        // .accountId("000000001")
-        // .accountStatusId(300)
-        // .productName("SACC")
-        // .productId(1L)
-        // .currency(CurrencyData.builder()
-        // .code("USD")
-        // .nameCode("US Dollar")
-        // .decimalPlaces(2)
-        // .inMultiplesOf(1)
-        // .displaySymbol("$")
-        // .nameCode("currency.USD")
-        // .displayLabel("US Dollar ($)")
-        // .build())
-        // .dueAmount(BigDecimal.ZERO)
-        // .depositAccountType("Saving Deposit")
-        // .build())).build()))
-        //
-        // .build();
 
         JLGCollectionSheetData mergedResults = JLGCollectionSheetData.builder().dueDate(LocalDate.of(2025, 9, 1)).loanProducts(loanProducts)
                 .groups(groupsDataList).attendanceTypeOptions(new ArrayList<>()).paymentTypeOptions(new ArrayList<>()).build();
