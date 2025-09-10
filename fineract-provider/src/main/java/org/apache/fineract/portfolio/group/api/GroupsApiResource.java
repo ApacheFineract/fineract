@@ -430,13 +430,16 @@ public class GroupsApiResource {
             + "Allows you to unassign Roles associated tp Group members.\n\n" + "Update a Role:\n\n"
             + "Allows you to update the member Role.\n\n" + "Mandatory Fields: role\n\n"
             + "Showing request/response for Transfer Clients across groups")
-    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsGroupIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsGroupIdResponse.class))) })
+    // @RequestBody(required = true, content = @Content(schema = @Schema(implementation =
+    // GroupsApiResourceSwagger.PostGroupsGroupIdRequest.class)))
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation =
+    // GroupsApiResourceSwagger.PostGroupsGroupIdResponse.class))) })
     public String activateOrGenerateCollectionSheet(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
             @QueryParam("roleId") @Parameter(description = "roleId") final Long roleId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
+            @RequestBody(required = true, content = @Content(schema = @Schema(type = "String"))) final String apiRequestBodyAsJson,
+            @Context final UriInfo uriInfo) {
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
         CommandProcessingResult result = null;
