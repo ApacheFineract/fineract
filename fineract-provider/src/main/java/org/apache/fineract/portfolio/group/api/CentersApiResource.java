@@ -321,12 +321,15 @@ public class CentersApiResource {
             + "Save Collection Sheet:\n\n"
             + "This Api allows the loan officer to perform bulk repayments of JLG loans for a center on a given meeting date.\n\n"
             + "Showing Request/Response for Close a Center")
-    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CentersApiResourceSwagger.PostCentersCenterIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CentersApiResourceSwagger.PostCentersCenterIdResponse.class))) })
+    // @RequestBody(required = true, content = @Content(schema = @Schema(implementation =
+    // CentersApiResourceSwagger.PostCentersCenterIdRequest.class)))
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation =
+    // CentersApiResourceSwagger.PostCentersCenterIdResponse.class))) })
     public String activate(@PathParam("centerId") @Parameter(description = "centerId") final Long centerId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
+            @RequestBody(required = true, content = @Content(schema = @Schema(type = "String"))) final String apiRequestBodyAsJson,
+            @Context final UriInfo uriInfo) {
 
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
