@@ -20,23 +20,23 @@ package org.apache.fineract.portfolio.collectionsheet.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @FieldNameConstants
 @AllArgsConstructor
 @Builder
-public class DisbursementTransactionsRequest implements Serializable {
+public class DisbursementTransactionsRequest extends BaseBulkTransactionsDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<RepaymentTransactionRequest> bulkRepaymentTransactions;
-    private List<SavingDueTransactionRequest> bulkSavingsDueTransactions;
+    private Long loanId;
 }

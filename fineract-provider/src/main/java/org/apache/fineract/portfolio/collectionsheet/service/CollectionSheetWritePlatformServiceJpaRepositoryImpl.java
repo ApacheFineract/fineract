@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
@@ -143,6 +144,8 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                 depositTransactionIds.add(savingsAccountTransaction.getId());
             } catch (Exception e) {
                 // TODO: handle exception
+              throw new PlatformInternalServerException(e.getLocalizedMessage(), e.getMessage(),
+                      e.getMessage());
             }
         }
         changes.put("SavingsTransactions", depositTransactionIds);
