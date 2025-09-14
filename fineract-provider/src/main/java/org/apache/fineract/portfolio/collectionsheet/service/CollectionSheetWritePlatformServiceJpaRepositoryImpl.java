@@ -29,7 +29,6 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.data.CollectionSheetTransactionDataValidator;
@@ -44,7 +43,6 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.domain.DepositAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.DepositAccountWritePlatformService;
-import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 
 @RequiredArgsConstructor
 public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements CollectionSheetWritePlatformService {
@@ -145,8 +143,7 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
                         .mandatorySavingsAccountDeposit(savingsAccountTransactionDTO);
                 depositTransactionIds.add(savingsAccountTransaction.getId());
             } catch (Exception e) {
-              throw new PlatformApiDataValidationException(e.getMessage(),e.getMessage(),
-                      e.getMessage(), e.getMessage());
+                throw new PlatformApiDataValidationException(e.getMessage(), e.getMessage(), e.getMessage(), e);
             }
         }
         changes.put("SavingsTransactions", depositTransactionIds);
