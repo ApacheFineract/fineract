@@ -80,10 +80,10 @@ public class CollectionSheetWritePlatformServiceJpaRepositoryImpl implements Col
 
         this.meetingWritePlatformService.updateCollectionSheetAttendance(command);
 
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(command.entityId()) //
-                .withGroupId(command.entityId()) //
+        return new CommandProcessingResultBuilder()
+                .withCommandId(command.commandId())
+                .withEntityId(command.entityId())
+                .withGroupId(command.entityId())
                 .with(changes).with(changes).build();
     }
 
