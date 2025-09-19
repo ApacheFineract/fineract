@@ -677,7 +677,8 @@ configure(project.fineractJavaProjects) {
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
 
-        testImplementation( 'org.mockito:mockito-core',
+        testImplementation(
+//                'org.mockito:mockito-core',
                 'org.mockito:mockito-junit-jupiter',
                 'org.junit.jupiter:junit-jupiter-api',
                 'org.junit.jupiter:junit-jupiter-engine',
@@ -761,6 +762,12 @@ configure(project.fineractCustomProjects) {
         dependsOn = []
     }
 
+    configurations {
+        mockitoAgent {
+            transitive = false
+        }
+    }
+
     dependencies {
         implementation (
                 'org.springframework:spring-context',
@@ -803,6 +810,12 @@ configure(project.fineractCustomProjects) {
                 'io.cucumber:cucumber-junit-platform-engine:7.20.1',
                 'io.cucumber:cucumber-spring:7.20.1',
                 )
+
+        mockitoAgent "org.mockito:mockito-core"
+
+        tasks.withType(Test).configureEach {
+            jvmArgs += "-javaagent:${configurations.mockitoAgent.singleFile}"
+        }
 
         testCompileOnly('org.projectlombok:lombok')
         testAnnotationProcessor('org.projectlombok:lombok')

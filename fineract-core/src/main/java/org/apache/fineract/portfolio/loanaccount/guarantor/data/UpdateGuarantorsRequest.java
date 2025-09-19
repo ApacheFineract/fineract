@@ -22,34 +22,45 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.apache.fineract.validation.constraints.Locale;
 import org.apache.fineract.validation.constraints.ValidAge;
 
-@Setter
+@SuperBuilder(toBuilder = true)
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ValidAge(dateField = "dob", formatField = "dateFormat", localeField = "locale", min = 15, max = 75, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.dob.validAge}")
-public abstract class GuarantorsRequest implements Serializable {
+public class UpdateGuarantorsRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.locale.notBlank}")
+    @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.loanId.digits}")
+    private Long loanId;
+
+    @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.positiveOrZero}")
+    @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorId.digits}")
+    private Long guarantorId;
+
     @Size(max = 50, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.locale.size}")
+    @Locale
     private String locale;
 
     @Size(max = 20, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.date.format.size}")
-    private String dateFormat; // "dd MMMM yyyy"
+    private String dateFormat;
 
     /*** Fields for capturing relationship of Guarantor with customer **/
     @PositiveOrZero(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.clientRelationshipTypeId.positiveOrZero}")
@@ -57,7 +68,6 @@ public abstract class GuarantorsRequest implements Serializable {
     private Long clientRelationshipTypeId;
 
     /*** Fields for current customers serving as guarantors **/
-    @NotNull(message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorTypeId.notNull}")
     @Min(value = 1, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorTypeId.min}")
     @Max(value = 3, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorTypeId.max}")
     @Digits(integer = 10, fraction = 0, message = "{org.apache.fineract.portfolio.loanaccount.guarantor.guarantorTypeId.digits}")
@@ -111,4 +121,8 @@ public abstract class GuarantorsRequest implements Serializable {
 
     @DecimalMin(value = "0.01", message = "{org.apache.fineract.portfolio.loanaccount.guarantor.amount.min}")
     private BigDecimal amount;
+
+    public UpdateGuarantorsRequest withLoanIdAndGuarantorId(Long loanId, Long guarantorId) {
+        return this.toBuilder().loanId(loanId).guarantorId(guarantorId).build();
+    }
 }
