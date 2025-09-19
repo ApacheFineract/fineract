@@ -87,7 +87,9 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/loans/{loanId}/guarantors")
 @Component
-@Tag(name = "Guarantors", description = "")
+@Tag(name = "Guarantors", description = """
+        Guarantors are individuals or entities that commit to repaying a loan if the primary borrower defaults. In the banking domain, they serve as an additional layer of security for lenders, helping to mitigate credit risk and improve loan eligibility for borrowers. This feature is especially important in microfinance and inclusive banking, where borrowers may lack traditional forms of collateral.
+        `The Apache Fineract` supports the full lifecycle management of guarantors, including creation, validation, and association with loan accounts, enabling financial institutions to manage credit guarantees transparently and effectively.""")
 @RequiredArgsConstructor
 public class GuarantorsApiResource {
 
@@ -95,13 +97,10 @@ public class GuarantorsApiResource {
 
     private final GuarantorReadPlatformService guarantorReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
-    // private final DefaultToApiJsonSerializer<GuarantorData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    // private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final PlatformSecurityContext context;
     private final PortfolioAccountReadPlatformService portfolioAccountReadPlatformService;
     private final LoanReadPlatformService loanReadPlatformService;
-    // private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final CommandPipeline commandPipeline;
 
@@ -149,18 +148,6 @@ public class GuarantorsApiResource {
         }
         return guarantorData;
     }
-
-    // @POST
-    // @Consumes({ MediaType.APPLICATION_JSON })
-    // @Produces({ MediaType.APPLICATION_JSON })
-    // public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest
-    // guarantorsRequest) {
-    //
-    // final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
-    // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
-    //
-    // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-    // }
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
