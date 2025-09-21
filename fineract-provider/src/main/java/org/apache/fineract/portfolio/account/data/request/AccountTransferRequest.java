@@ -18,10 +18,13 @@
  */
 package org.apache.fineract.portfolio.account.data.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.fineract.validation.constraints.Locale;
 
 @Data
 @NoArgsConstructor
@@ -30,17 +33,45 @@ public class AccountTransferRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.transfer.description.not.blank}")
+    @Size(max = 200, message = "{org.apache.fineract.portfolio.account.data.request.transfer.description.size}")
     private String transferDescription;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.to.office.id.not.blank}")
     private String toOfficeId;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.to.account.type.not.blank}")
     private String toAccountType;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.date.format.not.blank}")
     private String dateFormat;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.transfer.amount.not.blank}")
     private String transferAmount;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.to.account.id.not.blank}")
     private String toAccountId;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.from.client.id.not.blank}")
     private String fromClientId;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.locale.not.blank}")
+    @Size(max = 50, message = "{org.apache.fineract.portfolio.account.data.locale.size}")
+    @Locale
     private String locale;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.transfer.date.not.blank}")
     private String transferDate;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.from.account.type.not.blank}")
     private String fromAccountType;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.to.client.id.not.blank}")
     private String toClientId;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.from.account.id.not.blank}")
     private String fromAccountId;
+
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.from.office.id.not.blank}")
     private String fromOfficeId;
 }

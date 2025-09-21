@@ -41,6 +41,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.fineract.commands.domain.CommandWrapper;
+import org.apache.fineract.commands.service.CommandWrapperBuilder;
+import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -78,6 +81,7 @@ public class SelfAccountTransferApiResource {
     private final SelfBeneficiariesTPTReadPlatformService tptBeneficiaryReadPlatformService;
     private final ConfigurationDomainService configurationDomainService;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
+    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
     @Path("template")
@@ -117,7 +121,12 @@ public class SelfAccountTransferApiResource {
         if (type.equals("tpt")) {
             checkForLimits(params);
         }
-        return this.accountTransfersApiResource.create(accountTransferRequest);
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountTransfer()
+                .withJson(toApiJsonSerializer.serialize(accountTransferRequest)).build();
+
+        return commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return this.accountTransfersApiResource.create(accountTransferRequest);
     }
 
     private void checkForLimits(Map<String, Object> params) {
