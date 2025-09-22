@@ -22,11 +22,11 @@ import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.fineract.command.core.Command;
-import org.apache.fineract.portfolio.account.data.request.AccountTransferRequest;
+import org.apache.fineract.portfolio.account.data.RefundByTransferRequest;
 
 @Getter
 @Setter
-public class AccountTransferCreateCommand extends Command<AccountTransferRequest> {
+public class AccountRefundByTransferCommand extends Command<RefundByTransferRequest> {
 
     @Serial
     private static final long serialVersionUID = 1L;

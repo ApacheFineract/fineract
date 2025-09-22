@@ -27,23 +27,24 @@ import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformS
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
-import org.apache.fineract.portfolio.account.data.AccountTransferRequest;
-import org.apache.fineract.portfolio.account.data.AccountTransferResponse;
+import org.apache.fineract.portfolio.account.data.RefundByTransferRequest;
+import org.apache.fineract.portfolio.account.data.RefundByTransferResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AccountTransferCreateCommandHandler implements CommandHandler<AccountTransferRequest, AccountTransferResponse> {
+public class AccountRefundByTransferCommandHandler implements CommandHandler<RefundByTransferRequest, RefundByTransferResponse> {
 
     private final DefaultToApiJsonSerializer<AccountTransferData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @Override
-    public AccountTransferResponse handle(Command<AccountTransferRequest> command) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountTransfer()
-                .withJson(toApiJsonSerializer.serialize(command.getPayload())).build();
+    public RefundByTransferResponse handle(Command<RefundByTransferRequest> command) {
 
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().refundByTransfer()
+                .withJson(toApiJsonSerializer.serialize(command.getPayload())).build();
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-        return new AccountTransferResponse(result.getSavingsId(), result.getLoanId(), result.getResourceId());
+
+        return new RefundByTransferResponse(result.getSavingsId(), result.getResourceId());
     }
 }
