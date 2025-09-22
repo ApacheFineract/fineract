@@ -16,32 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.account.data.request;
+package org.apache.fineract.portfolio.account.command;
 
 import java.io.Serial;
-import java.io.Serializable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.portfolio.account.data.StandingInstructionUpdateRequest;
 
-@Data
-@NoArgsConstructor
-public class StandingInstructionUpdatesRequest implements Serializable {
+@Getter
+@Setter
+public class StandingInstructionUpdateCommand extends Command<StandingInstructionUpdateRequest> {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-    private String amount;
-    private String validTill;
-    private String dateFormat;
-    private String validFrom;
-    private String locale;
-    private String priority;
-    private String recurrenceType;
-    private String recurrenceInterval;
-    private String instructionType;
-    private String recurrenceFrequency;
-    private String recurrenceOnMonthDay;
-    private String name;
-    private String monthDayFormat;
-    private String status;
 }

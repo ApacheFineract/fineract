@@ -35,17 +35,17 @@ public class RefundByTransferRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.transfer.description.not.blank}")
-    @Size(max = 200, message = "{org.apache.fineract.portfolio.account.data.request.transfer.description.size}")
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.transfer.description.not.blank}")
+    @Size(max = 200, message = "{org.apache.fineract.portfolio.account.data.transfer.description.size}")
     private String transferDescription;
 
-    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.to.office.id.not.blank}")
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.to.office.id.not.blank}")
     private String toOfficeId;
 
-    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.to.account.type.not.blank}")
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.to.account.type.not.blank}")
     private String toAccountType;
 
-    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.request.date.format.not.blank}")
+    @NotBlank(message = "{org.apache.fineract.portfolio.account.data.date.format.not.blank}")
     private String dateFormat;
 
     @NotBlank(message = "{org.apache.fineract.portfolio.account.data.transfer.amount.not.blank}")
