@@ -16,33 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.command.core;
+package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
-import java.util.UUID;
-import lombok.Data;
-import lombok.experimental.FieldNameConstants;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@FieldNameConstants
-public class Command<T> implements Serializable {
+@Setter
+@Getter
+@NoArgsConstructor
+public class GuarantorsResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
-
-    private String idempotencyKey;
-
-    private OffsetDateTime createdAt;
-
-    private CommandBuilder commandBuilder;
-
-    private String tenantId;
-
-    private String username;
-
-    private T payload;
+    private Long resourceId;
 }

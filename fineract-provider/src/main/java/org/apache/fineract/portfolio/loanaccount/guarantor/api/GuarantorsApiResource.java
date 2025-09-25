@@ -38,7 +38,9 @@ import jakarta.ws.rs.core.UriInfo;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.apache.fineract.command.core.CommandBuilder;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -53,12 +55,14 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountDTO;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 import org.apache.fineract.portfolio.account.service.PortfolioAccountReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants;
+import org.apache.fineract.portfolio.loanaccount.guarantor.command.CreateGuarantorsCommand;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.data.GuarantorsRequest;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
@@ -138,10 +142,18 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public CommandProcessingResult createGuarantor(@PathParam("loanId") final Long loanId, final GuarantorsRequest guarantorsRequest) {
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
-                .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        // final CommandWrapper commandRequest = new CommandWrapperBuilder().createGuarantor(loanId)
+        // .withJson(apiJsonSerializerService.serialize(guarantorsRequest)).build();
+        //
+        // return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-        return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        CreateGuarantorsCommand command = new CreateGuarantorsCommand();
+        command.setPayload(guarantorsRequest);
+        command.setId(UUID.randomUUID());
+        command.setCommandBuilder(CommandBuilder.createGuarantor(loanId));
+        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+
+        return null;
     }
 
     @PUT

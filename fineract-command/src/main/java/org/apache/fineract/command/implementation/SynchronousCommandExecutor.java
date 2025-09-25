@@ -47,6 +47,8 @@ public class SynchronousCommandExecutor implements CommandExecutor {
             middleware.invoke(command);
         }
 
+        // Handle the command logging to the database with retry processing
+
         CommandHandler<REQ, RES> handler = router.route(command);
 
         return () -> handler.handle(command);

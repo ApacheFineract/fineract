@@ -58,5 +58,4 @@ public class GuarantorsRequest implements Serializable {
     private String dob;
     private Long savingsId;
     private BigDecimal amount;
-
 }
