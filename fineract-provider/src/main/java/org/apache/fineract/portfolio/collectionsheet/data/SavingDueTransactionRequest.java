@@ -23,13 +23,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@FieldNameConstants
 @AllArgsConstructor
 @Builder
 public class SavingDueTransactionRequest implements Serializable {
@@ -40,6 +40,7 @@ public class SavingDueTransactionRequest implements Serializable {
     private Long savingsId;
     private BigDecimal transactionAmount;
     private Long depositAccountType;
+    private String note;
     private Long paymentTypeId;
     private String accountNumber;
     private String checkNumber;
