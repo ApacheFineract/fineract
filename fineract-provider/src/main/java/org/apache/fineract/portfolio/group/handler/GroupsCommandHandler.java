@@ -16,37 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.command.implementation;
+package org.apache.fineract.portfolio.group.handler;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.List;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
-import org.apache.fineract.command.core.CommandExecutor;
-import org.apache.fineract.command.core.CommandMiddleware;
-import org.apache.fineract.command.core.CommandPipeline;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.apache.fineract.command.core.CommandHandler;
+import org.apache.fineract.portfolio.group.data.GroupsRequest;
+import org.apache.fineract.portfolio.group.data.GroupsResponse;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
-@ConditionalOnBean(CommandPipeline.class)
-public class DefaultCommandPipeline implements CommandPipeline {
-
-    private final CommandExecutor executor;
-    private final List<CommandMiddleware> middlewares; // Spring injects all beans implementing CommandMiddleware
+@RequiredArgsConstructor
+public class GroupsCommandHandler implements CommandHandler<GroupsRequest, GroupsResponse> {
 
     @Override
-    public <REQ, RES> Supplier<RES> send(final Command<REQ> command) {
-        requireNonNull(command, "Command must not be null");
+    public GroupsResponse handle(Command<GroupsRequest> command) {
 
-        // Execute middlewares
-        middlewares.forEach(mw -> mw.invoke(command));
+        log.info("GroupsCommandHandler, {}", command.getPayload());
 
-        return executor.execute(command);
+        return null;
     }
 }

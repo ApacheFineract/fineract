@@ -16,13 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.command.persistence.domain;
+package org.apache.fineract.portfolio.group.command;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import java.io.Serial;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.portfolio.group.data.GroupsRequest;
 
-import java.util.UUID;
+@Getter
+@Setter
+public class GroupsApiResourceCommand extends Command<GroupsRequest> {
 
-public interface CommandRepository extends JpaRepository<CommandEntity, Long>, JpaSpecificationExecutor<CommandEntity> {
-  boolean existsByCommandId(UUID id);
+    @Serial
+    private static final long serialVersionUID = 1L;
 }

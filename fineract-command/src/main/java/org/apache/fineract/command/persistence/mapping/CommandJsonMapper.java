@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-final class CommandJsonMapper {
+public final class CommandJsonMapper {
 
     private static final String CLASS_ATTRIBUTE = "@class";
     private final ObjectMapper mapper;
@@ -38,27 +38,21 @@ final class CommandJsonMapper {
         if (source == null) {
             return null;
         }
-
         var canonicalName = source.get(CLASS_ATTRIBUTE).asText();
-
         try {
-            return (T) mapper.convertValue(source, Class.forName(canonicalName));
+          return (T) mapper.convertValue(source, Class.forName(canonicalName));
         } catch (Exception e) {
             log.error("Error while mapping json node", e);
         }
-
         return null;
     }
 
     public JsonNode map(Object source) {
-        if (source == null) {
-            return null;
-        }
-
-        var json = mapper.convertValue(source, ObjectNode.class);
-
-        json.set(CLASS_ATTRIBUTE, new TextNode(source.getClass().getCanonicalName()));
-
-        return json;
+      if (source == null) {
+          return null;
+      }
+      var json = mapper.convertValue(source, ObjectNode.class);
+      json.set(CLASS_ATTRIBUTE, new TextNode(source.getClass().getCanonicalName()));
+      return json;
     }
 }

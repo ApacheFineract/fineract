@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.api;
 
-import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,8 +48,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.fineract.command.core.CommandPipeline;
+import org.apache.fineract.command.core.utils.CommandActionBuilder;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -59,14 +62,13 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookP
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
-import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.PaginationParameters;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
-import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
@@ -83,10 +85,12 @@ import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformServic
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
-import org.apache.fineract.portfolio.collectionsheet.data.JLGCollectionSheetData;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
+import org.apache.fineract.portfolio.group.command.GroupsApiResourceCommand;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.group.data.GroupRoleData;
+import org.apache.fineract.portfolio.group.data.GroupsRequest;
+import org.apache.fineract.portfolio.group.data.GroupsResponse;
 import org.apache.fineract.portfolio.group.service.CenterReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupRolesReadPlatformService;
@@ -132,6 +136,7 @@ public class GroupsApiResource {
     private final GLIMAccountInfoReadPlatformService glimAccountInfoReadPlatformService;
     private final GSIMReadPlatformService gsimReadPlatformService;
     private final SqlValidator sqlValidator;
+    private final CommandPipeline commandPipeline;
 
     @GET
     @Path("template")
@@ -331,7 +336,6 @@ public class GroupsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsResponse.class))) })
     public String create(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createGroup() //
                 .withJson(apiRequestBodyAsJson) //
@@ -350,14 +354,12 @@ public class GroupsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsGroupIdCommandUnassignStaffResponse.class))) })
     public String unassignLoanOfficer(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .unassignGroupStaff(groupId) //
                 .withJson(apiRequestBodyAsJson) //
                 .build(); //
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return toApiJsonSerializer.serialize(result);
-
     }
 
     @PUT
@@ -370,7 +372,6 @@ public class GroupsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PutGroupsGroupIdResponse.class))) })
     public String update(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .updateGroup(groupId) //
                 .withJson(apiRequestBodyAsJson) //
@@ -387,13 +388,133 @@ public class GroupsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.DeleteGroupsGroupIdResponse.class))) })
     public String delete(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .deleteGroup(groupId) //
                 .build(); //
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return toApiJsonSerializer.serialize(result);
     }
+
+    // @POST
+    // @Path("{groupId}")
+    // @Consumes({ MediaType.APPLICATION_JSON })
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // @Operation(summary = "Activate a Group | Associate Clients | Disassociate Clients | Transfer Clients across
+    // groups | Generate Collection Sheet | Save Collection Sheet | Unassign a Staff | Assign a Staff | Close a Group |
+    // Unassign a Role | Update a Role", description = "Activate a Group:\n\n"
+    // + "Groups can be created in a Pending state. This API exists to enable group activation.\n\n" + "\n\n"
+    // + "If the group happens to be already active this API will result in an error.\n\n" + "Mandatory Fields:
+    // activationDate\n\n"
+    // + "Associate Clients:\n\n" + "This API allows to associate existing clients to a group.\n\n" + "\n\n"
+    // + "The clients are listed from the office to which the group is associated.\n\n" + "\n\n"
+    // + "If client(s) is already associated with group then API will result in an error.\n\n" + "Mandatory Fields:
+    // clientMembers\n\n"
+    // + "Disassociate Clients:\n\n" + "This API allows to disassociate clients from a group.\n\n" + "\n\n"
+    // + "Disassociating a client with active joint liability group loans results in an error.\n\n"
+    // + "Mandatory Fields: clientMembers\n\n" + "Transfer Clients across groups:\n\n"
+    // + "This API allows to transfer clients from one group to another\n\n" + "Mandatory Fields: destinationGroupId and
+    // clients\n\n"
+    // + "Optional Fields: inheritDestinationGroupLoanOfficer (defaults to true) and transferActiveLoans (defaults to
+    // true)\n\n"
+    // + "Generate Collection Sheet:\n\n"
+    // + "This API retrieves repayment details of all jlg loans of all members of a group on a specified meeting
+    // date.\n\n"
+    // + "Mandatory Fields: calendarId and transactionDate\n\n" + "Save Collection Sheet:\n\n"
+    // + "This api allows the loan officer to perform bulk repayments of JLG loans for a group on its meeting date.\n\n"
+    // + "Mandatory Fields: calendarId, transactionDate, actualDisbursementDate\n\n"
+    // + "Optional Fields: clientsAttendance, bulkRepaymentTransaction, bulkDisbursementTransactions\n\n" + "Unassign a
+    // Staff:\n\n"
+    // + "Allows you to unassign the Staff.\n\n" + "Mandatory Fields: staffId\n\n" + "Assign a Staff:\n\n"
+    // + "Allows you to assign Staff to an existing Group.\n\n" + "\n\n"
+    // + "The selected Staff should be belong to the same office (or an office higher up in the hierarchy) as this
+    // group"
+    // + "Mandatory Fields: staffId\n\n"
+    // + "Optional Fields: inheritStaffForClientAccounts (Optional: Boolean if true all members of the group (i.e all
+    // clients with active loans and savings ) will inherit the staffId)\n\n"
+    // + "Close a Group:\n\n"
+    // + "This API exists to close a group. Groups can be closed if they don't have any non-closed
+    // clients/loans/savingsAccounts.\n\n"
+    // + "\n\n" + "If the group has any active clients/loans/savingsAccount, this API will result in an error." +
+    // "Assign a Role:\n\n"
+    // + "Allows you to assign a Role to an existing member of a group.\n\n" + "\n\n"
+    // + "We can define the different roles applicable to group members by adding code values to the pre-defined system
+    // code GROUPROLE. Example:Group leader etc.\n\n"
+    // + "Mandatory Fields: clientId, role\n\n" + "Unassign a Role:\n\n"
+    // + "Allows you to unassign Roles associated tp Group members.\n\n" + "Update a Role:\n\n"
+    // + "Allows you to update the member Role.\n\n" + "Mandatory Fields: role\n\n"
+    // + "Showing request/response for Transfer Clients across groups")
+    // @RequestBody(required = true, content = @Content(schema = @Schema(implementation =
+    // GroupsApiResourceSwagger.PostGroupsGroupIdRequest.class)))
+    // @ApiResponses({
+    // @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation =
+    // GroupsApiResourceSwagger.PostGroupsGroupIdResponse.class))) })
+    // public String activateOrGenerateCollectionSheet(@PathParam("groupId") @Parameter(description = "groupId") final
+    // Long groupId,
+    // @QueryParam("command") @Parameter(description = "command") final String commandParam,
+    // @QueryParam("roleId") @Parameter(description = "roleId") final Long roleId,
+    // @Parameter(hidden = true) final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
+    // final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
+    //
+    // CommandProcessingResult result = null;
+    // if (is(commandParam, "activate")) {
+    // final CommandWrapper commandRequest = builder.activateGroup(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "associateClients")) {
+    // final CommandWrapper commandRequest = builder.associateClientsToGroup(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "disassociateClients")) {
+    // final CommandWrapper commandRequest = builder.disassociateClientsFromGroup(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "generateCollectionSheet")) {
+    // final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
+    // final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
+    // final JLGCollectionSheetData collectionSheet =
+    // collectionSheetReadPlatformService.generateGroupCollectionSheet(groupId, query);
+    // final ApiRequestJsonSerializationSettings settings =
+    // apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    // return toApiJsonSerializer.serialize(settings, collectionSheet,
+    // GroupingTypesApiConstants.COLLECTIONSHEET_DATA_PARAMETERS);
+    // } else if (is(commandParam, "saveCollectionSheet")) {
+    // final CommandWrapper commandRequest = builder.saveGroupCollectionSheet(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "unassignStaff")) {
+    // final CommandWrapper commandRequest = builder.unassignGroupStaff(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "assignStaff")) {
+    // final CommandWrapper commandRequest = builder.assignGroupStaff(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "assignRole")) {
+    // final CommandWrapper commandRequest = builder.assignRole(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "unassignRole")) {
+    // final CommandWrapper commandRequest = builder.unassignRole(groupId, roleId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "updateRole")) {
+    // final CommandWrapper commandRequest = builder.updateRole(groupId, roleId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "transferClients")) {
+    // final CommandWrapper commandRequest = builder.transferClientsBetweenGroups(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else if (is(commandParam, "close")) {
+    // final CommandWrapper commandRequest = builder.closeGroup(groupId).build();
+    // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    // return toApiJsonSerializer.serialize(result);
+    // } else {
+    // throw new UnrecognizedQueryParamException("command", commandParam, new Object[] { "activate",
+    // "generateCollectionSheet",
+    // "saveCollectionSheet", "unassignStaff", "assignRole", "unassignRole", "updateassignRole" });
+    // }
+    // }
 
     @POST
     @Path("{groupId}")
@@ -430,71 +551,81 @@ public class GroupsApiResource {
             + "Allows you to unassign Roles associated tp Group members.\n\n" + "Update a Role:\n\n"
             + "Allows you to update the member Role.\n\n" + "Mandatory Fields: role\n\n"
             + "Showing request/response for Transfer Clients across groups")
-    @RequestBody(required = true, content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsGroupIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.PostGroupsGroupIdResponse.class))) })
-    public String activateOrGenerateCollectionSheet(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
+    public GroupsResponse activateOrGenerateCollectionSheet(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @QueryParam("roleId") @Parameter(description = "roleId") final Long roleId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
-        final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
+            @QueryParam("roleId") @Parameter(description = "roleId") final Long roleId, final GroupsRequest groupsRequest,
+            @Context final UriInfo uriInfo) {
+        // final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
+        // CommandProcessingResult result = null;
+        // if (is(commandParam, "activate")) {
+        // final CommandWrapper commandRequest = builder.activateGroup(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "associateClients")) {
+        // final CommandWrapper commandRequest = builder.associateClientsToGroup(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "disassociateClients")) {
+        // final CommandWrapper commandRequest = builder.disassociateClientsFromGroup(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "generateCollectionSheet")) {
+        // final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
+        // final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
+        // final JLGCollectionSheetData collectionSheet =
+        // collectionSheetReadPlatformService.generateGroupCollectionSheet(groupId, query);
+        // final ApiRequestJsonSerializationSettings settings =
+        // apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        // return toApiJsonSerializer.serialize(settings, collectionSheet,
+        // GroupingTypesApiConstants.COLLECTIONSHEET_DATA_PARAMETERS);
+        // } else if (is(commandParam, "saveCollectionSheet")) {
+        // final CommandWrapper commandRequest = builder.saveGroupCollectionSheet(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "unassignStaff")) {
+        // final CommandWrapper commandRequest = builder.unassignGroupStaff(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "assignStaff")) {
+        // final CommandWrapper commandRequest = builder.assignGroupStaff(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "assignRole")) {
+        // final CommandWrapper commandRequest = builder.assignRole(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "unassignRole")) {
+        // final CommandWrapper commandRequest = builder.unassignRole(groupId, roleId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "updateRole")) {
+        // final CommandWrapper commandRequest = builder.updateRole(groupId, roleId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "transferClients")) {
+        // final CommandWrapper commandRequest = builder.transferClientsBetweenGroups(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else if (is(commandParam, "close")) {
+        // final CommandWrapper commandRequest = builder.closeGroup(groupId).build();
+        // result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        // return toApiJsonSerializer.serialize(result);
+        // } else {
+        // throw new UnrecognizedQueryParamException("command", commandParam, new Object[] { "activate",
+        // "generateCollectionSheet",
+        // "saveCollectionSheet", "unassignStaff", "assignRole", "unassignRole", "updateassignRole" });
+        // }
 
-        CommandProcessingResult result = null;
-        if (is(commandParam, "activate")) {
-            final CommandWrapper commandRequest = builder.activateGroup(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "associateClients")) {
-            final CommandWrapper commandRequest = builder.associateClientsToGroup(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "disassociateClients")) {
-            final CommandWrapper commandRequest = builder.disassociateClientsFromGroup(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "generateCollectionSheet")) {
-            final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
-            final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
-            final JLGCollectionSheetData collectionSheet = collectionSheetReadPlatformService.generateGroupCollectionSheet(groupId, query);
-            final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-            return toApiJsonSerializer.serialize(settings, collectionSheet, GroupingTypesApiConstants.COLLECTIONSHEET_DATA_PARAMETERS);
-        } else if (is(commandParam, "saveCollectionSheet")) {
-            final CommandWrapper commandRequest = builder.saveGroupCollectionSheet(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "unassignStaff")) {
-            final CommandWrapper commandRequest = builder.unassignGroupStaff(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "assignStaff")) {
-            final CommandWrapper commandRequest = builder.assignGroupStaff(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "assignRole")) {
-            final CommandWrapper commandRequest = builder.assignRole(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "unassignRole")) {
-            final CommandWrapper commandRequest = builder.unassignRole(groupId, roleId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "updateRole")) {
-            final CommandWrapper commandRequest = builder.updateRole(groupId, roleId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "transferClients")) {
-            final CommandWrapper commandRequest = builder.transferClientsBetweenGroups(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else if (is(commandParam, "close")) {
-            final CommandWrapper commandRequest = builder.closeGroup(groupId).build();
-            result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-            return toApiJsonSerializer.serialize(result);
-        } else {
-            throw new UnrecognizedQueryParamException("command", commandParam, new Object[] { "activate", "generateCollectionSheet",
-                    "saveCollectionSheet", "unassignStaff", "assignRole", "unassignRole", "updateassignRole" });
-        }
+        final GroupsApiResourceCommand command = new GroupsApiResourceCommand();
 
+        command.setId(UUID.randomUUID());
+        command.setCreatedAt(DateUtils.getAuditOffsetDateTime());
+        command.setPayload(groupsRequest);
+        command.setCommandActionBuilder(CommandActionBuilder.saveGroupCollectionSheet(groupId));
+
+        final Supplier<GroupsResponse> response = commandPipeline.send(command);
+
+        return response.get();
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -512,7 +643,6 @@ public class GroupsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GroupsApiResourceSwagger.GetGroupsGroupIdAccountsResponse.class))) })
     public String retrieveAccounts(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @Context final UriInfo uriInfo) {
-
         context.authenticatedUser().validateHasReadPermission("GROUP");
 
         final AccountSummaryCollectionData groupAccount = accountDetailsReadPlatformService.retrieveGroupAccountDetails(groupId);
@@ -565,7 +695,6 @@ public class GroupsApiResource {
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return glimContainerToApiJsonSerializer.serialize(settings, glimContainer, GLIM_ACCOUNTS_DATA_PARAMETERS);
-
     }
 
     @GET
@@ -584,7 +713,6 @@ public class GroupsApiResource {
             gsimContainer = (List<GSIMContainer>) gsimReadPlatformService.findGsimAccountContainerbyGsimAccountNumber(parentGSIMAccountNo);
         } else {
             gsimContainer = (List<GSIMContainer>) gsimReadPlatformService.findGSIMAccountContainerByGroupId(groupId);
-
         }
 
         final Set<String> GSIM_ACCOUNTS_DATA_PARAMETERS = new HashSet<>(
@@ -592,7 +720,5 @@ public class GroupsApiResource {
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return gsimContainerToApiJsonSerializer.serialize(settings, gsimContainer, GSIM_ACCOUNTS_DATA_PARAMETERS);
-
     }
-
 }

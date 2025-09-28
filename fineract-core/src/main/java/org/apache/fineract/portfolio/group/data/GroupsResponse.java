@@ -16,13 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.command.persistence.domain;
+package org.apache.fineract.portfolio.group.data;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.UUID;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class GroupsResponse implements Serializable {
 
-public interface CommandRepository extends JpaRepository<CommandEntity, Long>, JpaSpecificationExecutor<CommandEntity> {
-  boolean existsByCommandId(UUID id);
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long officeId;
+    private Long groupId;
+    private Long clientId;
+    private Long resourceId;
+    private Map<String, Object> changes;
 }

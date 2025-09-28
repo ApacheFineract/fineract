@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.command.persistence.converter;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -27,13 +29,19 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Converter
 public class JsonAttributeConverter implements AttributeConverter<JsonNode, String> {
     // TODO: it would be nicer to use a native JSON type on the database side, but not every system supports this;
     // string/text are the lowest common denominator that should work on every database
 
     private final ObjectMapper mapper;
+
+    public JsonAttributeConverter() {
+      this.mapper = new ObjectMapper();
+      mapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+      mapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+    }
 
     @Override
     @SneakyThrows

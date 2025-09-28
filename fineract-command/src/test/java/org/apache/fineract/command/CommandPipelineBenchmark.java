@@ -77,7 +77,7 @@ public class CommandPipelineBenchmark {
         // Start the disruptor
         disruptor.start();
 
-        pipeline = new DefaultCommandPipeline(new DisruptorCommandExecutor(disruptor));
+//        pipeline = new DefaultCommandPipeline(new DisruptorCommandExecutor(disruptor));
     }
 
     @TearDown(Level.Iteration)
