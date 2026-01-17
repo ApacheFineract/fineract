@@ -37,19 +37,21 @@ public final class LoanScheduleModelDisbursementPeriod implements LoanScheduleMo
     private final LocalDate disbursementDate;
     private final Money principalDisbursed;
     private BigDecimal chargesDueAtTimeOfDisbursement;
+    private BigDecimal taxesDue = BigDecimal.valueOf(123.45);
     private boolean isEMIFixedSpecificToInstallment = false;
 
     public static LoanScheduleModelDisbursementPeriod disbursement(final LocalDate disbursementDate, final Money principalDisbursed,
-            final BigDecimal chargesDueAtTimeOfDisbursement) {
-        return new LoanScheduleModelDisbursementPeriod(null, disbursementDate, principalDisbursed, chargesDueAtTimeOfDisbursement);
+            final BigDecimal chargesDueAtTimeOfDisbursement, final BigDecimal taxesDue) {
+        return new LoanScheduleModelDisbursementPeriod(null, disbursementDate, principalDisbursed, chargesDueAtTimeOfDisbursement, taxesDue);
     }
 
     private LoanScheduleModelDisbursementPeriod(final Integer periodNumber, final LocalDate disbursementDate,
-            final Money principalDisbursed, final BigDecimal chargesDueAtTimeOfDisbursement) {
+            final Money principalDisbursed, final BigDecimal chargesDueAtTimeOfDisbursement, final BigDecimal taxesDue) {
         this.periodNumber = periodNumber;
         this.disbursementDate = disbursementDate;
         this.principalDisbursed = principalDisbursed;
         this.chargesDueAtTimeOfDisbursement = chargesDueAtTimeOfDisbursement;
+        this.taxesDue = taxesDue;
     }
 
     @Override

@@ -321,7 +321,7 @@ public class ProgressiveLoanScheduleGenerator implements LoanScheduleGenerator {
 
             final Money disbursedAmount = Money.of(loanApplicationTerms.getCurrency(), disbursementData.getPrincipal(), mc);
             final LoanScheduleModelDisbursementPeriod disbursementPeriod = LoanScheduleModelDisbursementPeriod
-                    .disbursement(disbursementData.disbursementDate(), disbursedAmount, chargesDueAtTimeOfDisbursement);
+                    .disbursement(disbursementData.disbursementDate(), disbursedAmount, chargesDueAtTimeOfDisbursement, BigDecimal.valueOf(555.55));
             periods.add(disbursementPeriod);
 
             // validation check for amount not exceeds specified max

@@ -19,9 +19,11 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import org.apache.fineract.accounting.journalentry.data.LoanDTO;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
 public interface AccountingProcessorForLoan {
 
     void createJournalEntriesForLoan(LoanDTO loanDTO);
 
+    void createJournalEntriesForTaxes(LoanDTO loanDTO, LoanTransaction loanTransaction);
 }

@@ -44,7 +44,7 @@ public class LoanChargeTaxCalculatorPeriod implements LoanScheduleModelPeriod {
 
   @Override
   public Integer periodNumber() {
-    return 0;
+    return null;
   }
 
   @Override

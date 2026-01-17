@@ -79,4 +79,5 @@ public interface JournalEntryWritePlatformService {
     void createJournalEntriesForExternalOwnerTransfer(Loan loan, ExternalAssetOwnerTransfer externalAssetOwnerTransfer,
             ExternalAssetOwner previousOwner);
 
+    void createJournalEntriesForTaxes(AccountingBridgeDataDTO accountingBridgeData, LoanTransaction loanTransaction);
 }

@@ -1070,7 +1070,7 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
                 // creates and add disbursement detail to the repayments
                 // period
                 final LoanScheduleModelDisbursementPeriod disbursementPeriod = LoanScheduleModelDisbursementPeriod
-                        .disbursement(disburseDetail.getKey(), disburseDetail.getValue(), chargesDueAtTimeOfDisbursement);
+                        .disbursement(disburseDetail.getKey(), disburseDetail.getValue(), chargesDueAtTimeOfDisbursement, BigDecimal.valueOf(444.44));
                 periods.add(disbursementPeriod);
 
                 BigDecimal downPaymentAmt = BigDecimal.ZERO;
@@ -2053,7 +2053,7 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
         if (!loanApplicationTerms.isMultiDisburseLoan()) {
             final LoanScheduleModelDisbursementPeriod disbursementPeriod = LoanScheduleModelDisbursementPeriod.disbursement(
                     loanApplicationTerms.getExpectedDisbursementDate(), loanApplicationTerms.getPrincipal(),
-                    chargesDueAtTimeOfDisbursement);
+                    chargesDueAtTimeOfDisbursement, BigDecimal.valueOf(222.22));
             periods.add(disbursementPeriod);
             if (loanApplicationTerms.isDownPaymentEnabled()) {
                 final LoanScheduleModelDownPaymentPeriod downPaymentPeriod = createDownPaymentPeriod(loanApplicationTerms,
@@ -2072,7 +2072,7 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
                 if (disbursementData.disbursementDate().equals(loanScheduleParams.getPeriodStartDate())) {
                     final LoanScheduleModelDisbursementPeriod disbursementPeriod = LoanScheduleModelDisbursementPeriod.disbursement(
                             disbursementData.disbursementDate(),
-                            Money.of(loanScheduleParams.getCurrency(), disbursementData.getPrincipal()), chargesDueAtTimeOfDisbursement);
+                            Money.of(loanScheduleParams.getCurrency(), disbursementData.getPrincipal()), chargesDueAtTimeOfDisbursement, BigDecimal.valueOf(333.33));
                     periods.add(disbursementPeriod);
                     if (loanApplicationTerms.isDownPaymentEnabled()) {
                         final LoanScheduleModelDownPaymentPeriod downPaymentPeriod = createDownPaymentPeriod(loanApplicationTerms,
@@ -2426,7 +2426,7 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
                         // creates and add disbursement detail to the repayments
                         // period
                         final LoanScheduleModelDisbursementPeriod disbursementPeriod = LoanScheduleModelDisbursementPeriod
-                                .disbursement(disburseDetail.getKey(), disburseDetail.getValue(), chargesDueAtTimeOfDisbursement);
+                                .disbursement(disburseDetail.getKey(), disburseDetail.getValue(), chargesDueAtTimeOfDisbursement, BigDecimal.valueOf(111.11));
                         periods.add(disbursementPeriod);
 
                         BigDecimal downPaymentAmt = BigDecimal.ZERO;
