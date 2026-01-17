@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -65,7 +66,11 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.exception.MultiDis
 import org.apache.fineract.portfolio.loanaccount.loanschedule.exception.MultiDisbursementOutstandingAmoutException;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.exception.ScheduleDateException;
 import org.apache.fineract.portfolio.loanproduct.domain.RepaymentStartDateType;
+import org.apache.fineract.portfolio.tax.domain.TaxComponent;
+import org.apache.fineract.portfolio.tax.domain.TaxGroupMappings;
+import org.apache.fineract.portfolio.tax.service.TaxUtils;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanScheduleGenerator {
 
@@ -118,18 +123,34 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
 
         List<LoanScheduleModelPeriod> periods = new ArrayList<>();
         if (!scheduleParams.isPartialUpdate()) {
-            periods = createNewLoanScheduleListWithDisbursementDetails(loanApplicationTerms, scheduleParams,
-                    chargesDueAtTimeOfDisbursement);
+            periods.addAll(createNewLoanScheduleListWithDisbursementDetails(loanApplicationTerms, scheduleParams,
+                    chargesDueAtTimeOfDisbursement));
         }
+
+        final Set<TaxGroupMappings> loanChargesTaxGroupMappingSet = new HashSet<>();
+        for(LoanCharge loanCharge: loanCharges) {
+            loanChargesTaxGroupMappingSet.addAll(loanCharge.getCharge().getTaxGroup().getTaxGroupMappings());
+        }
+
+        final Map<TaxComponent, BigDecimal> taxSplitMap = TaxUtils.splitTax(chargesDueAtTimeOfDisbursement, periodStartDate, loanChargesTaxGroupMappingSet, currency.getDecimalPlaces());
+//        BigDecimal loanTaxCalculation = TaxUtils.addTax(chargesDueAtTimeOfDisbursement, LocalDate.now(), taxesList, currency.getDecimalPlaces());
+        for(Map.Entry<TaxComponent, BigDecimal> entry : taxSplitMap.entrySet()) {
+            final LoanChargeTaxCalculatorPeriod tax = LoanChargeTaxCalculatorPeriod.taxPayment(null, periodStartDate, Money.of(currency, entry.getValue()));
+            periods.add(tax);
+        }
+
+//        List<TaxGroupMappings> taxesList = new ArrayList<>();
+//        List<LoanCharge> loanChargeList = new ArrayList<>(loanCharges);
+//        TaxGroupMappings taxesMapping = new ArrayList<>(loanChargeList.getFirst().getCharge().getTaxGroup().getTaxGroupMappings()).getFirst();
+//        taxesList.add(taxesMapping);
+//        BigDecimal loanTaxCalculation = TaxUtils.addTax(chargesDueAtTimeOfDisbursement, LocalDate.now(), taxesList, 1);
 
         // Determine the total interest owed over the full loan for FLAT
         // interest method .
         if (!scheduleParams.isPartialUpdate() && !loanApplicationTerms.isEqualAmortization()) {
             Money totalInterestChargedForFullLoanTerm = loanApplicationTerms
                     .calculateTotalInterestCharged(getPaymentPeriodsInOneYearCalculator(), mc);
-
             loanApplicationTerms.updateTotalInterestDue(totalInterestChargedForFullLoanTerm);
-
         }
 
         boolean isFirstRepayment = true;
@@ -434,6 +455,19 @@ public abstract class AbstractCumulativeLoanScheduleGenerator implements LoanSch
         final BigDecimal totalOutstanding = BigDecimal.ZERO;
 
         updateCompoundingDetails(periods, scheduleParams, loanApplicationTerms);
+
+//        final Set<TaxGroupMappings> loanChargesTaxGroupMappingSet = new HashSet<>();
+//        for(LoanCharge loanCharge: loanCharges) {
+//            loanChargesTaxGroupMappingSet.addAll(loanCharge.getCharge().getTaxGroup().getTaxGroupMappings());
+//        }
+//
+//        final Map<TaxComponent, BigDecimal> taxSplitMap = TaxUtils.splitTax(chargesDueAtTimeOfDisbursement, periodStartDate, loanChargesTaxGroupMappingSet, currency.getDecimalPlaces());
+//
+//        for(Map.Entry<TaxComponent, BigDecimal> entry : taxSplitMap.entrySet()) {
+//            final LoanChargeTaxCalculatorPeriod tax = LoanChargeTaxCalculatorPeriod.taxPayment(periods.size(), periodStartDate, Money.of(currency, entry.getValue()));
+//            periods.add(tax);
+//        }
+
         return LoanScheduleModel.from(periods, currency, scheduleParams.getLoanTermInDays(),
                 scheduleParams.getPrincipalToBeScheduled().plus(loanApplicationTerms.getDownPaymentAmount()),
                 scheduleParams.getTotalCumulativePrincipal().plus(loanApplicationTerms.getDownPaymentAmount()).getAmount(),

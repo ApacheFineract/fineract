@@ -27,18 +27,33 @@ import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(config = MapstructMapperConfig.class, uses = { GlAccountMapper.class, GlAccountTypeMapper.class })
+@Mapper(config = MapstructMapperConfig.class, uses = { GlAccountMapper.class, GlAccountTypeMapper.class, GLAccountTypeMapper.class })
 public interface TaxComponentMapper {
 
-    @Mapping(target = "creditAccount", source = "taxComponent.creditAccount")
-    @Mapping(target = "debitAccount", source = "taxComponent.debitAccount")
-    @Mapping(target = "creditAccountType", source = "taxComponent.creditAccountType")
-    @Mapping(target = "debitAccountType", source = "taxComponent.debitAccountType")
+//    @Mapping(target = "creditAccount", source = "taxComponent.creditAccount")
+//    @Mapping(target = "debitAccount", source = "taxComponent.debitAccount")
+//    @Mapping(target = "creditAccountType", source = "taxComponent.creditAccountType")
+//    @Mapping(target = "debitAccountType", source = "taxComponent.debitAccountType")
+//    @Mapping(target = "glAccountOptions", ignore = true)
+//    @Mapping(target = "glAccountTypeOptions", ignore = true)
+//    @Mapping(target = "taxComponentHistories", ignore = true)
+
+    @Mapping(target = "creditAccount", source = "creditAccount")
+    @Mapping(target = "debitAccount", source = "debitAccount")
+    @Mapping(
+        target = "creditAccountType",
+        source = "creditAccountType",
+        qualifiedByName = "intToGLAccountType"
+    )
+    @Mapping(
+        target = "debitAccountType",
+        source = "debitAccountType",
+        qualifiedByName = "intToGLAccountType"
+    )
     @Mapping(target = "glAccountOptions", ignore = true)
     @Mapping(target = "glAccountTypeOptions", ignore = true)
     @Mapping(target = "taxComponentHistories", ignore = true)
     TaxComponentData map(TaxComponent taxComponent);
 
     List<TaxComponentData> map(List<TaxComponent> taxComponents);
-
 }
