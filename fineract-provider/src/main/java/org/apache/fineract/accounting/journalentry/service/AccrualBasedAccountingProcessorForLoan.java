@@ -21,10 +21,13 @@ package org.apache.fineract.accounting.journalentry.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
@@ -39,10 +42,16 @@ import org.apache.fineract.accounting.journalentry.data.LoanDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanTransactionDTO;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMapping;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.PortfolioProductType;
+import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.tax.domain.TaxComponent;
+import org.apache.fineract.portfolio.tax.domain.TaxGroupMappings;
+import org.apache.fineract.portfolio.tax.service.TaxUtils;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -165,6 +174,56 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
   @Override
   public void createJournalEntriesForTaxes(LoanDTO loanDTO, LoanTransaction loanTransaction) {
     log.info("Create Journal Entry for Taxes - AccrualBasedAccountingProcessorForLoan");
+    final Long officeId = loanDTO.getOfficeId();
+    final Office office = this.helper.getOfficeById(officeId);
+    final CurrencyData currency = loanTransaction.getLoan().getLoanProduct().getLoanProductRelatedDetail().getCurrencyData();
+
+    Map<TaxComponent, BigDecimal> taxComponentMap = new LinkedHashMap<>();
+
+    final List<Charge> loanChargesList = loanTransaction.getLoan().getLoanProduct().getCharges();
+
+    for(Charge charge : loanChargesList) {
+      final Set<TaxGroupMappings> taxGroupMappingsSet = charge.getTaxGroup().getTaxGroupMappings();
+      final Map<TaxComponent, BigDecimal> splitMap =
+          TaxUtils.splitTax(
+              charge.getAmount(),
+              loanTransaction.getTransactionDate(),
+              taxGroupMappingsSet,
+              currency.getDecimalPlaces());
+
+      for(Map.Entry<TaxComponent, BigDecimal> entry : splitMap.entrySet()) {
+        taxComponentMap.merge(
+            entry.getKey(),
+            entry.getValue(),
+            BigDecimal::add);
+      }
+    }
+
+    for(Map.Entry<TaxComponent, BigDecimal> entry : taxComponentMap.entrySet()) {
+      final BigDecimal taxAmount = entry.getValue();
+
+      if(Objects.nonNull(loanTransaction.getPaymentDetail()) && MathUtil.isGreaterThanZero(taxAmount)) {
+        this.helper.createDebitJournalEntryForChargeTax(office,
+            currency.getCode(),
+            AccrualAccountsForLoan.LOAN_PORTFOLIO.getValue(),
+            loanDTO.getLoanProductId(),
+            loanTransaction.getPaymentDetail().getId(),
+            loanDTO.getLoanId(),
+            String.valueOf(loanTransaction.getId()),
+            loanTransaction.getTransactionDate(),
+            taxAmount);
+
+        this.helper.createCreditJournalEntryForTax(office,
+            currency.getCode(),
+            FinancialActivity.LIABILITY_TRANSFER.getValue(),
+            loanDTO.getLoanProductId(),
+            loanTransaction.getPaymentDetail().getId(),
+            loanDTO.getLoanId(),
+            String.valueOf(loanTransaction.getId()),
+            loanTransaction.getTransactionDate(),
+            taxAmount);
+      }
+    }
   }
 
   private void createJournalEntriesForCapitalizedIncome(final LoanDTO loanDTO, final LoanTransactionDTO loanTransactionDTO,

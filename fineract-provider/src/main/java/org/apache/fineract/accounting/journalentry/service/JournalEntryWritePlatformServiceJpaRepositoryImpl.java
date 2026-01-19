@@ -31,6 +31,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.MathUtils;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
 import org.apache.fineract.accounting.closure.domain.GLClosureRepository;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
@@ -77,6 +78,7 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
+import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
