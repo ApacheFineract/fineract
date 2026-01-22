@@ -16,19 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.external.producer;
+package org.apache.fineract.portfolio.loanorigination.data;
 
-import java.util.List;
-import java.util.Map;
-import org.apache.fineract.infrastructure.event.external.exception.AcknowledgementTimeoutException;
+import java.io.Serial;
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface ExternalEventProducer {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoanOriginatorData implements Serializable {
 
-    /**
-     * Sends the created ExternalEvents
-     *
-     * @param partitions
-     *            The value is list of external events belong to the same key, serialized into byte array
-     */
-    void sendEvents(Map<Long, List<byte[]>> partitions) throws AcknowledgementTimeoutException;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long id;
+    private String externalId;
+    private String name;
+    private String status;
+    private Long originatorTypeId;
+    private Long channelTypeId;
 }

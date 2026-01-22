@@ -1517,7 +1517,6 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
     }
 
     private void handleDisbursement(LoanTransaction disbursementTransaction, TransactionCtx transactionCtx) {
-        // TODO: Fix this and enhance EMICalculator to support reamortization and reaging
         if (shouldUseEmiCalculation(transactionCtx, disbursementTransaction.getTransactionDate())) {
             handleDisbursementWithEMICalculator(disbursementTransaction, transactionCtx);
         } else {
@@ -1649,7 +1648,6 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
     }
 
     private void handleCapitalizedIncome(LoanTransaction capitalizedIncomeTransaction, TransactionCtx transactionCtx) {
-        // TODO: Fix this and enhance EMICalculator to support reamortization and reaging
         if (shouldUseEmiCalculation(transactionCtx, capitalizedIncomeTransaction.getTransactionDate())) {
             handleCapitalizedIncomeWithEMICalculator(capitalizedIncomeTransaction, transactionCtx);
         } else {
@@ -1793,21 +1791,19 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
     }
 
     private boolean shouldUseEmiCalculation(TransactionCtx transactionCtx, LocalDate transactionDate) {
-        if (transactionCtx instanceof ProgressiveTransactionCtx progressiveTransactionCtx) {
-            boolean hasActiveReAmortization = progressiveTransactionCtx.getAlreadyProcessedTransactions().stream()
-                    .anyMatch(t -> t.getTypeOf().isReAmortize() && t.isNotReversed());
-            boolean hasActiveReAge = progressiveTransactionCtx.getAlreadyProcessedTransactions().stream()
-                    .anyMatch(t -> t.getTypeOf().isReAge() && t.isNotReversed());
-            if (hasActiveReAmortization) {
-                return false;
-            } else {
-                return !hasActiveReAge || !DateUtils.isAfter(transactionDate, progressiveTransactionCtx.getModel().getMaturityDate());
-            }
+        if (!(transactionCtx instanceof ProgressiveTransactionCtx progressiveTransactionCtx)) {
+            return true;
         }
-        // From now on we are defaulting to using the EMICalculator on all progressive loans. However currently the
-        // model is not aware of re-aging and re-amortization. So only these specific cases should ignore this
-        // requirement. This method can be removed once these operations are supported by the EMI model.
-        return true;
+
+        final Loan loan = progressiveTransactionCtx.getInstallments().getFirst().getLoan();
+        final boolean hasActiveReAmortizeOrReAge = progressiveTransactionCtx.getAlreadyProcessedTransactions().stream()
+                .anyMatch(t -> (t.getTypeOf().isReAmortize() || t.getTypeOf().isReAge()) && t.isNotReversed());
+
+        if (!loan.isInterestBearing() && hasActiveReAmortizeOrReAge) {
+            return false;
+        }
+
+        return !DateUtils.isAfter(transactionDate, progressiveTransactionCtx.getModel().getMaturityDate());
     }
 
     protected void handleWriteOff(final LoanTransaction transaction, TransactionCtx ctx) {
@@ -2034,7 +2030,7 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
                         && loan.isInterestBearingAndInterestRecalculationEnabled()) {
                     final BigDecimal interestOutstanding = currentInstallment.getInterestOutstanding(loan.getCurrency()).getAmount();
                     final BigDecimal newInterest = emiCalculator.getPeriodInterestTillDate(progressiveTransactionCtx.getModel(),
-                            currentInstallment.getFromDate(), currentInstallment.getDueDate(), transactionDate, true).getAmount();
+                            currentInstallment.getFromDate(), currentInstallment.getDueDate(), transactionDate, true, false).getAmount();
                     if (interestOutstanding.compareTo(BigDecimal.ZERO) > 0 || newInterest.compareTo(BigDecimal.ZERO) > 0) {
                         currentInstallment.updateInterestCharged(newInterest);
                     }
@@ -2146,8 +2142,9 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
                 installments.stream().filter(installment -> !installment.getFromDate().isAfter(transactionDate)
                         && installment.getDueDate().isAfter(transactionDate)).forEach(installment -> {
                             final BigDecimal interestOutstanding = installment.getInterestOutstanding(currency).getAmount();
+
                             final BigDecimal newInterest = emiCalculator.getPeriodInterestTillDate(progressiveTransactionCtx.getModel(),
-                                    installment.getFromDate(), installment.getDueDate(), transactionDate, true).getAmount();
+                                    installment.getFromDate(), installment.getDueDate(), transactionDate, true, false).getAmount();
                             if (MathUtil.isGreaterThanZero(interestOutstanding) || MathUtil.isGreaterThanZero(newInterest)) {
                                 final BigDecimal interestRemoved = MathUtil.subtract(MathUtil.nullToZero(installment.getInterestCharged()),
                                         newInterest);
@@ -3390,7 +3387,7 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
                 BigDecimal::add);
 
         final BigDecimal newInterest = emiCalculator.getPeriodInterestTillDate(transactionCtx.getModel(), lastPeriod.getFromDate(),
-                lastPeriod.getDueDate(), transactionDate, false).getAmount();
+                lastPeriod.getDueDate(), transactionDate, false, false).getAmount();
 
         lastPeriod.setEmi(lastPeriod.getDuePrincipal().add(totalPrincipal).add(newInterest));
 
@@ -3434,7 +3431,7 @@ public class AdvancedPaymentScheduleTransactionProcessor extends AbstractLoanRep
                 if (transactionCtx instanceof ProgressiveTransactionCtx progressiveTransactionCtx
                         && loan.isInterestBearingAndInterestRecalculationEnabled()) {
                     interest = emiCalculator.getPeriodInterestTillDate(progressiveTransactionCtx.getModel(), installment.getFromDate(),
-                            installment.getDueDate(), chargeOffDate, true).getAmount();
+                            installment.getDueDate(), chargeOffDate, true, false).getAmount();
                 } else {
                     final BigDecimal totalInterest = installment.getInterestOutstanding(currency).getAmount();
                     if (LoanChargeOffBehaviour.ZERO_INTEREST.equals(loan.getLoanProductRelatedDetail().getChargeOffBehaviour())

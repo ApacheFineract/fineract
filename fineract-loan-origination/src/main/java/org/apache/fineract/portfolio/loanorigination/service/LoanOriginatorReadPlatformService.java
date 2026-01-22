@@ -16,19 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.event.external.producer;
+package org.apache.fineract.portfolio.loanorigination.service;
 
 import java.util.List;
-import java.util.Map;
-import org.apache.fineract.infrastructure.event.external.exception.AcknowledgementTimeoutException;
+import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 
-public interface ExternalEventProducer {
+public interface LoanOriginatorReadPlatformService {
 
-    /**
-     * Sends the created ExternalEvents
-     *
-     * @param partitions
-     *            The value is list of external events belong to the same key, serialized into byte array
-     */
-    void sendEvents(Map<Long, List<byte[]>> partitions) throws AcknowledgementTimeoutException;
+    List<LoanOriginatorData> retrieveAll();
+
+    LoanOriginatorData retrieveById(Long id);
+
+    LoanOriginatorData retrieveByExternalId(String externalId);
+
+    Long resolveIdByExternalId(String externalId);
 }

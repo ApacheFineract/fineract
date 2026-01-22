@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.loanorigination.domain;
 
 public enum LoanOriginatorStatus {
 
-    ACTIVE("ACTIVE"), PENDING("PENDING");
+    ACTIVE("ACTIVE"), PENDING("PENDING"), INACTIVE("INACTIVE");
 
     private final String value;
 
