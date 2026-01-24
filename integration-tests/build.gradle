@@ -98,7 +98,7 @@ import javax.net.ssl.X509TrustManager
 
 tasks.register('waitForFineract') {
     doLast {
-        int timeoutSeconds = (project.findProperty('waitForFineractTimeoutSeconds') ?: '600') as int
+        int timeoutSeconds = (project.findProperty('waitForFineractTimeoutSeconds') ?: '60000') as int
         int waited = 0
         int interval = 5
 

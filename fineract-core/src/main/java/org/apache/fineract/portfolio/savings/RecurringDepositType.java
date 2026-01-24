@@ -25,47 +25,47 @@ import java.util.Arrays;
  */
 public enum RecurringDepositType {
 
-  INVALID(0, "recurringDepositType.invalid"), VOLUNTARY(1, "recurringDepositType.voluntary"), //
-  MANDATORY(2, "recurringDepositType.mandatory"); //
+    INVALID(0, "recurringDepositType.invalid"), VOLUNTARY(1, "recurringDepositType.voluntary"), //
+    MANDATORY(2, "recurringDepositType.mandatory"); //
 
-  private final Integer value;
-  private final String code;
+    private final Integer value;
+    private final String code;
 
-  RecurringDepositType(final Integer value, final String code) {
-    this.value = value;
-    this.code = code;
-  }
-
-  public Integer getValue() {
-    return this.value;
-  }
-
-  public String getCode() {
-    return this.code;
-  }
-
-  public static RecurringDepositType fromInt(final Integer v) {
-    if (v == null) {
-      return INVALID;
+    RecurringDepositType(final Integer value, final String code) {
+        this.value = value;
+        this.code = code;
     }
 
-    switch (v) {
-      case 1:
-        return VOLUNTARY;
-      case 2:
-        return MANDATORY;
-      default:
-        return INVALID;
+    public Integer getValue() {
+        return this.value;
     }
-  }
 
-  // TODO: do we really need this?!?
-  public static Object[] integerValues() {
-    return Arrays.stream(values()).filter(value -> !INVALID.equals(value)).map(value -> value.value).toList().toArray();
-  }
+    public String getCode() {
+        return this.code;
+    }
 
-  // TODO: why not just use the enum values... just more boilerplate code here!!
-  public boolean isInvalid() {
-    return this.value.equals(RecurringDepositType.INVALID.value);
-  }
+    public static RecurringDepositType fromInt(final Integer v) {
+        if (v == null) {
+            return INVALID;
+        }
+
+        switch (v) {
+            case 1:
+                return VOLUNTARY;
+            case 2:
+                return MANDATORY;
+            default:
+                return INVALID;
+        }
+    }
+
+    // TODO: do we really need this?!?
+    public static Object[] integerValues() {
+        return Arrays.stream(values()).filter(value -> !INVALID.equals(value)).map(value -> value.value).toList().toArray();
+    }
+
+    // TODO: why not just use the enum values... just more boilerplate code here!!
+    public boolean isInvalid() {
+        return this.value.equals(RecurringDepositType.INVALID.value);
+    }
 }
